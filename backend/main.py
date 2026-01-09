@@ -1,10 +1,11 @@
 from fastapi import FastAPI
 from dotenv import load_dotenv
 
-from routers import health
+from routers import health, auth
 
 load_dotenv()
 
-app = FastAPI(title="My Music Universe API")
+app = FastAPI(title="Tuniverse API")
 
 app.include_router(health.router)
+app.include_router(auth.router)
