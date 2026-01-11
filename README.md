@@ -11,6 +11,8 @@ Tuniverse is a full-stack music analytics and visualization application that tra
 - Secure environment-based configuration
 - Health check endpoint
 - Spotify OAuth login and authorization flow
+- OAuth token exchange with Spotify (access + refresh tokens)
+
 
 ## Tech Stack
 **Backend**
@@ -30,6 +32,8 @@ Tuniverse is a full-stack music analytics and visualization application that tra
 - Spotify OAuth for user authentication
 - Environment variables for secret management
 - OAuth-based authentication with Spotify Accounts service
+- Secure token exchange using Spotify Accounts service
+
 
 ## Setup & Installation
 
