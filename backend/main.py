@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from dotenv import load_dotenv
+from routers import spotify
+
 
 from routers import health, auth
 
@@ -9,3 +11,4 @@ app = FastAPI(title="Tuniverse API")
 
 app.include_router(health.router)
 app.include_router(auth.router)
+app.include_router(spotify.router)

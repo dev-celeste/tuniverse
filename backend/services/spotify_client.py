@@ -24,3 +24,7 @@ class SpotifyClient:
 
         response.raise_for_status()
         return response.json()
+    
+    def get_current_user(self):
+        return self.get("/me")
+

@@ -9,6 +9,8 @@ import requests
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize"
+ACCESS_TOKEN_STORE = {}
+
 
 @router.get("/login")
 def spotify_login():
@@ -51,6 +53,8 @@ def spotify_callback(code: str):
     )
 
     token_data = response.json()
+
+    ACCESS_TOKEN_STORE["access_token"] = token_data.get("access_token")
 
     return {
         "access_token_received": "access_token" in token_data,
