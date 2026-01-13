@@ -27,4 +27,23 @@ class SpotifyClient:
     
     def get_current_user(self):
         return self.get("/me")
+    
+    def get_top_artists(self, time_range: str = "medium_term", limit: int = 10):
+        return self.get(
+            "/me/top/artists",
+            params={
+                "time_range": time_range,
+                "limit": limit,
+            },
+    )
+
+    def get_top_tracks(self, time_range: str = "medium_term", limit: int = 10):
+        return self.get(
+            "/me/top/tracks",
+            params={
+                "time_range": time_range,
+                "limit": limit,
+            },
+        )
+
 
