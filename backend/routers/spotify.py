@@ -78,8 +78,19 @@ def get_music_mood(limit: int = 20):
     spotify_client = SpotifyClient()
 
     # Fetch the user's saved tracks (Liked Songs)
-    saved_tracks_response = spotify_client.get("/me/tracks", params={"limit": limit})
+    # saved_tracks_response = spotify_client.get("/me/tracks", params={"limit": limit})
+    # saved_tracks = saved_tracks_response.get("items", [])
+    saved_tracks_response = spotify_client.get_playlist_tracks("37i9dQZF1DXcBWIGoYBM5M", limit=limit)
     saved_tracks = saved_tracks_response.get("items", [])
+
+    print("Playlist response keys:", saved_tracks_response.keys())
+
+    if saved_tracks:
+        first = saved_tracks[0]["track"]
+        print("First track name:", first["name"])
+        print("First track ID:", first["id"])
+        print("Is local:", first.get("is_local"))
+
 
     # Filter out local or unavailable tracks
     track_ids = [
@@ -106,3 +117,50 @@ def get_music_mood(limit: int = 20):
         }
 
     return transform_audio_features_to_mood(audio_features)
+
+
+
+
+@router.get("/mood-test")
+def test_mood_tracks(batch_size: int = 50):
+    """
+    Test endpoint to check how many saved tracks are restricted vs usable.
+    Fetches `batch_size` saved tracks from the user's library.
+    """
+    access_token = ACCESS_TOKEN_STORE.get("access_token")
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    spotify_client = SpotifyClient()
+
+    # Step 1: Fetch saved tracks
+    saved_tracks_response = spotify_client.get("/me/tracks", params={"limit": batch_size})
+    saved_tracks = saved_tracks_response.get("items", [])
+
+    if not saved_tracks:
+        return {"message": "No saved tracks found in your library."}
+
+    # Step 2: Extract track IDs (ignore local tracks)
+    track_ids = [
+        item["track"]["id"]
+        for item in saved_tracks
+        if item["track"]["id"] and not item["track"].get("is_local")
+    ]
+
+    print("Track IDs fetched:", track_ids)
+
+    # Step 3: Fetch audio features, skipping restricted tracks
+    audio_features_result = spotify_client.get_audio_features(track_ids)
+    usable_tracks = [
+        feature["id"] for feature in audio_features_result.get("audio_features", [])
+        if feature
+    ]
+    restricted_count = len(track_ids) - len(usable_tracks)
+
+    # Step 4: Return summary
+    return {
+        "total_tracks_fetched": len(track_ids),
+        "restricted_tracks_skipped": restricted_count,
+        "usable_tracks_count": len(usable_tracks),
+        "usable_track_ids_sample": usable_tracks[:10],  # sample of first 10 usable tracks
+    }
