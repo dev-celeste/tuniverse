@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from transformers.spotify_transformer import transform_top_artists_to_planets
-from transformers.spotify_transformer import transform_audio_features_to_mood
+from transformers.spotify_transformer import transform_top_artists_to_mood
 
 
 from services.spotify_client import SpotifyClient
@@ -65,58 +65,40 @@ def get_music_galaxy(
     return transform_top_artists_to_planets(raw_artists)
 
 @router.get("/mood")
-def get_music_mood(limit: int = 20):
+def get_music_mood(
+    limit: int = 20,
+    time_range: str = "medium_term",
+):
     """
-    Returns the mood analysis of a user's top saved tracks (Liked Songs).
-    Only uses tracks the user has saved, avoiding restricted tracks.
+    Returns a genre-based mood analysis of the user's music taste.
+    Uses the user's top artists instead of deprecated audio features.
     """
-    access_token = ACCESS_TOKEN_STORE.get("access_token")
 
+    access_token = ACCESS_TOKEN_STORE.get("access_token")
     if not access_token:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
     spotify_client = SpotifyClient()
 
-    # Fetch the user's saved tracks (Liked Songs)
-    # saved_tracks_response = spotify_client.get("/me/tracks", params={"limit": limit})
-    # saved_tracks = saved_tracks_response.get("items", [])
-    saved_tracks_response = spotify_client.get_playlist_tracks("37i9dQZF1DXcBWIGoYBM5M", limit=limit)
-    saved_tracks = saved_tracks_response.get("items", [])
+    # Fetch user's top artists
+    artists_response = spotify_client.get(
+        "/me/top/artists",
+        params={
+            "limit": limit,
+            "time_range": time_range,
+        },
+    )
 
-    print("Playlist response keys:", saved_tracks_response.keys())
+    artists = artists_response.get("items", [])
 
-    if saved_tracks:
-        first = saved_tracks[0]["track"]
-        print("First track name:", first["name"])
-        print("First track ID:", first["id"])
-        print("Is local:", first.get("is_local"))
-
-
-    # Filter out local or unavailable tracks
-    track_ids = [
-        item["track"]["id"]
-        for item in saved_tracks
-        if item["track"]["id"] and not item["track"].get("is_local")
-    ]
-
-    print("Track IDs sent to audio-features:", track_ids)
-
-    if not track_ids:
+    if not artists:
         return {
-            "message": "No eligible tracks found for mood analysis",
-            "reason": "All saved tracks are local or restricted",
+            "message": "No top artists found",
+            "reason": "Spotify returned an empty artist list",
         }
 
-    # Fetch audio features for the eligible tracks
-    audio_features = spotify_client.get_audio_features(track_ids)
+    return transform_top_artists_to_mood(artists)
 
-    if not audio_features.get("audio_features"):
-        return {
-            "message": "No audio features available",
-            "reason": "Tracks may be restricted or unavailable",
-        }
-
-    return transform_audio_features_to_mood(audio_features)
 
 
 
