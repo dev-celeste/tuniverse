@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from transformers.spotify_transformer import transform_top_artists_to_planets
 from transformers.spotify_transformer import transform_top_artists_to_mood
+from transformers.mood_visual_transformer import transform_mood_to_visual_identity
 
 
 from services.spotify_client import SpotifyClient
@@ -96,6 +97,7 @@ def get_music_mood(
             "message": "No top artists found",
             "reason": "Spotify returned an empty artist list",
         }
+
 
     return transform_top_artists_to_mood(artists)
 

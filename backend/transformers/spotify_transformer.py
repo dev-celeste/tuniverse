@@ -116,9 +116,13 @@ def transform_top_artists_to_mood(artists: List[Dict]) -> Dict:
         if total > 0
     }
 
+    visual_identity = transform_mood_to_visual_identity(dominant_mood)
+
     return {
-        "top_genres": genre_counter.most_common(10),
+        "top_genres": top_genres,
         "mood_distribution": mood_distribution,
-        "dominant_mood": mood_counter.most_common(1)[0][0] if mood_counter else None,
+        "dominant_mood": dominant_mood,
+        "visual_identity": visual_identity,
         "total_artists_analyzed": len(artists),
     }
+
