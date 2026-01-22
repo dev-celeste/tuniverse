@@ -1,10 +1,26 @@
-def transform_mood_to_visual_identity(dominant_mood: str) -> dict:
-    """
-    Maps a dominant mood to a visual identity
-    that the frontend can use for styling.
-    """
+from collections import Counter
 
-    MOOD_VISUAL_MAP = {
+GENRE_MOOD_MAP = {
+    "metal": "Aggressive",
+    "metalcore": "Aggressive",
+    "deathcore": "Aggressive",
+    "hard rock": "Aggressive",
+
+    "pop": "Upbeat",
+    "dance": "Upbeat",
+    "edm": "Upbeat",
+
+    "indie": "Reflective",
+    "folk": "Reflective",
+
+    "hip hop": "Confident",
+    "rap": "Confident",
+
+    "ambient": "Calm",
+    "classical": "Calm",
+}
+
+MOOD_VISUAL_IDENTITY = {
         "Aggressive": {
             "primary_color": "#E63946",     # red
             "secondary_color": "#1D3557",   # dark blue
@@ -49,4 +65,34 @@ def transform_mood_to_visual_identity(dominant_mood: str) -> dict:
         },
     }
 
-    return MOOD_VISUAL_MAP.get(dominant_mood, MOOD_VISUAL_MAP["Other"])
+
+def analyze_mood_from_genres(genres: list[str]):
+    mood_counts = Counter()
+
+    for genre in genres:
+        matched = False
+        for key, mood in GENRE_MOOD_MAP.items():
+            if key in genre:
+                mood_counts[mood] += 1
+                matched = True
+                break
+        if not matched:
+            mood_counts["Other"] += 1
+
+    total = sum(mood_counts.values()) or 1
+
+    mood_distribution = {
+        mood: round((count / total) * 100, 2)
+        for mood, count in mood_counts.items()
+    }
+
+    dominant_mood = max(mood_counts, key=mood_counts.get)
+
+    return mood_distribution, dominant_mood
+
+
+def transform_mood_to_visual_identity(dominant_mood: str):
+    return MOOD_VISUAL_IDENTITY.get(
+        dominant_mood,
+        MOOD_VISUAL_IDENTITY["Other"],
+    )

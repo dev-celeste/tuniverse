@@ -1,7 +1,9 @@
 from fastapi import APIRouter, HTTPException
 from transformers.spotify_transformer import transform_top_artists_to_planets
-from transformers.spotify_transformer import transform_top_artists_to_mood
+from transformers.spotify_transformer import extract_genres_from_artists
 from transformers.mood_visual_transformer import transform_mood_to_visual_identity
+from transformers.mood_visual_transformer import analyze_mood_from_genres
+from collections import Counter
 
 
 from services.spotify_client import SpotifyClient
@@ -66,85 +68,35 @@ def get_music_galaxy(
     return transform_top_artists_to_planets(raw_artists)
 
 @router.get("/mood")
-def get_music_mood(
-    limit: int = 20,
-    time_range: str = "medium_term",
-):
-    """
-    Returns a genre-based mood analysis of the user's music taste.
-    Uses the user's top artists instead of deprecated audio features.
-    """
-
-    access_token = ACCESS_TOKEN_STORE.get("access_token")
-    if not access_token:
+def get_music_mood(limit: int = 20):
+    if not ACCESS_TOKEN_STORE.get("access_token"):
         raise HTTPException(status_code=401, detail="Not authenticated")
 
     spotify_client = SpotifyClient()
 
-    # Fetch user's top artists
-    artists_response = spotify_client.get(
-        "/me/top/artists",
-        params={
-            "limit": limit,
-            "time_range": time_range,
-        },
-    )
+    # 1. Fetch top artists
+    top_artists = spotify_client.get_top_artists(limit=limit)
 
-    artists = artists_response.get("items", [])
+    # 2. Extract genres
+    genres = extract_genres_from_artists(top_artists)
 
-    if not artists:
-        return {
-            "message": "No top artists found",
-            "reason": "Spotify returned an empty artist list",
-        }
+    # 3. Analyze mood
+    mood_distribution, dominant_mood = analyze_mood_from_genres(genres)
 
+    # 4. Visual identity
+    visual_identity = transform_mood_to_visual_identity(dominant_mood)
 
-    return transform_top_artists_to_mood(artists)
-
-
-
-
-
-@router.get("/mood-test")
-def test_mood_tracks(batch_size: int = 50):
-    """
-    Test endpoint to check how many saved tracks are restricted vs usable.
-    Fetches `batch_size` saved tracks from the user's library.
-    """
-    access_token = ACCESS_TOKEN_STORE.get("access_token")
-    if not access_token:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-
-    spotify_client = SpotifyClient()
-
-    # Step 1: Fetch saved tracks
-    saved_tracks_response = spotify_client.get("/me/tracks", params={"limit": batch_size})
-    saved_tracks = saved_tracks_response.get("items", [])
-
-    if not saved_tracks:
-        return {"message": "No saved tracks found in your library."}
-
-    # Step 2: Extract track IDs (ignore local tracks)
-    track_ids = [
-        item["track"]["id"]
-        for item in saved_tracks
-        if item["track"]["id"] and not item["track"].get("is_local")
-    ]
-
-    print("Track IDs fetched:", track_ids)
-
-    # Step 3: Fetch audio features, skipping restricted tracks
-    audio_features_result = spotify_client.get_audio_features(track_ids)
-    usable_tracks = [
-        feature["id"] for feature in audio_features_result.get("audio_features", [])
-        if feature
-    ]
-    restricted_count = len(track_ids) - len(usable_tracks)
-
-    # Step 4: Return summary
     return {
-        "total_tracks_fetched": len(track_ids),
-        "restricted_tracks_skipped": restricted_count,
-        "usable_tracks_count": len(usable_tracks),
-        "usable_track_ids_sample": usable_tracks[:10],  # sample of first 10 usable tracks
-    }
+    "meta": {
+        "artists_analyzed": len(top_artists.get("items", [])),
+        "genres_analyzed": len(genres),
+    },
+    "genres": {
+        "top": Counter(genres).most_common(10),
+    },
+    "mood": {
+        "dominant": dominant_mood,
+        "distribution": mood_distribution,
+    },
+    "visual_identity": visual_identity,
+}
