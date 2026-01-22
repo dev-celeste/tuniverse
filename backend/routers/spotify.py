@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException
 from transformers.spotify_transformer import transform_top_artists_to_planets
-from transformers.spotify_transformer import extract_genres_from_artists
 from transformers.mood_visual_transformer import transform_mood_to_visual_identity
 from transformers.mood_visual_transformer import analyze_mood_from_genres
 from collections import Counter
@@ -69,34 +68,28 @@ def get_music_galaxy(
 
 @router.get("/mood")
 def get_music_mood(limit: int = 20):
-    if not ACCESS_TOKEN_STORE.get("access_token"):
+    access_token = ACCESS_TOKEN_STORE.get("access_token")
+    if not access_token:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
     spotify_client = SpotifyClient()
-
-    # 1. Fetch top artists
     top_artists = spotify_client.get_top_artists(limit=limit)
 
-    # 2. Extract genres
-    genres = extract_genres_from_artists(top_artists)
+    # Extract all genres
+    genres = []
+    for artist in top_artists.get("items", []):
+        genres.extend(artist.get("genres", []))
 
-    # 3. Analyze mood
+    # Run transformer
     mood_distribution, dominant_mood = analyze_mood_from_genres(genres)
-
-    # 4. Visual identity
     visual_identity = transform_mood_to_visual_identity(dominant_mood)
 
+    # Build response
     return {
-    "meta": {
-        "artists_analyzed": len(top_artists.get("items", [])),
-        "genres_analyzed": len(genres),
-    },
-    "genres": {
-        "top": Counter(genres).most_common(10),
-    },
-    "mood": {
-        "dominant": dominant_mood,
-        "distribution": mood_distribution,
-    },
-    "visual_identity": visual_identity,
-}
+        "top_genres": Counter(genres).most_common(10),
+        "mood_distribution": mood_distribution,
+        "dominant_mood": dominant_mood,
+        "visual_identity": visual_identity,
+        "total_artists_analyzed": len(top_artists.get("items", [])),
+    }
+
