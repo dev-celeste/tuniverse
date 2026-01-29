@@ -34,6 +34,17 @@ Tuniverse is a full-stack music analytics and visualization application that tra
 - OAuth-based authentication with Spotify Accounts service
 - Secure token exchange using Spotify Accounts service
 
+## Data Modeling & API Contracts
+The backend uses explicit response models to define and guarantee the shape of data returned by API endpoints.
+
+These models:
+- Serve as a stable contract between backend and frontend
+- Enable automatic FastAPI documentation and validation
+- Make the system easier to evolve (including future ML-based analysis)
+- Reduce frontend guesswork and defensive coding
+
+Response models live in the `backend/models` directory and are introduced incrementally as endpoints stabilize.
+
 
 ## Setup & Installation
 
@@ -44,3 +55,15 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 uvicorn main:app --reload
+```
+
+## Roadmap
+Phase 1 – Core Experience
+- Complete backend API and data models
+- Build interactive, space-themed frontend
+- Deploy and launch Tuniverse
+
+Phase 2 – Intelligence Layer (Stretch Goal)
+- Introduce machine learning for mood detection and pattern analysis
+- Replace or augment rule-based transformers with learned models
+- Preserve existing API contracts while enhancing insights
