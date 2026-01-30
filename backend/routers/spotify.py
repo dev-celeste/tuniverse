@@ -6,6 +6,7 @@ from routers.auth import ACCESS_TOKEN_STORE
 
 from transformers.spotify_transformer import transform_top_artists_to_planets
 from transformers.mood_visual_transformer import analyze_and_visualize_mood
+from models.spotify_models import MoodResponse
 
 
 router = APIRouter(
@@ -65,7 +66,7 @@ def get_music_galaxy(
     return transform_top_artists_to_planets(raw_artists)
 
 
-@router.get("/mood")
+@router.get("/mood", response_model=MoodResponse)
 def get_music_mood(limit: int = 20):
     """
     Analyzes the user's top artists and derives:
