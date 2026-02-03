@@ -34,6 +34,13 @@ Tuniverse is a full-stack music analytics and visualization application that tra
 - OAuth-based authentication with Spotify Accounts service
 - Secure token exchange using Spotify Accounts service
 
+Typed API Responses (Pydantic Models)
+- Backend responses are defined using Pydantic models
+- Enables automatic OpenAPI schema generation
+- Improves frontend-backend contracts
+- Lays groundwork for ML-ready data pipelines
+
+
 ## Data Modeling & API Contracts
 The backend uses explicit response models to define and guarantee the shape of data returned by API endpoints.
 
