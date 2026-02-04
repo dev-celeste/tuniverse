@@ -40,6 +40,12 @@ Typed API Responses (Pydantic Models)
 - Improves frontend-backend contracts
 - Lays groundwork for ML-ready data pipelines
 
+Response Models
+- API responses are enforced using Pydantic models
+- Ensures consistent backend → frontend contracts
+- Enables automatic OpenAPI documentation
+- Prepares data layer for future ML integration
+
 
 ## Data Modeling & API Contracts
 The backend uses explicit response models to define and guarantee the shape of data returned by API endpoints.

@@ -90,10 +90,11 @@ def get_music_mood(limit: int = 20):
     # Run unified mood + visual analysis
     mood_result = analyze_and_visualize_mood(genres)
 
-    return {
-        "top_genres": Counter(genres).most_common(10) if genres else [],
-        "mood_distribution": mood_result["mood_distribution"],
-        "dominant_mood": mood_result["dominant_mood"],
-        "visual_identity": mood_result["visual_identity"],
-        "total_artists_analyzed": len(top_artists.get("items", [])) if top_artists else 0,
-    }
+    return MoodResponse(
+        top_genres=Counter(genres).most_common(10) if genres else [],
+        mood_distribution=mood_distribution or {},
+        dominant_mood=dominant_mood or "Other",
+        visual_identity=visual_identity,
+        total_artists_analyzed=len(top_artists.get("items", [])) if top_artists else 0,
+    )
+
