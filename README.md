@@ -58,6 +58,13 @@ These models:
 
 Response models live in the `backend/models` directory and are introduced incrementally as endpoints stabilize.
 
+API Design Decisions
+- Responses are normalized for frontend consumption
+- Arrays of objects are preferred over tuples
+- Pydantic models enforce stable response contracts
+- Backend minimizes transformation logic required by frontend
+
+
 
 ## Setup & Installation
 
