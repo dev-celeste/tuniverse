@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from services.spotify_client import SpotifyClient
-from services.spotify_service import build_mood_response, build_track_insights
+from services.spotify_service import build_mood_response, build_track_insights, build_galaxy_response
 from routers.auth import ACCESS_TOKEN_STORE
 from transformers.spotify_transformer import transform_top_artists_to_planets
 from models.spotify_models import MoodResponse
@@ -60,10 +60,8 @@ def get_music_galaxy(
     if not access_token:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    spotify_client = SpotifyClient(access_token=access_token)
-    raw_artists = spotify_client.get_top_artists(time_range, limit)
-
-    return transform_top_artists_to_planets(raw_artists)
+    # Use the new service function
+    return build_galaxy_response(access_token=access_token, time_range=time_range, limit=limit)
 
 
 

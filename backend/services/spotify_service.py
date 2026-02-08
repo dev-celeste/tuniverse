@@ -5,6 +5,7 @@ from transformers.mood_visual_transformer import (
     transform_mood_to_visual_identity,
 )
 from models.spotify_models import MoodResponse
+from transformers.spotify_transformer import transform_top_artists_to_planets
 
 
 def build_mood_response(access_token: str, limit: int = 20) -> MoodResponse:
@@ -55,3 +56,12 @@ def build_track_insights(access_token: str, limit: int = 20):
         })
 
     return {"tracks": insights, "total_tracks": len(insights)}
+
+def build_galaxy_response(access_token: str, time_range: str = "medium_term", limit: int = 10):
+    """
+    Fetches user's top artists and transforms them into a visual 'galaxy' representation.
+    """
+    spotify_client = SpotifyClient(access_token=access_token)
+    top_artists = spotify_client.get_top_artists(time_range=time_range, limit=limit)
+
+    return transform_top_artists_to_planets(top_artists)
