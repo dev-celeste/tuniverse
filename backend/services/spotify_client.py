@@ -8,14 +8,16 @@ SPOTIFY_API_BASE_URL = "https://api.spotify.com/v1"
 class SpotifyClient:
     BASE_URL = SPOTIFY_API_BASE_URL
 
-    def __init__(self):
+    def __init__(self, access_token: Optional[str] = None):
         """
-        Spotify client that always uses the current user's access token.
+        Spotify client that can either:
+        1) Use an explicitly passed access_token (recommended for services + ML later)
+        2) Fall back to the global ACCESS_TOKEN_STORE
         """
-        pass  # Token is fetched dynamically per request
+        self.access_token = access_token
 
     def _get_headers(self) -> Dict[str, str]:
-        access_token = ACCESS_TOKEN_STORE.get("access_token")
+        access_token = self.access_token or ACCESS_TOKEN_STORE.get("access_token")
 
         if not access_token:
             raise Exception("No Spotify access token found. Please log in first.")

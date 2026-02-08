@@ -8,7 +8,7 @@ from models.spotify_models import MoodResponse
 
 
 def build_mood_response(access_token: str, limit: int = 20) -> MoodResponse:
-    spotify_client = SpotifyClient()
+    spotify_client = SpotifyClient(access_token=access_token)
     top_artists = spotify_client.get_top_artists(limit=limit)
 
     # Collect genres from top artists

@@ -1,13 +1,12 @@
 from fastapi import APIRouter, HTTPException
-from collections import Counter
 
 from services.spotify_client import SpotifyClient
+from services.spotify_service import build_mood_response
 from routers.auth import ACCESS_TOKEN_STORE
 
 from transformers.spotify_transformer import transform_top_artists_to_planets
-from transformers.mood_visual_transformer import analyze_mood_from_genres, transform_mood_to_visual_identity
 from models.spotify_models import MoodResponse
-from services.spotify_service import build_mood_response
+
 
 
 
@@ -23,7 +22,7 @@ def get_current_user():
     if not access_token:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    spotify_client = SpotifyClient()
+    spotify_client = SpotifyClient(access_token=access_token)
     return spotify_client.get_current_user()
 
 
@@ -36,7 +35,7 @@ def get_top_artists(
     if not access_token:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    spotify_client = SpotifyClient()
+    spotify_client = SpotifyClient(access_token=access_token)
     return spotify_client.get_top_artists(time_range, limit)
 
 
@@ -49,7 +48,7 @@ def get_top_tracks(
     if not access_token:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    spotify_client = SpotifyClient()
+    spotify_client = SpotifyClient(access_token=access_token)
     return spotify_client.get_top_tracks(time_range, limit)
 
 
@@ -62,7 +61,7 @@ def get_music_galaxy(
     if not access_token:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    spotify_client = SpotifyClient()
+    spotify_client = SpotifyClient(access_token=access_token)
     raw_artists = spotify_client.get_top_artists(time_range, limit)
 
     return transform_top_artists_to_planets(raw_artists)
