@@ -136,3 +136,25 @@ class SpotifyClient:
                     print(f"Skipping restricted or unavailable track {track_id}")
 
             return {"audio_features": features}
+
+
+    def build_track_insights(access_token: str, limit: int = 20):
+        spotify_client = SpotifyClient(access_token=access_token)
+        top_tracks = spotify_client.get_top_tracks(limit=limit)
+
+        insights = []
+        for track in top_tracks.get("items", []):
+            insights.append({
+                "id": track.get("id"),
+                "name": track.get("name"),
+                "album": {
+                    "name": track.get("album", {}).get("name"),
+                    "release_date": track.get("album", {}).get("release_date"),
+                    "image": track.get("album", {}).get("images", [{}])[0].get("url")
+                },
+                "artists": [artist.get("name") for artist in track.get("artists", [])],
+                "popularity": track.get("popularity"),
+                "spotify_url": track.get("external_urls", {}).get("spotify"),
+            })
+
+        return {"tracks": insights, "total_tracks": len(insights)}
