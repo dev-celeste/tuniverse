@@ -87,3 +87,5 @@ Phase 2 – Intelligence Layer (Stretch Goal)
 - Introduce machine learning for mood detection and pattern analysis
 - Replace or augment rule-based transformers with learned models
 - Preserve existing API contracts while enhancing insights
+
+Spotify Audio Features endpoints are deprecated for new apps (403). Tuniverse uses track metadata + genres instead.
