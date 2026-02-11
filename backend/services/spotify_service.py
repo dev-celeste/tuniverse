@@ -6,6 +6,7 @@ from transformers.mood_visual_transformer import (
 )
 from models.spotify_models import MoodResponse
 from transformers.spotify_transformer import transform_top_artists_to_planets
+from typing import Dict, Any
 
 
 def build_mood_response(access_token: str, limit: int = 20) -> MoodResponse:
@@ -65,3 +66,21 @@ def build_galaxy_response(access_token: str, time_range: str = "medium_term", li
     top_artists = spotify_client.get_top_artists(time_range=time_range, limit=limit)
 
     return transform_top_artists_to_planets(top_artists)
+
+
+def build_top_artists_response(
+    access_token: str,
+    time_range: str = "medium_term",
+    limit: int = 10,
+) -> Dict[str, Any]:
+    spotify_client = SpotifyClient(access_token=access_token)
+    return spotify_client.get_top_artists(time_range=time_range, limit=limit)
+
+
+def build_top_tracks_response(
+    access_token: str,
+    time_range: str = "medium_term",
+    limit: int = 10,
+) -> Dict[str, Any]:
+    spotify_client = SpotifyClient(access_token=access_token)
+    return spotify_client.get_top_tracks(time_range=time_range, limit=limit)
