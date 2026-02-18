@@ -1,10 +1,9 @@
 from fastapi import FastAPI
 from dotenv import load_dotenv
-from routers import spotify
+from routers import spotify, health, auth
 from fastapi.middleware.cors import CORSMiddleware
 
 
-from routers import health, auth
 
 load_dotenv()
 
@@ -26,9 +25,6 @@ def root():
 def api_root():
     return {"message": "API v1 is liveee"}
 
-@app.get("/api/v1/health")
-def health_check():
-    return {"status": "ok"}
 
 app.include_router(health.router, prefix="/api/v1")
 app.include_router(auth.router, prefix="/api/v1")
