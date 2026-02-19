@@ -6,13 +6,10 @@ from routers.auth import ACCESS_TOKEN_STORE
 from models.spotify_models import MoodResponse
 
 
-
-
 router = APIRouter(
     prefix="/spotify",
     tags=["Spotify"],
 )
-
 
 @router.get("/me")
 def get_current_user():
@@ -40,7 +37,6 @@ def get_top_artists(
     )
 
 
-
 @router.get("/top-tracks")
 def get_top_tracks(
     time_range: str = "medium_term",
@@ -57,7 +53,6 @@ def get_top_tracks(
     )
 
 
-
 @router.get("/galaxy")
 def get_music_galaxy(
     time_range: str = "medium_term",
@@ -69,7 +64,6 @@ def get_music_galaxy(
 
     # Use the new service function
     return build_galaxy_response(access_token=access_token, time_range=time_range, limit=limit)
-
 
 
 @router.get("/mood", response_model=MoodResponse)
