@@ -98,3 +98,40 @@ def spotify_callback(code: str):
         "expires_in": token_data.get("expires_in"),
         "scopes": token_data.get("scope"),
     }
+
+# unfinished refresh token logic ==>
+
+def refresh_access_token():
+    client_id = os.getenv("SPOTIFY_CLIENT_ID")
+    client_secret = os.getenv("SPOTIFY_CLIENT_SECRET")
+
+    refresh_token = ACCESS_TOKEN_STORE.get("refresh_token")
+    if not refresh_token:
+        return None
+
+    auth_header = base64.b64encode(
+        f"{client_id}:{client_secret}".encode()
+    ).decode()
+
+    headers = {
+        "Authorization": f"Basic {auth_header}",
+        "Content-Type": "application/x-www-form-urlencoded",
+    }
+
+    data = {
+        "grant_type": "refresh_token",
+        "refresh_token": refresh_token,
+    }
+
+    response = requests.post(
+        SPOTIFY_TOKEN_URL,
+        headers=headers,
+        data=data,
+    )
+
+    if response.status_code != 200:
+        return None
+
+    new_token = response.json().get("access_token")
+    ACCESS_TOKEN_STORE["access_token"] = new_token
+    return new_token
