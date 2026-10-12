@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, Optional
 
 import requests
@@ -5,6 +6,8 @@ import requests
 from core.exceptions import NotAuthenticatedError, SpotifyAPIError, SpotifyAuthError
 from core.sessions import SessionStore, TokenSet
 from services import spotify_auth
+
+logger = logging.getLogger(__name__)
 
 SPOTIFY_API_BASE_URL = "https://api.spotify.com/v1"
 REQUEST_TIMEOUT_SECONDS = 10
@@ -92,9 +95,7 @@ class SpotifyClient:
             raise NotAuthenticatedError("Spotify rejected the session. Please log in again.")
 
         if response.status_code >= 400:
-            # Helpful debug output during development
-            print(f"Spotify API error {response.status_code} for {url}")
-            print("Response body:", response.text)
+            logger.warning("Spotify API error %s for %s: %s", response.status_code, url, response.text)
 
             status = response.status_code if response.status_code in PASSTHROUGH_STATUS_CODES else 502
             raise SpotifyAPIError(status, f"Spotify API error {response.status_code} for {endpoint}")

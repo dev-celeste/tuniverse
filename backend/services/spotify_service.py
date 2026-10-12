@@ -28,8 +28,8 @@ def build_current_user_response(client: SpotifyClient) -> SpotifyUser:
     return transform_user(client.get_current_user())
 
 
-def build_mood_response(client: SpotifyClient, limit: int = 20) -> MoodResponse:
-    top_artists = client.get_top_artists(limit=limit)
+def build_mood_response(client: SpotifyClient, time_range: str = "medium_term", limit: int = 20) -> MoodResponse:
+    top_artists = client.get_top_artists(time_range=time_range, limit=limit)
 
     # Collect genres from top artists
     genres = extract_genres_from_artists(top_artists)
@@ -45,20 +45,21 @@ def build_mood_response(client: SpotifyClient, limit: int = 20) -> MoodResponse:
     top_genres = [{"genre": genre, "count": count} for genre, count in raw_top_genres]
 
     return MoodResponse(
+        time_range=time_range,
         top_genres=top_genres,
-        mood_distribution=mood_distribution or {},
-        dominant_mood=dominant_mood or "Other",
+        mood_distribution=mood_distribution,
+        dominant_mood=dominant_mood,
         visual_identity=visual_identity,
         total_artists_analyzed=len(top_artists.get("items", [])),
         artists_with_genres=sum(1 for artist in top_artists.get("items", []) if artist.get("genres")),
     )
 
 
-def build_track_insights(client: SpotifyClient, limit: int = 20) -> TrackInsightsResponse:
-    top_tracks = client.get_top_tracks(limit=limit)
+def build_track_insights(client: SpotifyClient, time_range: str = "medium_term", limit: int = 20) -> TrackInsightsResponse:
+    top_tracks = client.get_top_tracks(time_range=time_range, limit=limit)
     tracks = [transform_track(track) for track in top_tracks.get("items", [])]
 
-    return TrackInsightsResponse(tracks=tracks, total_tracks=len(tracks))
+    return TrackInsightsResponse(time_range=time_range, tracks=tracks, total_tracks=len(tracks))
 
 def build_galaxy_response(client: SpotifyClient, time_range: str = "medium_term", limit: int = 10) -> GalaxyResponse:
     """

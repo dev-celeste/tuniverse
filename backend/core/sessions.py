@@ -13,11 +13,6 @@ SESSION_TTL_SECONDS = 60 * 60 * 24 * 30  # sliding: reset whenever tokens are sa
 REDIS_KEY_PREFIX = "tuniverse:session:"
 
 
-def cookie_secure() -> bool:
-    """Secure cookies need HTTPS — off for local http://127.0.0.1, on in production."""
-    return os.getenv("COOKIE_SECURE", "false").lower() == "true"
-
-
 @dataclass
 class TokenSet:
     access_token: str

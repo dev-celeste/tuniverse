@@ -1,3 +1,4 @@
+import re
 from collections import Counter
 
 GENRE_MOOD_MAP = {
@@ -5,6 +6,12 @@ GENRE_MOOD_MAP = {
     "metalcore": ("Aggressive", 1.5),
     "deathcore": ("Aggressive", 1.5),
     "hard rock": ("Aggressive", 1.1),
+
+    "punk": ("Intense", 1.1),
+    "hardcore": ("Intense", 1.3),
+    "industrial": ("Intense", 1.2),
+    "dubstep": ("Intense", 1.3),
+    "drum and bass": ("Intense", 1.2),
 
     "pop": ("Upbeat", 1.0),
     "dance": ("Upbeat", 1.2),
@@ -15,10 +22,19 @@ GENRE_MOOD_MAP = {
 
     "hip hop": ("Confident", 1.2),
     "rap": ("Confident", 1.2),
+    "trap": ("Confident", 1.2),
 
     "ambient": ("Calm", 1.3),
     "classical": ("Calm", 1.4),
 }
+
+# Longest keys first, so "metalcore" wins over "metal" and "hard rock" over "rock"
+_GENRE_PATTERNS = [
+    (re.compile(rf"\b{re.escape(key)}\b"), mood, weight)
+    for key, (mood, weight) in sorted(GENRE_MOOD_MAP.items(), key=lambda item: -len(item[0]))
+]
+
+UNMATCHED_GENRE_WEIGHT = 0.5
 
 
 MOOD_VISUAL_IDENTITY = {
@@ -57,6 +73,13 @@ MOOD_VISUAL_IDENTITY = {
             "planet_glow_intensity": 0.5,
             "background_style": "deepSpace",
         },
+        "Calm": {
+            "primary_color": "#80FFDB",     # aqua
+            "secondary_color": "#0B1D3A",
+            "accent_color": "#B8F2E6",
+            "planet_glow_intensity": 0.45,
+            "background_style": "aurora",
+        },
         "Other": {
             "primary_color": "#ADB5BD",     # gray
             "secondary_color": "#343A40",
@@ -70,20 +93,29 @@ DEFAULT_VISUAL_IDENTITY = MOOD_VISUAL_IDENTITY["Other"]
 
 
 
+def mood_for_genre(genre: str) -> tuple[str, float]:
+    """
+    Each genre maps to exactly one mood: its most specific (longest) whole-word match,
+    e.g. "metalcore" → metalcore (not metal + metalcore), "k-pop" → pop.
+    """
+    for pattern, mood, weight in _GENRE_PATTERNS:
+        if pattern.search(genre):
+            return mood, weight
+    return "Other", UNMATCHED_GENRE_WEIGHT
+
+
 def analyze_mood_from_genres(genres: list[str]):
     mood_scores = Counter()
 
     for genre in genres:
-        matched = False
-        for key, (mood, weight) in GENRE_MOOD_MAP.items():
-            if key in genre:
-                mood_scores[mood] += weight
-                matched = True
+        mood, weight = mood_for_genre(genre)
+        mood_scores[mood] += weight
 
-        if not matched:
-            mood_scores["Other"] += 0.5
+    # No genre data at all (new account, or artists Spotify hasn't tagged)
+    if not mood_scores:
+        return {}, "Other"
 
-    total = sum(mood_scores.values()) or 1
+    total = sum(mood_scores.values())
 
     mood_distribution = {
         mood: round((score / total) * 100, 2)
@@ -102,17 +134,3 @@ def transform_mood_to_visual_identity(dominant_mood: str):
         DEFAULT_VISUAL_IDENTITY,
     )
 
-
-def analyze_and_visualize_mood(genres: list[str]):
-    """
-    Single entry point for mood analysis.
-    This is where ML can later replace heuristic logic.
-    """
-    mood_distribution, dominant_mood = analyze_mood_from_genres(genres)
-    visual_identity = transform_mood_to_visual_identity(dominant_mood)
-
-    return {
-        "mood_distribution": mood_distribution,
-        "dominant_mood": dominant_mood,
-        "visual_identity": visual_identity,
-    }

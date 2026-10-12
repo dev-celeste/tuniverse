@@ -67,15 +67,17 @@ def get_music_galaxy(
 
 @router.get("/mood", response_model=MoodResponse)
 def get_music_mood(
+    time_range: TimeRange = "medium_term",
     limit: int = Query(20, ge=1, le=50),
     client: SpotifyClient = Depends(get_spotify_client),
 ):
-    return build_mood_response(client, limit=limit)
+    return build_mood_response(client, time_range=time_range, limit=limit)
 
 
 @router.get("/track-insights", response_model=TrackInsightsResponse)
 def get_track_insights(
+    time_range: TimeRange = "medium_term",
     limit: int = Query(20, ge=1, le=50),
     client: SpotifyClient = Depends(get_spotify_client),
 ):
-    return build_track_insights(client, limit=limit)
+    return build_track_insights(client, time_range=time_range, limit=limit)

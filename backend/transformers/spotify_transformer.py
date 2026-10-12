@@ -1,5 +1,9 @@
 from typing import Optional
 
+from transformers.mood_visual_transformer import (
+    analyze_mood_from_genres,
+    transform_mood_to_visual_identity,
+)
 from models.spotify_models import (
     AlbumSummary,
     Artist,
@@ -82,6 +86,7 @@ def transform_top_artists_to_planets(
     planets_by_artist_id = {}
 
     for index, artist in enumerate(top_artists.get("items", [])):
+        _, mood = analyze_mood_from_genres(artist.get("genres", []))
         planet = Planet(
             id=artist["id"],
             name=artist["name"],
@@ -89,6 +94,8 @@ def transform_top_artists_to_planets(
             orbit_radius=100 + (index * 40),
             planet_size=max(20, 100 - (index * 5)),
             glow_intensity=_glow_from_popularity(artist.get("popularity")),
+            mood=mood,
+            color=transform_mood_to_visual_identity(mood)["primary_color"],
             image_url=_first_image_url(artist.get("images")),
             genres=artist.get("genres", []),
             popularity=artist.get("popularity"),

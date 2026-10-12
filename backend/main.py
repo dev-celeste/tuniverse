@@ -1,18 +1,26 @@
+import logging
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 from routers import spotify, health, auth
 from fastapi.middleware.cors import CORSMiddleware
+from core.config import cors_origins
 from core.exceptions import NotAuthenticatedError, SpotifyAPIError, SpotifyAuthError, SpotifyConfigError
 
 
 
 load_dotenv()
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+)
+
 app = FastAPI(title="Tuniverse API")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

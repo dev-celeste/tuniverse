@@ -1,10 +1,13 @@
 import base64
+import logging
 import os
 import urllib.parse
 
 import requests
 
 from core.exceptions import SpotifyAuthError, SpotifyConfigError
+
+logger = logging.getLogger(__name__)
 
 SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize"
 SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token"
@@ -81,7 +84,7 @@ def _request_token(data: dict) -> dict:
         raise SpotifyAuthError(f"Could not reach Spotify accounts service: {e}") from e
 
     if response.status_code != 200:
-        print(f"Spotify token error ({data['grant_type']}):", response.text)
+        logger.warning("Spotify token error (%s): %s", data["grant_type"], response.text)
         raise SpotifyAuthError(f"Spotify token request failed ({data['grant_type']})")
 
     return response.json()

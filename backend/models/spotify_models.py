@@ -64,6 +64,7 @@ class TopTracksResponse(BaseModel):
 
 
 class TrackInsightsResponse(BaseModel):
+    time_range: TimeRange
     total_tracks: int
     tracks: list[Track]
 
@@ -91,6 +92,8 @@ class Planet(BaseModel):
     orbit_radius: int
     planet_size: int
     glow_intensity: float  # 0–1, from artist popularity
+    mood: str  # genre family of this artist, e.g. "Aggressive"; "Other" when Spotify has no genres
+    color: str  # hex primary color for that mood
     image_url: Optional[str] = None
     genres: list[str]
     popularity: Optional[int] = None
@@ -121,6 +124,7 @@ class GenreCount(BaseModel):
 
 
 class MoodResponse(BaseModel):
+    time_range: TimeRange
     top_genres: list[GenreCount]
     mood_distribution: dict[str, float]
     dominant_mood: str

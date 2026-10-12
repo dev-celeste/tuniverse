@@ -21,6 +21,8 @@ def raw_track(track_id, name, artist_ids, popularity=50, images=None):
 
 
 class FakeSpotifyClient:
+    time_ranges_requested = []
+
     def get_current_user(self):
         return {
             "id": "me",
@@ -32,6 +34,7 @@ class FakeSpotifyClient:
         }
 
     def get_top_artists(self, time_range="medium_term", limit=10):
+        self.time_ranges_requested.append(time_range)
         return {
             "items": [
                 {
@@ -45,6 +48,7 @@ class FakeSpotifyClient:
         }
 
     def get_top_tracks(self, time_range="medium_term", limit=10):
+        self.time_ranges_requested.append(time_range)
         return {
             "items": [
                 raw_track("t1", "Song One", ["a1"]),
@@ -60,8 +64,14 @@ class LoggedOutClient:
         raise NotAuthenticatedError("No Spotify session found. Please log in first.")
 
 
+class NoGenresClient:
+    def get_top_artists(self, time_range="medium_term", limit=10):
+        return {"items": [{"id": "a1", "name": "Unknown", "images": [], "genres": []}]}
+
+
 @pytest.fixture
 def api():
+    FakeSpotifyClient.time_ranges_requested = []
     app.dependency_overrides[get_spotify_client] = FakeSpotifyClient
     yield TestClient(app)
     app.dependency_overrides.clear()
@@ -89,6 +99,9 @@ def test_galaxy_maps_artists_to_planets(api):
     assert sleep_token["glow_intensity"] == 0.85
     assert dua["image_url"] is None
     assert dua["glow_intensity"] == 0.5  # no popularity → default
+    assert (sleep_token["mood"], sleep_token["color"]) == ("Aggressive", "#E63946")
+    assert dua["mood"] == "Upbeat"
+    assert (new_artist["mood"], new_artist["color"]) == ("Other", "#ADB5BD")
 
 
 def test_galaxy_attaches_tracks_as_moons(api):
@@ -151,3 +164,25 @@ def test_not_authenticated_returns_401():
         app.dependency_overrides.clear()
 
     assert response.status_code == 401
+
+
+@pytest.mark.parametrize("path", ["/galaxy", "/mood", "/track-insights", "/top-artists", "/top-tracks"])
+def test_time_range_is_passed_to_spotify(api, path):
+    body = api.get(f"/api/v1/spotify{path}?time_range=long_term").json()
+
+    assert body["time_range"] == "long_term"
+    assert set(FakeSpotifyClient.time_ranges_requested) == {"long_term"}
+
+
+def test_mood_without_any_genres_falls_back_to_other():
+    app.dependency_overrides[get_spotify_client] = NoGenresClient
+    try:
+        response = TestClient(app).get("/api/v1/spotify/mood")
+    finally:
+        app.dependency_overrides.clear()
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["dominant_mood"] == "Other"
+    assert body["mood_distribution"] == {}
+    assert body["artists_with_genres"] == 0
