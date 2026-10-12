@@ -50,6 +50,7 @@ def build_mood_response(client: SpotifyClient, limit: int = 20) -> MoodResponse:
         dominant_mood=dominant_mood or "Other",
         visual_identity=visual_identity,
         total_artists_analyzed=len(top_artists.get("items", [])),
+        artists_with_genres=sum(1 for artist in top_artists.get("items", []) if artist.get("genres")),
     )
 
 

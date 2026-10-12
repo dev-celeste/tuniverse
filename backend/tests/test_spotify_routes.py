@@ -40,6 +40,7 @@ class FakeSpotifyClient:
                     "followers": {"total": 1000}, "uri": "spotify:artist:a1",
                 },
                 {"id": "a2", "name": "Dua Lipa", "images": [], "genres": ["dance pop"]},
+                {"id": "a3", "name": "New Artist", "images": [], "genres": []},
             ]
         }
 
@@ -82,8 +83,8 @@ def test_galaxy_maps_artists_to_planets(api):
     body = api.get("/api/v1/spotify/galaxy?time_range=short_term").json()
 
     assert body["time_range"] == "short_term"
-    assert body["total_planets"] == 2
-    sleep_token, dua = body["planets"]
+    assert body["total_planets"] == 3
+    sleep_token, dua, new_artist = body["planets"]
     assert sleep_token["name"] == "Sleep Token"
     assert sleep_token["glow_intensity"] == 0.85
     assert dua["image_url"] is None
@@ -91,12 +92,13 @@ def test_galaxy_maps_artists_to_planets(api):
 
 
 def test_galaxy_attaches_tracks_as_moons(api):
-    sleep_token, dua = api.get("/api/v1/spotify/galaxy").json()["planets"]
+    sleep_token, dua, new_artist = api.get("/api/v1/spotify/galaxy").json()["planets"]
 
     assert [m["id"] for m in sleep_token["moons"]] == ["t1", "t4"]
     assert sleep_token["moons"][1]["rank"] == 4
     assert sleep_token["moons"][1]["album_image_url"] == "cover"
     assert [m["id"] for m in dua["moons"]] == ["t2"]
+    assert new_artist["moons"] == []
 
 
 def test_top_tracks_strips_raw_spotify_fields(api):
@@ -122,7 +124,8 @@ def test_mood_returns_dominant_mood(api):
     body = api.get("/api/v1/spotify/mood").json()
 
     assert body["dominant_mood"] == "Aggressive"
-    assert body["total_artists_analyzed"] == 2
+    assert body["total_artists_analyzed"] == 3
+    assert body["artists_with_genres"] == 2
     assert set(body["visual_identity"]) == {
         "primary_color", "secondary_color", "accent_color", "planet_glow_intensity", "background_style",
     }

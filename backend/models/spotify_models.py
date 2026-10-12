@@ -126,3 +126,4 @@ class MoodResponse(BaseModel):
     dominant_mood: str
     visual_identity: VisualIdentity
     total_artists_analyzed: int
+    artists_with_genres: int  # only these contribute to the mood
