@@ -121,15 +121,6 @@ class SpotifyClient:
             params={"time_range": time_range, "limit": limit},
         )
 
-    def get_saved_tracks(self, limit: int = 20):
-        """
-        User's Liked Songs
-        """
-        return self.get(
-            "/me/tracks",
-            params={"limit": limit},
-        )
-
     # -------------------------
     # Playlist endpoints
     # -------------------------

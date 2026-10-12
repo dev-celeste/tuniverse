@@ -14,7 +14,7 @@ TOKEN_RESPONSE = {
     "refresh_token": "refresh-1",
     "token_type": "Bearer",
     "expires_in": 3600,
-    "scope": "user-top-read user-library-read",
+    "scope": "user-top-read",
 }
 
 

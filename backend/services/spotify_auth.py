@@ -13,10 +13,10 @@ SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize"
 SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token"
 REQUEST_TIMEOUT_SECONDS = 10
 
-# ✅ Explicit scope list (Spotify is picky)
+# ✅ Explicit scope list (Spotify is picky). Ask only for what an endpoint uses —
+# it's what users see on the consent screen.
 SCOPES = [
     "user-top-read",
-    "user-library-read",
 ]
 
 
