@@ -1,7 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 from routers import spotify, health, auth
 from fastapi.middleware.cors import CORSMiddleware
+from core.exceptions import NotAuthenticatedError, SpotifyAPIError, SpotifyAuthError, SpotifyConfigError
 
 
 
@@ -15,6 +17,27 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# Services raise domain errors; this is the one place they become HTTP responses
+@app.exception_handler(NotAuthenticatedError)
+def handle_not_authenticated(request: Request, exc: NotAuthenticatedError):
+    return JSONResponse(status_code=401, content={"detail": str(exc)})
+
+
+@app.exception_handler(SpotifyAuthError)
+def handle_spotify_auth_error(request: Request, exc: SpotifyAuthError):
+    return JSONResponse(status_code=400, content={"detail": str(exc)})
+
+
+@app.exception_handler(SpotifyConfigError)
+def handle_spotify_config_error(request: Request, exc: SpotifyConfigError):
+    return JSONResponse(status_code=500, content={"detail": str(exc)})
+
+
+@app.exception_handler(SpotifyAPIError)
+def handle_spotify_api_error(request: Request, exc: SpotifyAPIError):
+    return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
 
 
 @app.get("/")

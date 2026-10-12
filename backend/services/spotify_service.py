@@ -5,20 +5,20 @@ from transformers.mood_visual_transformer import (
     transform_mood_to_visual_identity,
 )
 from models.spotify_models import MoodResponse
-from transformers.spotify_transformer import transform_top_artists_to_planets
+from transformers.spotify_transformer import (
+    extract_genres_from_artists,
+    transform_top_artists_to_planets,
+)
 from typing import Dict, Any
 
 
-def build_mood_response(access_token: str, limit: int = 20) -> MoodResponse:
-    spotify_client = SpotifyClient(access_token=access_token)
-    top_artists = spotify_client.get_top_artists(limit=limit)
+def build_mood_response(client: SpotifyClient, limit: int = 20) -> MoodResponse:
+    top_artists = client.get_top_artists(limit=limit)
 
     # Collect genres from top artists
-    genres = []
-    for artist in top_artists.get("items", []):
-        genres.extend(artist.get("genres", []))
+    genres = extract_genres_from_artists(top_artists)
 
-    # Analyze mood 
+    # Analyze mood
     mood_distribution, dominant_mood = analyze_mood_from_genres(genres)
 
     # Map mood → visuals
@@ -33,23 +33,24 @@ def build_mood_response(access_token: str, limit: int = 20) -> MoodResponse:
         mood_distribution=mood_distribution or {},
         dominant_mood=dominant_mood or "Other",
         visual_identity=visual_identity,
-        total_artists_analyzed=len(top_artists.get("items", [])) if top_artists else 0,
+        total_artists_analyzed=len(top_artists.get("items", [])),
     )
 
 
-def build_track_insights(access_token: str, limit: int = 20):
-    spotify_client = SpotifyClient(access_token=access_token)
-    top_tracks = spotify_client.get_top_tracks(limit=limit)
+def build_track_insights(client: SpotifyClient, limit: int = 20):
+    top_tracks = client.get_top_tracks(limit=limit)
 
     insights = []
     for track in top_tracks.get("items", []):
+        album = track.get("album", {})
+        images = album.get("images") or [{}]
         insights.append({
             "id": track.get("id"),
             "name": track.get("name"),
             "album": {
-                "name": track.get("album", {}).get("name"),
-                "release_date": track.get("album", {}).get("release_date"),
-                "image": track.get("album", {}).get("images", [{}])[0].get("url")
+                "name": album.get("name"),
+                "release_date": album.get("release_date"),
+                "image": images[0].get("url"),
             },
             "artists": [artist.get("name") for artist in track.get("artists", [])],
             "popularity": track.get("popularity"),
@@ -58,29 +59,26 @@ def build_track_insights(access_token: str, limit: int = 20):
 
     return {"tracks": insights, "total_tracks": len(insights)}
 
-def build_galaxy_response(access_token: str, time_range: str = "medium_term", limit: int = 10):
+def build_galaxy_response(client: SpotifyClient, time_range: str = "medium_term", limit: int = 10):
     """
     Fetches user's top artists and transforms them into a visual 'galaxy' representation.
     """
-    spotify_client = SpotifyClient(access_token=access_token)
-    top_artists = spotify_client.get_top_artists(time_range=time_range, limit=limit)
+    top_artists = client.get_top_artists(time_range=time_range, limit=limit)
 
     return transform_top_artists_to_planets(top_artists)
 
 
 def build_top_artists_response(
-    access_token: str,
+    client: SpotifyClient,
     time_range: str = "medium_term",
     limit: int = 10,
 ) -> Dict[str, Any]:
-    spotify_client = SpotifyClient(access_token=access_token)
-    return spotify_client.get_top_artists(time_range=time_range, limit=limit)
+    return client.get_top_artists(time_range=time_range, limit=limit)
 
 
 def build_top_tracks_response(
-    access_token: str,
+    client: SpotifyClient,
     time_range: str = "medium_term",
     limit: int = 10,
 ) -> Dict[str, Any]:
-    spotify_client = SpotifyClient(access_token=access_token)
-    return spotify_client.get_top_tracks(time_range=time_range, limit=limit)
+    return client.get_top_tracks(time_range=time_range, limit=limit)
