@@ -4,12 +4,28 @@ from transformers.mood_visual_transformer import (
     analyze_mood_from_genres,
     transform_mood_to_visual_identity,
 )
-from models.spotify_models import MoodResponse
+from models.spotify_models import (
+    GalaxyResponse,
+    MoodResponse,
+    SpotifyUser,
+    TopArtistsResponse,
+    TopTracksResponse,
+    TrackInsightsResponse,
+)
 from transformers.spotify_transformer import (
     extract_genres_from_artists,
+    transform_artist,
     transform_top_artists_to_planets,
+    transform_track,
+    transform_user,
 )
-from typing import Dict, Any
+
+# Pull the max top tracks for the galaxy so most planets get some moons
+GALAXY_MOON_TRACK_LIMIT = 50
+
+
+def build_current_user_response(client: SpotifyClient) -> SpotifyUser:
+    return transform_user(client.get_current_user())
 
 
 def build_mood_response(client: SpotifyClient, limit: int = 20) -> MoodResponse:
@@ -37,48 +53,41 @@ def build_mood_response(client: SpotifyClient, limit: int = 20) -> MoodResponse:
     )
 
 
-def build_track_insights(client: SpotifyClient, limit: int = 20):
+def build_track_insights(client: SpotifyClient, limit: int = 20) -> TrackInsightsResponse:
     top_tracks = client.get_top_tracks(limit=limit)
+    tracks = [transform_track(track) for track in top_tracks.get("items", [])]
 
-    insights = []
-    for track in top_tracks.get("items", []):
-        album = track.get("album", {})
-        images = album.get("images") or [{}]
-        insights.append({
-            "id": track.get("id"),
-            "name": track.get("name"),
-            "album": {
-                "name": album.get("name"),
-                "release_date": album.get("release_date"),
-                "image": images[0].get("url"),
-            },
-            "artists": [artist.get("name") for artist in track.get("artists", [])],
-            "popularity": track.get("popularity"),
-            "spotify_url": track.get("external_urls", {}).get("spotify"),
-        })
+    return TrackInsightsResponse(tracks=tracks, total_tracks=len(tracks))
 
-    return {"tracks": insights, "total_tracks": len(insights)}
-
-def build_galaxy_response(client: SpotifyClient, time_range: str = "medium_term", limit: int = 10):
+def build_galaxy_response(client: SpotifyClient, time_range: str = "medium_term", limit: int = 10) -> GalaxyResponse:
     """
-    Fetches user's top artists and transforms them into a visual 'galaxy' representation.
+    Fetches user's top artists (planets) and top tracks (moons) and transforms them
+    into a visual 'galaxy' representation.
     """
     top_artists = client.get_top_artists(time_range=time_range, limit=limit)
+    top_tracks = client.get_top_tracks(time_range=time_range, limit=GALAXY_MOON_TRACK_LIMIT)
 
-    return transform_top_artists_to_planets(top_artists)
+    planets = transform_top_artists_to_planets(top_artists, top_tracks)
+    return GalaxyResponse(time_range=time_range, total_planets=len(planets), planets=planets)
 
 
 def build_top_artists_response(
     client: SpotifyClient,
     time_range: str = "medium_term",
     limit: int = 10,
-) -> Dict[str, Any]:
-    return client.get_top_artists(time_range=time_range, limit=limit)
+) -> TopArtistsResponse:
+    top_artists = client.get_top_artists(time_range=time_range, limit=limit)
+    artists = [transform_artist(artist) for artist in top_artists.get("items", [])]
+
+    return TopArtistsResponse(time_range=time_range, total=len(artists), artists=artists)
 
 
 def build_top_tracks_response(
     client: SpotifyClient,
     time_range: str = "medium_term",
     limit: int = 10,
-) -> Dict[str, Any]:
-    return client.get_top_tracks(time_range=time_range, limit=limit)
+) -> TopTracksResponse:
+    top_tracks = client.get_top_tracks(time_range=time_range, limit=limit)
+    tracks = [transform_track(track) for track in top_tracks.get("items", [])]
+
+    return TopTracksResponse(time_range=time_range, total=len(tracks), tracks=tracks)
