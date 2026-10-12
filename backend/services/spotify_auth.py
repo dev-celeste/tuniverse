@@ -17,7 +17,7 @@ SCOPES = [
 ]
 
 
-def build_authorize_url() -> str:
+def build_authorize_url(state: str) -> str:
     client_id = os.getenv("SPOTIFY_CLIENT_ID")
     redirect_uri = os.getenv("SPOTIFY_REDIRECT_URI")
 
@@ -30,6 +30,7 @@ def build_authorize_url() -> str:
         "redirect_uri": redirect_uri,
         "scope": " ".join(SCOPES),
         "show_dialog": "true",
+        "state": state,
     }
 
     # ✅ Proper URL encoding (prevents illegal_scope)

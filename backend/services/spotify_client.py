@@ -3,7 +3,7 @@ from typing import Dict, Optional
 import requests
 
 from core.exceptions import NotAuthenticatedError, SpotifyAPIError, SpotifyAuthError
-from core.token_store import InMemoryTokenStore, TokenSet, token_store
+from core.sessions import SessionStore, TokenSet
 from services import spotify_auth
 
 SPOTIFY_API_BASE_URL = "https://api.spotify.com/v1"
@@ -16,13 +16,14 @@ PASSTHROUGH_STATUS_CODES = {403, 404, 429}
 class SpotifyClient:
     """
     The only place that talks to the Spotify Web API.
-    Reads tokens from the store, refreshes them when expired (or on a 401),
-    and retries the request once — callers never see token expiry.
+    Acts on behalf of one session: reads its tokens from the store, refreshes them
+    when expired (or on a 401), and retries the request once — callers never see token expiry.
     """
 
     BASE_URL = SPOTIFY_API_BASE_URL
 
-    def __init__(self, store: InMemoryTokenStore = token_store):
+    def __init__(self, session_id: str, store: SessionStore):
+        self.session_id = session_id
         self.store = store
 
     # -------------------------
@@ -30,7 +31,7 @@ class SpotifyClient:
     # -------------------------
 
     def _current_tokens(self) -> TokenSet:
-        tokens = self.store.get()
+        tokens = self.store.get(self.session_id)
         if not tokens:
             raise NotAuthenticatedError("No Spotify session found. Please log in first.")
 
@@ -41,18 +42,18 @@ class SpotifyClient:
 
     def _refresh(self, tokens: TokenSet) -> TokenSet:
         if not tokens.refresh_token:
-            self.store.clear()
+            self.store.delete(self.session_id)
             raise NotAuthenticatedError("Spotify session expired. Please log in again.")
 
         try:
             token_data = spotify_auth.refresh_access_token(tokens.refresh_token)
         except SpotifyAuthError as e:
             # Refresh token revoked or invalid — the session is unrecoverable
-            self.store.clear()
+            self.store.delete(self.session_id)
             raise NotAuthenticatedError("Spotify session expired. Please log in again.") from e
 
         new_tokens = TokenSet.from_spotify(token_data, fallback_refresh_token=tokens.refresh_token)
-        self.store.save(new_tokens)
+        self.store.save(self.session_id, new_tokens)
         return new_tokens
 
     # -------------------------
@@ -87,7 +88,7 @@ class SpotifyClient:
             response = self._send(url, tokens.access_token, params)
 
         if response.status_code == 401:
-            self.store.clear()
+            self.store.delete(self.session_id)
             raise NotAuthenticatedError("Spotify rejected the session. Please log in again.")
 
         if response.status_code >= 400:

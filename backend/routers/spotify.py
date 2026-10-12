@@ -1,5 +1,9 @@
-from fastapi import APIRouter, Depends, Query
+from typing import Optional
 
+from fastapi import APIRouter, Cookie, Depends, Query
+
+from core.exceptions import NotAuthenticatedError
+from core.sessions import SESSION_COOKIE_NAME, get_session_store
 from services.spotify_client import SpotifyClient
 from services.spotify_service import build_current_user_response, build_mood_response, build_track_insights, build_galaxy_response, build_top_artists_response, build_top_tracks_response
 from models.spotify_models import (
@@ -19,9 +23,14 @@ router = APIRouter(
 )
 
 
-def get_spotify_client() -> SpotifyClient:
-    """Dependency so tests (and later, per-session auth) can swap the client."""
-    return SpotifyClient()
+def get_spotify_client(
+    session_id: Optional[str] = Cookie(None, alias=SESSION_COOKIE_NAME),
+) -> SpotifyClient:
+    """Builds a client for the caller's session; overridable in tests."""
+    if not session_id:
+        raise NotAuthenticatedError("No Spotify session found. Please log in first.")
+
+    return SpotifyClient(session_id=session_id, store=get_session_store())
 
 
 @router.get("/me", response_model=SpotifyUser)
