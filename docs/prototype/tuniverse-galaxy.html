@@ -1,0 +1,1818 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tuniverse Galaxy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a full-bleed 3D galaxy is the page; quiet glass UI sits in the corners and a detail panel slides in when you visit a planet */
+:root {
+  --void: #05050a;
+  --ink: #ece8f4;
+  --muted: #8f8ba6;
+  --faint: #5b5873;
+  --hair: rgba(236, 232, 244, 0.09);
+  --glass: rgba(9, 9, 18, 0.62);
+  --lift: rgba(236, 232, 244, 0.07);
+  --champagne: #d8c49c;
+
+  --display: "Instrument Serif", "Cormorant Garamond", Georgia, serif;
+  --ui: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+
+  color-scheme: dark;
+}
+
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--void);
+  color: var(--ink);
+  font-family: var(--ui);
+  font-size: 14px;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+#scene { position: fixed; inset: 0; }
+#scene canvas { display: block; }
+
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 1px solid var(--champagne); outline-offset: 3px; border-radius: 6px; }
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--champagne);
+}
+
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--hair);
+  border-radius: 14px;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+/* ---------- Top bar ---------- */
+.top {
+  position: fixed;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+  pointer-events: none;
+  z-index: 3;
+}
+.top > * { pointer-events: auto; }
+.brand { display: grid; gap: 4px; }
+.wordmark {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+.wordmark em { font-style: italic; color: var(--champagne); }
+
+.actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start; justify-content: flex-end; }
+.tracks-btn {
+  padding: 11px 14px;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.25s, background 0.25s;
+}
+.tracks-btn:hover, .tracks-btn[aria-pressed="true"] { color: var(--ink); }
+.tracks-btn[aria-pressed="true"] { background: rgba(236, 232, 244, 0.1); }
+
+.ranges {
+  display: flex;
+  padding: 4px;
+  gap: 2px;
+}
+.ranges button {
+  border: 0;
+  background: transparent;
+  padding: 7px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s;
+}
+.ranges button:hover { color: var(--ink); }
+.ranges button[aria-checked="true"] { background: var(--lift); color: var(--ink); }
+
+/* ---------- Floating labels ---------- */
+#labels { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: auto;
+  background: none;
+  border: 0;
+  padding: 3px 6px;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--ink);
+  text-shadow: 0 0 10px #000, 0 0 2px #000;
+  cursor: pointer;
+  will-change: transform, opacity;
+}
+.label .rk {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--muted);
+  margin-right: 6px;
+}
+.label.star { pointer-events: none; font-size: 11px; font-weight: 400; }
+.label.star.compact .tt { display: none; }
+.label.caption {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--champagne);
+}
+.label.caption .rk { color: var(--champagne); opacity: 0.6; }
+.label.moon {
+  pointer-events: none;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+/* ---------- Mood legend ---------- */
+.mood-card {
+  position: fixed;
+  left: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  width: min(272px, calc(100vw - 32px));
+  box-sizing: border-box;
+  padding: 16px 16px 14px;
+  display: grid;
+  gap: 10px;
+  z-index: 2;
+  transition: opacity 0.4s, transform 0.4s;
+}
+.dominant {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 30px;
+  line-height: 1;
+}
+.dominant small {
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--muted);
+  margin-left: 6px;
+}
+.moods { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.moods button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 10px 76px 1fr 38px;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+.moods button:hover, .moods button:focus-visible, .moods button.on { background: var(--lift); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c); box-shadow: 0 0 8px var(--c); }
+.bar { height: 2px; background: var(--hair); border-radius: 2px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--c); opacity: 0.8; transition: width 0.6s; }
+.pct { font-family: var(--mono); font-size: 11px; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+.mood-card .moods li:nth-child(n + 4) { display: none; }  /* top 3 here; the full mix lives in the nebula panel */
+.basis { margin: 0; font-size: 11px; color: var(--faint); }
+
+/* ---------- Hint ---------- */
+.hint {
+  position: fixed;
+  left: 50%;
+  bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  white-space: nowrap;
+  z-index: 2;
+  transition: opacity 0.8s;
+  pointer-events: none;
+}
+.hint.gone { opacity: 0; }
+
+/* ---------- Detail panel ---------- */
+#panel {
+  position: fixed;
+  top: calc(84px + env(safe-area-inset-top, 0px));
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  width: min(360px, calc(100vw - 32px));
+  box-sizing: border-box;
+  padding: 20px 22px 22px;
+  overflow-y: auto;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  transition: opacity 0.5s, transform 0.5s cubic-bezier(.2,.7,.2,1);
+}
+#panel.closed { opacity: 0; transform: translateX(28px); pointer-events: none; }
+.back {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--hair);
+  background: transparent;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.back:hover { color: var(--ink); border-color: rgba(236,232,244,.2); }
+kbd {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 1px 5px;
+  border: 1px solid var(--hair);
+  border-radius: 4px;
+  color: var(--faint);
+}
+.artist { display: grid; gap: 8px; }
+.artist h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 44px;
+  line-height: 0.95;
+  text-wrap: balance;
+}
+.chip { display: inline-flex; align-items: center; gap: 8px; margin: 0; font-size: 13px; color: var(--muted); }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0; }
+.stats div { display: grid; gap: 6px; }
+.stats dt { font-size: 11px; color: var(--faint); letter-spacing: 0.04em; }
+.stats dd { margin: 0; font-family: var(--mono); font-size: 18px; font-variant-numeric: tabular-nums; }
+.stats dd small { font-size: 11px; color: var(--faint); }
+.genres { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.5; }
+.section-title {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.tracks { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.tracks a {
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  gap: 10px;
+  align-items: baseline;
+  padding: 8px 8px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--ink);
+}
+.tracks a:hover, .tracks a:focus-visible { background: var(--lift); }
+.tracks .rk, .tracks .d { font-family: var(--mono); font-size: 11px; color: var(--faint); font-variant-numeric: tabular-nums; }
+.tracks .t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tracks .t span { color: var(--faint); font-size: 11px; margin-left: 6px; }
+.tracks a.on { background: var(--lift); }
+.tracks.ranked a { align-items: center; }
+.tracks.ranked .t { display: grid; gap: 2px; white-space: normal; }
+.tracks.ranked .t b { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tracks.ranked .t small { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--faint); font-size: 11px; min-width: 0; }
+.tracks.ranked .t small .dot { width: 6px; height: 6px; margin: 0; flex: none; }
+.portrait {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--hair);
+  background: radial-gradient(circle at 32% 28%, color-mix(in srgb, var(--c) 45%, transparent), rgba(12, 12, 22, 0.9) 72%);
+  font-family: var(--display);
+  font-size: 28px;
+  color: var(--ink);
+}
+.portrait-note { margin: 0; font-size: 10px; color: var(--faint); letter-spacing: 0.04em; }
+.stats.four { grid-template-columns: 1fr 1fr; row-gap: 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.chips li { padding: 4px 9px; border: 1px solid var(--hair); border-radius: 999px; font-size: 12px; color: var(--muted); }
+.chips b { margin-left: 5px; font-family: var(--mono); font-size: 10px; font-weight: 400; color: var(--faint); }
+.swatches { display: flex; gap: 12px; flex-wrap: wrap; }
+.swatch { display: grid; gap: 5px; font-family: var(--mono); font-size: 10px; color: var(--faint); }
+.swatch i { width: 46px; height: 30px; border-radius: 7px; background: var(--c); border: 1px solid var(--hair); box-shadow: 0 0 14px color-mix(in srgb, var(--c) 35%, transparent); }
+.era { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.era li { display: grid; grid-template-columns: 52px 1fr 24px; gap: 10px; align-items: center; font-size: 12px; }
+.era .n { font-family: var(--mono); font-size: 11px; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+.era .bar i { background: var(--champagne); }
+.panel-moods button { grid-template-columns: 10px 84px 1fr 38px; }
+.out { align-self: flex-start; font-size: 12px; color: var(--champagne); text-decoration: none; border-bottom: 1px solid rgba(216, 196, 156, 0.3); padding-bottom: 2px; }
+.out:hover { border-bottom-color: var(--champagne); }
+.mood-link {
+  justify-self: start;
+  border: 0;
+  background: none;
+  padding: 2px 0;
+  font-size: 12px;
+  color: var(--champagne);
+  cursor: pointer;
+}
+.mood-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.empty { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.55; }
+.key {
+  margin: auto 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--hair);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--faint);
+}
+
+body.focused .mood-card { opacity: 0.35; }
+
+/* ---------- Landing (login) ---------- */
+.wordmark button { border: 0; background: none; padding: 0; font: inherit; color: inherit; cursor: pointer; }
+.top, .mood-card, .hint, #labels { transition: opacity 0.9s ease; }
+body.landing-on .top,
+body.landing-on .mood-card,
+body.landing-on .hint,
+body.landing-on #labels,
+body.landing-on #panel { opacity: 0 !important; pointer-events: none !important; }
+
+.landing {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  padding-inline: 16px;
+  padding-block: calc(24px + env(safe-area-inset-top, 0px)) calc(24px + env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  background: radial-gradient(ellipse 70% 55% at 50% 42%, rgba(5, 5, 10, 0.55), rgba(5, 5, 10, 0) 70%);
+  transition: opacity 0.9s ease, transform 1.2s cubic-bezier(.2,.7,.2,1);
+}
+.landing.gone { opacity: 0; transform: scale(1.06); pointer-events: none; }
+.landing-inner {
+  width: min(560px, 100%);
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  text-align: center;
+  transform: translateY(-10vh);
+}
+.landing .wordmark-xl {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(56px, 13vw, 112px);
+  line-height: 0.9;
+  letter-spacing: 0.005em;
+}
+.landing .wordmark-xl em { font-style: italic; color: var(--champagne); }
+.tagline {
+  margin: 0;
+  max-width: 44ch;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--muted);
+  text-wrap: balance;
+}
+.cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.btn {
+  border-radius: 999px;
+  padding: 13px 22px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background 0.25s, border-color 0.25s, color 0.25s, box-shadow 0.25s;
+}
+.btn-primary {
+  border: 1px solid var(--champagne);
+  background: var(--champagne);
+  color: #14110b;
+  box-shadow: 0 0 28px rgba(216, 196, 156, 0.18);
+}
+.btn-primary:hover { box-shadow: 0 0 36px rgba(216, 196, 156, 0.32); }
+.btn-ghost { border: 1px solid rgba(236, 232, 244, 0.22); background: rgba(9, 9, 18, 0.4); color: var(--ink); }
+.btn-ghost:hover { border-color: rgba(236, 232, 244, 0.45); }
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 22px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.legend b { color: var(--champagne); font-weight: 400; }
+.fineprint { margin: 0; max-width: 52ch; font-size: 12px; line-height: 1.6; color: var(--faint); text-wrap: balance; }
+.login-error {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid rgba(230, 57, 70, 0.35);
+  border-radius: 10px;
+  background: rgba(230, 57, 70, 0.08);
+  font-size: 13px;
+  color: var(--ink);
+}
+.toast {
+  position: fixed;
+  left: 50%;
+  top: calc(84px + env(safe-area-inset-top, 0px));
+  transform: translate(-50%, -8px);
+  z-index: 5;
+  max-width: calc(100vw - 32px);
+  box-sizing: border-box;
+  padding: 10px 16px;
+  font-size: 13px;
+  color: var(--ink);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s, transform 0.5s;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+.fallback {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding-inline: 16px;
+  text-align: center;
+  color: var(--muted);
+}
+
+@media (max-width: 720px) {
+  .wordmark { font-size: 26px; }
+  #panel {
+    top: auto;
+    left: 16px;
+    right: 16px;
+    width: auto;
+    max-height: 56%;
+    gap: 14px;
+  }
+  #panel.closed { transform: translateY(28px); }
+  .artist h2 { font-size: 34px; }
+  body.focused .mood-card { opacity: 0; pointer-events: none; }
+  .hint { bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+  .mood-card { gap: 8px; padding: 12px 12px 10px; bottom: calc(44px + env(safe-area-inset-bottom, 0px)); }
+  .dominant { font-size: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #panel, .mood-card, .hint, .bar i, .landing, .toast { transition: none; }
+  .landing.gone { transform: none; }
+}
+</style>
+</head>
+<body>
+
+<script>document.body.classList.add("landing-on");</script>
+<div id="scene" aria-hidden="true"></div>
+<div id="labels"></div>
+
+<header class="top">
+  <div class="brand">
+    <h1 class="wordmark"><button type="button" id="home-btn" aria-label="Tuniverse, back to the start screen">Tun<em>i</em>verse</button></h1>
+    <p class="eyebrow">Demo universe · sample data</p>
+  </div>
+  <div class="actions">
+  <button type="button" class="tracks-btn glass" id="tracks-btn" aria-pressed="false">Top tracks</button>
+  <div class="ranges glass" role="radiogroup" aria-label="Listening period">
+    <button type="button" role="radio" id="range-short_term" data-range="short_term" aria-checked="false">4 weeks</button>
+    <button type="button" role="radio" id="range-medium_term" data-range="medium_term" aria-checked="true">6 months</button>
+    <button type="button" role="radio" id="range-long_term" data-range="long_term" aria-checked="false">All time</button>
+  </div>
+  </div>
+</header>
+
+<section class="mood-card glass" aria-label="Galaxy mood">
+  <p class="eyebrow" id="mood-eyebrow">Galaxy mood · 6 months</p>
+  <p class="dominant" id="dominant">Aggressive</p>
+  <ul class="moods" id="moods"></ul>
+  <p class="basis" id="basis"></p>
+  <button type="button" class="mood-link" id="mood-link">Explore the mood nebula →</button>
+</section>
+
+<section class="landing" id="landing" aria-labelledby="landing-title">
+  <div class="landing-inner">
+    <p class="eyebrow">Your listening, mapped</p>
+    <h2 class="wordmark-xl" id="landing-title">Tun<em>i</em>verse</h2>
+    <p class="tagline">Your top artists become planets, your favorite songs form a constellation, and your moods color the nebula.</p>
+    <p class="login-error" id="login-error" role="alert" hidden></p>
+    <div class="cta">
+      <button type="button" class="btn btn-primary" id="connect-btn">Connect Spotify</button>
+      <button type="button" class="btn btn-ghost" id="demo-btn">Explore the demo universe</button>
+    </div>
+    <ul class="legend" aria-label="What you'll see">
+      <li><b>Planets</b> · artists</li>
+      <li><b>Stars</b> · top tracks</li>
+      <li><b>Nebula</b> · mood</li>
+    </ul>
+    <p class="fineprint">Read-only access to your top artists and tracks. Spotify sign-in is invite-only while the app is in development; the demo shows everything with sample data.</p>
+  </div>
+</section>
+
+<p class="toast glass" id="toast" role="status"></p>
+
+<p class="hint" id="hint">Drag to orbit · Scroll to zoom · Click anything that glows</p>
+
+<aside id="panel" class="glass closed" aria-live="polite" aria-label="Artist details"></aside>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+<script>
+(() => {
+  // ------------------------------------------------------------------
+  // Sample data, shaped like the Tuniverse API (/galaxy + /mood)
+  // ------------------------------------------------------------------
+  const MOOD_COLORS = {
+    Aggressive: "#E63946", Intense: "#8A2ECC", Upbeat: "#FFD166", Confident: "#30B8E6",
+    Reflective: "#EF8DC1", Calm: "#80FFDB", Other: "#ADB5BD",
+  };
+
+  // Same genre → mood rules as backend/transformers/mood_visual_transformer.py
+  const GENRE_MOOD_MAP = {
+    "metal": ["Aggressive", 1.2], "metalcore": ["Aggressive", 1.5], "deathcore": ["Aggressive", 1.5], "hard rock": ["Aggressive", 1.1],
+    "punk": ["Intense", 1.1], "hardcore": ["Intense", 1.3], "industrial": ["Intense", 1.2], "dubstep": ["Intense", 1.3], "drum and bass": ["Intense", 1.2],
+    "pop": ["Upbeat", 1.0], "dance": ["Upbeat", 1.2], "edm": ["Upbeat", 1.3],
+    "indie": ["Reflective", 1.1], "folk": ["Reflective", 1.0],
+    "hip hop": ["Confident", 1.2], "rap": ["Confident", 1.2], "trap": ["Confident", 1.2],
+    "ambient": ["Calm", 1.3], "classical": ["Calm", 1.4],
+  };
+  const PATTERNS = Object.entries(GENRE_MOOD_MAP)
+    .sort((a, b) => b[0].length - a[0].length)
+    .map(([key, [mood, weight]]) => [new RegExp(`\\b${key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`), mood, weight]);
+
+  function moodForGenre(genre) {
+    for (const [re, mood, weight] of PATTERNS) if (re.test(genre)) return [mood, weight];
+    return ["Other", 0.5];
+  }
+  function analyzeGenres(genres) {
+    const scores = {};
+    for (const g of genres) {
+      const [mood, weight] = moodForGenre(g);
+      scores[mood] = (scores[mood] || 0) + weight;
+    }
+    const total = Object.values(scores).reduce((a, b) => a + b, 0);
+    if (!total) return { distribution: {}, dominant: "Other" };
+    const distribution = {};
+    for (const m in scores) distribution[m] = (scores[m] / total) * 100;
+    const dominant = Object.keys(scores).reduce((a, b) => (scores[b] > scores[a] ? b : a));
+    return { distribution, dominant };
+  }
+
+  const ARTISTS = {
+    st: { name: "Sleep Token", genres: ["metalcore", "alt metal", "progressive metal"], popularity: 82, tracks: [["The Summoning", 396, 2023], ["Granite", 234, 2023], ["Aqua Regia", 250, 2023]], followers: 4100000 },
+    pb: { name: "Phoebe Bridgers", genres: ["indie folk", "indie pop"], popularity: 76, tracks: [["Motion Sickness", 230, 2017], ["Kyoto", 184, 2020]], followers: 3900000 },
+    kl: { name: "Kendrick Lamar", genres: ["hip hop", "rap", "west coast rap"], popularity: 93, tracks: [["Not Like Us", 274, 2024], ["Money Trees", 386, 2012], ["luther", 177, 2024]], followers: 33000000 },
+    dl: { name: "Dua Lipa", genres: ["dance pop", "pop"], popularity: 87, tracks: [["Houdini", 185, 2023], ["Levitating", 203, 2020]], followers: 47000000 },
+    bi: { name: "Bon Iver", genres: ["indie folk", "chamber pop"], popularity: 72, tracks: [["Holocene", 337, 2011]], followers: 7300000 },
+    ts: { name: "Turnstile", genres: ["hardcore", "punk"], popularity: 68, tracks: [["MYSTERY", 183, 2021]], followers: 900000 },
+    nf: { name: "Nils Frahm", genres: ["ambient", "neoclassical"], popularity: 61, tracks: [["Says", 498, 2013]], followers: 1200000 },
+    bo: { name: "Bad Omens", genres: ["metalcore"], popularity: 79, tracks: [["Just Pretend", 205, 2022]], followers: 1600000 },
+    sz: { name: "SZA", genres: ["r&b", "pop"], popularity: 89, tracks: [["Snooze", 201, 2022], ["Saturn", 186, 2024]], followers: 25000000 },
+    hk: { name: "Hiatus Kaiyote", genres: [], popularity: 57, tracks: [], followers: 600000 },
+    fa: { name: "Fred again..", genres: ["edm", "house"], popularity: 80, tracks: [["Delilah (pull me out of this)", 253, 2022], ["adore u", 200, 2024]], followers: 3100000 },
+    mt: { name: "Mitski", genres: ["indie pop", "art pop"], popularity: 84, tracks: [["Nobody", 193, 2018], ["My Love Mine All Mine", 138, 2023]], followers: 4800000 },
+  };
+
+  const RANGES = {
+    short_term: { label: "4 weeks", order: ["kl", "sz", "fa", "st", "dl", "ts", "pb", "bo", "bi", "hk"] },
+    medium_term: { label: "6 months", order: ["st", "pb", "kl", "dl", "bi", "ts", "nf", "bo", "sz", "hk"] },
+    long_term: { label: "All time", order: ["pb", "bi", "st", "kl", "mt", "bo", "dl", "nf", "sz", "hk"] },
+  };
+
+  for (const id in ARTISTS) ARTISTS[id].mood = analyzeGenres(ARTISTS[id].genres).dominant;
+
+  // Top tracks by artists outside the top 10: no planet, so they only appear in the constellation
+  const EXTRA_TRACKS = [
+    ["Good Luck, Babe!", "Chappell Roan", ["pop"], 218, 2024],
+    ["360", "Charli xcx", ["dance pop", "pop"], 133, 2024],
+    ["Too Sweet", "Hozier", ["irish singer-songwriter", "folk"], 251, 2024],
+    ["Glue Song", "beabadoobee", ["bedroom pop", "indie pop"], 135, 2023],
+    ["Kool-Aid", "Bring Me The Horizon", ["metalcore", "alt metal"], 235, 2024],
+    ["Dreams", "Fleetwood Mac", ["soft rock", "classic rock"], 257, 1977],
+  ].map(([title, artist, genres, seconds, year]) => ({ title, artist, seconds, year, mood: analyzeGenres(genres).dominant }));
+
+  // Sample of /me
+  const USER = { display_name: "Demo Listener", followers: 48, profile_url: "https://open.spotify.com" };
+
+  // Same palettes as backend MOOD_VISUAL_IDENTITY (/mood visual_identity)
+  const MOOD_IDENTITY = {
+    Aggressive: { primary: "#E63946", secondary: "#1D3557", accent: "#99F67A", glow: 0.9, background: "supernova" },
+    Intense: { primary: "#8A2ECC", secondary: "#1B0033", accent: "#E0AAFF", glow: 0.8, background: "vortex" },
+    Upbeat: { primary: "#FFD166", secondary: "#EF476F", accent: "#06D6A0", glow: 0.7, background: "stardust" },
+    Confident: { primary: "#30B8E6", secondary: "#073B4C", accent: "#443995", glow: 0.6, background: "orbit" },
+    Reflective: { primary: "#EF8DC1", secondary: "#F93070", accent: "#EAEAEA", glow: 0.5, background: "deepSpace" },
+    Calm: { primary: "#80FFDB", secondary: "#0B1D3A", accent: "#B8F2E6", glow: 0.45, background: "aurora" },
+    Other: { primary: "#ADB5BD", secondary: "#343A40", accent: "#CED4DA", glow: 0.4, background: "cosmicFog" },
+  };
+  const fmtCount = (n) => n >= 1e6 ? `${(n / 1e6).toFixed(n >= 1e7 ? 0 : 1)}M` : n >= 1e3 ? `${Math.round(n / 1e3)}K` : String(n);
+  const initials = (name) => name.replace(/[^\p{L}\p{N} ]/gu, "").split(" ").filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("");
+
+  function hash(str) {
+    let h = 2166136261;
+    for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return (h >>> 0) / 4294967295;
+  }
+  function rng(seed) {
+    let a = Math.floor(seed * 4294967295) >>> 0;
+    return () => {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const fmtDuration = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+  const pad2 = (n) => String(n).padStart(2, "0");
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  // ------------------------------------------------------------------
+  // Renderer, or a plain fallback when WebGL is unavailable
+  // ------------------------------------------------------------------
+  const container = document.getElementById("scene");
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+  } catch (e) {
+    const note = document.createElement("p");
+    note.className = "fallback";
+    note.textContent = "This browser can't show the 3D galaxy (WebGL is unavailable).";
+    document.body.appendChild(note);
+    return;
+  }
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // 1.5x is plenty for soft, glowing visuals and saves ~44% of the pixels a 2x screen would draw
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x05050a, 1);
+  container.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x05050a, 0.0042);
+  const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 2000);
+  const HOME_DIST = window.innerWidth < 720 ? 96 : 70;
+  // Start screen: far out, looking above the galaxy so it sits low under the title
+  const LANDING_TARGET = new THREE.Vector3(0, 64, 0);
+  const LANDING_DIST = window.innerWidth < 720 ? 300 : 190;
+  camera.position.set(0, 0.42, 1).normalize().multiplyScalar(LANDING_DIST).add(LANDING_TARGET);
+
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.06;
+  controls.enablePan = false;
+  controls.minDistance = 6;
+  controls.maxDistance = 220;
+  controls.rotateSpeed = 0.55;
+  controls.zoomSpeed = 0.7;
+  controls.autoRotateSpeed = 0.22;
+
+  let composer = null;
+  if (THREE.EffectComposer && THREE.UnrealBloomPass) {
+    composer = new THREE.EffectComposer(renderer);
+    composer.setPixelRatio(renderer.getPixelRatio());
+    composer.setSize(window.innerWidth, window.innerHeight);
+    composer.addPass(new THREE.RenderPass(scene, camera));
+    composer.addPass(new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.7, 0.6, 0.42));
+  }
+
+  // ------------------------------------------------------------------
+  // Shared textures
+  // ------------------------------------------------------------------
+  function glowTexture() {
+    const c = document.createElement("canvas");
+    c.width = c.height = 128;
+    const g = c.getContext("2d");
+    const grad = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+    grad.addColorStop(0, "rgba(255,255,255,1)");
+    grad.addColorStop(0.18, "rgba(255,255,255,0.42)");
+    grad.addColorStop(0.5, "rgba(255,255,255,0.08)");
+    grad.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 128, 128);
+    return new THREE.CanvasTexture(c);
+  }
+  // Grayscale gas-giant bands; the material color tints them
+  function bandTexture(seed) {
+    const c = document.createElement("canvas");
+    c.width = 256; c.height = 128;
+    const g = c.getContext("2d");
+    const rand = rng(seed);
+    let y = 0;
+    while (y < 128) {
+      const h = 2 + rand() * 11;
+      const l = Math.round(150 + rand() * 105);
+      g.fillStyle = `rgb(${l},${l},${l})`;
+      g.fillRect(0, y, 256, h + 1);
+      y += h;
+    }
+    g.globalAlpha = 0.5;
+    g.drawImage(c, 0, 2);
+    g.drawImage(c, 0, -2);
+    g.globalAlpha = 0.12;
+    for (let i = 0; i < 260; i++) {
+      const l = rand() > 0.5 ? 255 : 90;
+      g.fillStyle = `rgb(${l},${l},${l})`;
+      g.fillRect(rand() * 256, rand() * 128, 1 + rand() * 6, 1);
+    }
+    const tex = new THREE.CanvasTexture(c);
+    tex.wrapS = THREE.RepeatWrapping;
+    return tex;
+  }
+  const GLOW = glowTexture();
+
+  // ------------------------------------------------------------------
+  // Backdrop: stars, galactic dust, faint nebula
+  // ------------------------------------------------------------------
+  {
+    const N = 5200;
+    const pos = new Float32Array(N * 3);
+    const col = new Float32Array(N * 3);
+    const rand = rng(0.42);
+    const tint = [new THREE.Color("#ffffff"), new THREE.Color("#cfd8ff"), new THREE.Color("#ffe6c7")];
+    for (let i = 0; i < N; i++) {
+      const r = 320 + rand() * 520;
+      const th = rand() * Math.PI * 2;
+      const ph = Math.acos(2 * rand() - 1);
+      pos[i * 3] = r * Math.sin(ph) * Math.cos(th);
+      pos[i * 3 + 1] = r * Math.cos(ph);
+      pos[i * 3 + 2] = r * Math.sin(ph) * Math.sin(th);
+      const c = tint[Math.floor(rand() * 3)].clone().multiplyScalar(0.25 + rand() * 0.75);
+      col.set([c.r, c.g, c.b], i * 3);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
+    scene.add(new THREE.Points(geo, new THREE.PointsMaterial({ size: 1.3, sizeAttenuation: false, vertexColors: true, fog: false })));
+  }
+
+  const dust = (() => {
+    const N = 3000;
+    const pos = new Float32Array(N * 3);
+    const col = new Float32Array(N * 3);
+    const rand = rng(0.77);
+    for (let i = 0; i < N; i++) {
+      const r = 5 + Math.pow(rand(), 0.75) * 78;
+      const th = rand() * Math.PI * 2;
+      const spread = (rand() + rand() + rand() - 1.5) * (0.6 + r / 40);
+      pos[i * 3] = Math.cos(th) * r;
+      pos[i * 3 + 1] = spread;
+      pos[i * 3 + 2] = Math.sin(th) * r;
+      const b = 0.15 + rand() * 0.35;
+      col.set([b, b, b * 1.1], i * 3);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
+    const mat = new THREE.PointsMaterial({
+      size: 0.16, map: GLOW, vertexColors: true, transparent: true, opacity: 0.8,
+      depthWrite: false, blending: THREE.AdditiveBlending,
+    });
+    const pts = new THREE.Points(geo, mat);
+    scene.add(pts);
+    return pts;
+  })();
+
+  const nebulae = [
+    { pos: [-160, 40, -260], scale: 380, opacity: 0.03 },
+    { pos: [220, -60, -200], scale: 300, opacity: 0.06 },
+    { pos: [40, 120, 260], scale: 340, opacity: 0.05 },
+  ].map(({ pos, scale, opacity }) => {
+    const s = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: GLOW, color: 0xffffff, transparent: true, opacity, depthWrite: false,
+      blending: THREE.AdditiveBlending, fog: false,
+    }));
+    s.position.set(...pos);
+    s.scale.setScalar(scale);
+    scene.add(s);
+    return s;
+  });
+
+  // ------------------------------------------------------------------
+  // The core (you)
+  // ------------------------------------------------------------------
+  scene.add(new THREE.AmbientLight(0x2a2a44, 0.55));
+  const sunLight = new THREE.PointLight(0xfff1dd, 1.15, 0);
+  scene.add(sunLight);
+
+  const sun = new THREE.Mesh(
+    new THREE.SphereGeometry(2.3, 48, 48),
+    new THREE.MeshBasicMaterial({ color: 0xfff4e6 }),
+  );
+  sun.userData.kind = "sun";
+  scene.add(sun);
+  const sunHalo = new THREE.Sprite(new THREE.SpriteMaterial({ map: GLOW, transparent: true, opacity: 0.6, depthWrite: false, blending: THREE.AdditiveBlending }));
+  sunHalo.scale.setScalar(20);
+  scene.add(sunHalo);
+  const sunCorona = new THREE.Sprite(new THREE.SpriteMaterial({ map: GLOW, transparent: true, opacity: 0.14, depthWrite: false, blending: THREE.AdditiveBlending }));
+  sunCorona.scale.setScalar(56);
+  scene.add(sunCorona);
+  const moodTint = new THREE.Color(MOOD_COLORS.Other);
+  const moodTintTarget = new THREE.Color(MOOD_COLORS.Other);
+
+  // ------------------------------------------------------------------
+  // Planets (artists) and moons (tracks)
+  // ------------------------------------------------------------------
+  const labelsEl = document.getElementById("labels");
+  const SPHERE = new THREE.SphereGeometry(1, 48, 32);
+  const MOON_SPHERE = new THREE.SphereGeometry(1, 24, 16);
+  const CIRCLE = (() => {
+    const pts = [];
+    for (let i = 0; i <= 160; i++) {
+      const a = (i / 160) * Math.PI * 2;
+      pts.push(new THREE.Vector3(Math.cos(a), 0, Math.sin(a)));
+    }
+    return new THREE.BufferGeometry().setFromPoints(pts);
+  })();
+
+  const orbitFor = (rank) => 10 + (rank - 1) * 4.6;
+  const sizeFor = (rank) => 2.05 - (rank - 1) * 0.11;
+  const glowFor = (popularity) => Math.min(Math.max(popularity / 100, 0), 1);
+
+  const planets = Object.entries(ARTISTS).map(([id, a]) => {
+    const color = new THREE.Color(MOOD_COLORS[a.mood]);
+    const glow = glowFor(a.popularity);
+
+    const plane = new THREE.Object3D();
+    plane.rotation.x = (hash(id + "x") - 0.5) * 0.36;
+    plane.rotation.z = (hash(id + "z") - 0.5) * 0.26;
+    scene.add(plane);
+
+    const orbitLine = new THREE.LineLoop(CIRCLE, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0, depthWrite: false }));
+    plane.add(orbitLine);
+
+    const holder = new THREE.Group();
+    plane.add(holder);
+
+    const tex = bandTexture(hash(id));
+    const material = new THREE.MeshStandardMaterial({
+      map: tex, color: color.clone(), emissive: color.clone(), emissiveMap: tex,
+      emissiveIntensity: 0.1 + glow * 0.22, roughness: 0.82, metalness: 0,
+    });
+    const mesh = new THREE.Mesh(SPHERE, material);
+    mesh.rotation.z = (hash(id + "t") - 0.5) * 0.7;
+    mesh.userData = { kind: "planet", id };
+    holder.add(mesh);
+
+    const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: GLOW, color, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }));
+    holder.add(halo);
+
+    const label = document.createElement("button");
+    label.type = "button";
+    label.className = "label";
+    label.style.opacity = "0";
+    label.addEventListener("click", () => focusPlanet(planet));
+    labelsEl.appendChild(label);
+
+    const moons = a.tracks.map(([title, seconds, year], i) => {
+      const pivot = new THREE.Object3D();
+      pivot.rotation.x = (hash(title + "p") - 0.5) * 1.1;
+      pivot.rotation.z = (hash(title + "q") - 0.5) * 0.8;
+      holder.add(pivot);
+      const m = new THREE.Mesh(MOON_SPHERE, new THREE.MeshStandardMaterial({
+        color: 0xdedbe9, emissive: color.clone(), emissiveIntensity: 0.28, roughness: 0.9,
+      }));
+      m.userData = { kind: "moon", id, index: i };
+      pivot.add(m);
+      const ml = document.createElement("span");
+      ml.className = "label moon";
+      ml.style.opacity = "0";
+      ml.textContent = title;
+      labelsEl.appendChild(ml);
+      return {
+        title, seconds, year, pivot, mesh: m, label: ml, rank: 0,
+        angle: hash(title) * Math.PI * 2,
+        speed: (0.5 + hash(title + "s") * 0.4) / (i + 1),
+        highlight: 0, highlightTarget: 0,
+      };
+    });
+
+    const planet = {
+      id, artist: a, color, glow, plane, holder, mesh, material, halo, orbitLine, label, moons,
+      angle: hash(id + "a") * Math.PI * 2,
+      rank: 0, orbit: 30, orbitTarget: 30, radius: 0, radiusTarget: 0,
+      dim: 1, dimTarget: 1, hover: 0,
+    };
+    return planet;
+  });
+  const planetById = Object.fromEntries(planets.map((p) => [p.id, p]));
+
+  // ------------------------------------------------------------------
+  // Constellation (top tracks), hung in the sky behind the galaxy
+  // ------------------------------------------------------------------
+  const STAR_COUNT = 20;
+  const HOME_DIR = new THREE.Vector3(0, 0.42, 1).normalize();
+  // Home view looks slightly above the core, leaving sky room for the constellation
+  const HOME_TARGET = new THREE.Vector3(0, 7, 0);
+  const constellation = (() => {
+    const group = new THREE.Group();
+    group.position.set(0, 8, -110);
+    scene.add(group);
+    group.lookAt(HOME_TARGET.clone().addScaledVector(HOME_DIR, HOME_DIST));
+    if (window.innerWidth < 720) group.scale.setScalar(0.8);  // fit phone widths
+    group.updateMatrixWorld(true);
+
+    // One winding chain with sharp turns, like Draco or Eridanus: #1 at one end, #20 at
+    // the other, joined in rank order so it reads start to finish. Drawn as seen from the
+    // close-up view (behind the constellation), so x is mirrored into local space.
+    const PATH = [
+      [-25, 12], [-20, 15], [-15, 10], [-17, 4], [-11, 1],
+      [-6, 6], [-1, 12], [4, 15], [9, 10], [6, 4],
+      [10, -1], [5, -6], [-2, -4], [-8, -9], [-4, -15],
+      [3, -13], [10, -16], [16, -11], [21, -5], [26, -9],
+    ];
+    const rand = rng(0.318);
+    const pts = PATH.map(([x, y]) => new THREE.Vector3(-x, y, (rand() - 0.5) * 6));
+    const EDGES = pts.slice(1).map((pt, i) => [pts[i], pt]);
+
+    const line = new THREE.LineSegments(
+      new THREE.BufferGeometry().setFromPoints(EDGES.flat()),
+      new THREE.LineBasicMaterial({ color: 0xcfd3ff, transparent: true, opacity: 0.12, depthWrite: false, fog: false }),
+    );
+    group.add(line);
+
+    // Invisible hit area so the whole constellation can be hovered and clicked as one object
+    const hitArea = new THREE.Mesh(
+      new THREE.PlaneGeometry(62, 42),
+      new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide }),
+    );
+    hitArea.userData = { kind: "sky" };
+    group.add(hitArea);
+
+    const stars = pts.map((pt, i) => {
+      const core = new THREE.Sprite(new THREE.SpriteMaterial({ map: GLOW, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
+      core.position.copy(pt);
+      core.userData = { kind: "star", slot: i };
+      group.add(core);
+      const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: GLOW, transparent: true, opacity: 0.16, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
+      halo.position.copy(pt);
+      group.add(halo);
+      const label = document.createElement("span");
+      label.className = "label star";
+      label.style.opacity = "0";
+      labelsEl.appendChild(label);
+      return {
+        slot: i, core, halo, label, track: null,
+        size: 4.6 - i * 0.13,
+        color: new THREE.Color(0xffffff), colorTarget: new THREE.Color(0xffffff),
+        highlight: 0, highlightTarget: 0, dim: 1, dimTarget: 1,
+        twinkle: rand() * Math.PI * 2,
+      };
+    });
+
+    const caption = document.createElement("button");
+    caption.type = "button";
+    caption.className = "label caption";
+    caption.setAttribute("aria-label", "View your top tracks constellation");
+    caption.addEventListener("click", () => focusConstellation());
+    labelsEl.appendChild(caption);
+
+    const normal = new THREE.Vector3(0, 0, 1).applyQuaternion(group.quaternion);
+    return {
+      group, line, stars, caption, hitArea,
+      center: group.position.clone(),
+      normal,
+      // Close-up camera sits behind and a little below, looking back toward the galaxy
+      viewDir: normal.clone().negate().add(new THREE.Vector3(0, -0.4, 0)).normalize(),
+      captionPos: group.localToWorld(new THREE.Vector3(0, -21, 0)),
+    };
+  })();
+
+  // ------------------------------------------------------------------
+  // Mood nebula: wisps colored in proportion to the mood mix (/mood)
+  // ------------------------------------------------------------------
+  function cloudTexture(seed) {
+    const c = document.createElement("canvas");
+    c.width = c.height = 256;
+    const g = c.getContext("2d");
+    const rand = rng(seed);
+    for (let i = 0; i < 70; i++) {
+      // Blobs cluster toward the middle and fade out, so each wisp has a soft, irregular edge
+      const r = Math.pow(rand(), 1.6) * 90;
+      const a = rand() * Math.PI * 2;
+      const x = 128 + Math.cos(a) * r, y = 128 + Math.sin(a) * r * 0.7;
+      const size = 14 + rand() * 46;
+      const grad = g.createRadialGradient(x, y, 0, x, y, size);
+      grad.addColorStop(0, `rgba(255,255,255,${0.05 + rand() * 0.08})`);
+      grad.addColorStop(1, "rgba(255,255,255,0)");
+      g.fillStyle = grad;
+      g.fillRect(0, 0, 256, 256);
+    }
+    return new THREE.CanvasTexture(c);
+  }
+  const CLOUDS = [cloudTexture(0.11), cloudTexture(0.52), cloudTexture(0.87)];
+
+  const nebula = (() => {
+    const center = new THREE.Vector3(-120, -22, -250);
+    const group = new THREE.Group();
+    group.position.copy(center);
+    scene.add(group);
+    const rand = rng(0.909);
+    const puffs = [];
+    for (let i = 0; i < 32; i++) {
+      const r = 8 + Math.pow(rand(), 0.6) * 50;
+      const th = rand() * Math.PI * 2;
+      const ph = Math.acos(2 * rand() - 1);
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: CLOUDS[i % 3], transparent: true, opacity: 0, depthWrite: false,
+        blending: THREE.AdditiveBlending, fog: false,
+      }));
+      sprite.position.set(r * Math.sin(ph) * Math.cos(th) * 1.35, r * Math.cos(ph) * 0.6, r * Math.sin(ph) * Math.sin(th) * 0.8);
+      sprite.scale.setScalar(38 + rand() * 52);
+      sprite.material.rotation = rand() * Math.PI * 2;
+      group.add(sprite);
+      puffs.push({
+        // pick follows the wisp's angle around the center, so each mood fills its own lobe
+        sprite, base: 0.5 + rand() * 0.5, spin: (rand() - 0.5) * 0.03,
+        pick: Math.min(0.999, Math.max(0, th / (Math.PI * 2) + (rand() - 0.5) * 0.06)),
+        mood: "Other", color: new THREE.Color(MOOD_COLORS.Other), colorTarget: new THREE.Color(MOOD_COLORS.Other),
+        dim: 1,
+      });
+    }
+    const hit = new THREE.Mesh(new THREE.SphereGeometry(58, 16, 12), new THREE.MeshBasicMaterial({ visible: false }));
+    hit.userData = { kind: "nebula" };
+    group.add(hit);
+
+    const caption = document.createElement("button");
+    caption.type = "button";
+    caption.className = "label caption";
+    caption.textContent = "Mood nebula";
+    caption.setAttribute("aria-label", "Explore your mood nebula");
+    caption.addEventListener("click", () => focusNebula());
+    labelsEl.appendChild(caption);
+
+    return { kind: "nebula", group, puffs, hit, caption, center, captionPos: center.clone().add(new THREE.Vector3(0, -44, 0)) };
+  })();
+
+  // Wisps take moods by walking the cumulative distribution, so each mood's share of
+  // the cloud matches its share of the mix
+  function colorNebula(distribution) {
+    const rows = Object.entries(distribution).sort((a, b) => b[1] - a[1]);
+    for (const puff of nebula.puffs) {
+      let acc = 0;
+      puff.mood = "Other";
+      for (const [mood, pct] of rows) {
+        acc += pct / 100;
+        if (puff.pick <= acc) { puff.mood = mood; break; }
+      }
+      puff.colorTarget.set(MOOD_COLORS[puff.mood]);
+    }
+  }
+
+  const core = { kind: "core" };
+  const coreLabel = document.createElement("span");
+  coreLabel.className = "label";
+  coreLabel.style.pointerEvents = "none";
+  coreLabel.style.opacity = "0";
+  coreLabel.textContent = "You";
+  labelsEl.appendChild(coreLabel);
+
+  // ------------------------------------------------------------------
+  // State + UI
+  // ------------------------------------------------------------------
+  const state = {
+    range: "medium_term",
+    focus: null,
+    flying: true,
+    hovered: null,
+    highlightMood: null,
+    interacted: false,
+    landing: true,
+    warp: 1,
+    hoveredStar: null,
+    skyHover: false,
+    nebulaHover: false,
+    coreHover: false,
+    mood: null,
+    linkedPlanet: null,
+    restoreHome: false,
+  };
+  let topTracks = [];
+  const tracksBtn = document.getElementById("tracks-btn");
+
+  const panel = document.getElementById("panel");
+  const hint = document.getElementById("hint");
+  const moodsEl = document.getElementById("moods");
+
+  function setRange(range) {
+    state.range = range;
+    const order = RANGES[range].order;
+    for (const p of planets) {
+      p.rank = order.indexOf(p.id) + 1;
+      if (p.rank) {
+        p.orbitTarget = orbitFor(p.rank);
+        p.radiusTarget = sizeFor(p.rank);
+        p.label.innerHTML = `<span class="rk">${pad2(p.rank)}</span>${esc(p.artist.name)}`;
+        p.label.setAttribute("aria-label", `${p.artist.name}, rank ${p.rank}. Visit planet`);
+        p.label.tabIndex = 0;
+      } else {
+        p.radiusTarget = 0;
+        p.label.tabIndex = -1;
+      }
+    }
+
+    // Top tracks: roughly follow artist rank, with some shuffle
+    const tracks = [];
+    for (const p of planets) {
+      if (!p.rank) continue;
+      for (const m of p.moons) {
+        tracks.push({ title: m.title, artist: p.artist.name, seconds: m.seconds, year: m.year, mood: p.artist.mood, moon: m, planet: p, score: p.rank + hash(m.title + range) * 5 });
+      }
+    }
+    for (const x of EXTRA_TRACKS) tracks.push({ ...x, moon: null, planet: null, score: 3.5 + hash(x.title + range) * 9 });
+    tracks.sort((a, b) => a.score - b.score).forEach((t, i) => {
+      t.rank = i + 1;
+      if (t.moon) t.moon.rank = t.rank;
+    });
+    topTracks = tracks.slice(0, STAR_COUNT);
+    constellation.stars.forEach((star, i) => {
+      const t = topTracks[i] || null;
+      star.track = t;
+      star.colorTarget.set(0xffffff).lerp(new THREE.Color(MOOD_COLORS[t ? t.mood : "Other"]), 0.4);
+      star.label.innerHTML = t ? `<span class="rk">#${t.rank}</span><span class="tt">${esc(t.title)}</span>` : "";
+    });
+    constellation.caption.innerHTML = `<span class="rk">${topTracks.length}</span>Top tracks`;
+
+    for (const btn of document.querySelectorAll(".ranges button")) {
+      btn.setAttribute("aria-checked", String(btn.dataset.range === range));
+    }
+
+    renderMood();
+    if (state.focus === constellation) renderTracksPanel();
+    else if (state.focus === nebula) renderNebulaPanel();
+    else if (state.focus === core) renderCorePanel();
+    else if (state.focus && !state.focus.rank) unfocus();
+    else if (state.focus) renderPanel(state.focus);
+  }
+
+  function moodRows(distribution) {
+    return Object.entries(distribution).sort((a, b) => b[1] - a[1]).map(([mood, pct]) => `
+      <li><button type="button" data-mood="${mood}" style="--c:${MOOD_COLORS[mood]}" aria-label="Highlight ${mood}, ${Math.round(pct)} percent">
+        <span class="dot"></span><span>${mood}</span><span class="bar"><i style="width:${pct.toFixed(1)}%"></i></span><span class="pct">${Math.round(pct)}%</span>
+      </button></li>`).join("");
+  }
+  function bindMoodRows(el) {
+    el.addEventListener("pointerover", (e) => { const b = e.target.closest("button[data-mood]"); if (b) setHighlight(b.dataset.mood); });
+    el.addEventListener("pointerleave", () => setHighlight(null));
+    el.addEventListener("focusin", (e) => { const b = e.target.closest("button[data-mood]"); if (b) setHighlight(b.dataset.mood); });
+    el.addEventListener("focusout", () => setHighlight(null));
+    el.addEventListener("click", (e) => {
+      const b = e.target.closest("button[data-mood]");
+      if (b) setHighlight(state.highlightMood === b.dataset.mood ? null : b.dataset.mood);
+    });
+  }
+
+  function renderMood() {
+    const active = planets.filter((p) => p.rank);
+    const genres = active.flatMap((p) => p.artist.genres);
+    const { distribution, dominant } = analyzeGenres(genres);
+    const withGenres = active.filter((p) => p.artist.genres.length).length;
+    const counts = {};
+    for (const g of genres) counts[g] = (counts[g] || 0) + 1;
+    const topGenres = Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 10);
+    state.mood = { distribution, dominant, withGenres, total: active.length, topGenres };
+    moodTintTarget.set(MOOD_COLORS[dominant]);
+    colorNebula(distribution);
+
+    document.getElementById("mood-eyebrow").textContent = `Galaxy mood · ${RANGES[state.range].label}`;
+    const dom = document.getElementById("dominant");
+    dom.innerHTML = `${dominant}<small>${Math.round(distribution[dominant] || 0)}%</small>`;
+    dom.style.color = MOOD_COLORS[dominant];
+
+    moodsEl.innerHTML = moodRows(distribution);
+    document.getElementById("basis").textContent = `Based on ${withGenres} of ${active.length} artists with genre data`;
+  }
+
+  bindMoodRows(moodsEl);
+  document.getElementById("mood-link").addEventListener("click", () => focusNebula());
+
+  function setHighlight(mood) {
+    state.highlightMood = mood;
+    for (const b of document.querySelectorAll("button[data-mood]")) b.classList.toggle("on", b.dataset.mood === mood);
+  }
+
+  function renderPanel(p) {
+    const a = p.artist;
+    const range = RANGES[state.range].label;
+    const moons = [...p.moons].sort((x, y) => x.rank - y.rank);
+    const tracks = moons.length
+      ? `<ol class="tracks">${moons.map((m, i) => `
+          <li><a href="https://open.spotify.com/search/${encodeURIComponent(`${m.title} ${a.name}`)}" target="_blank" rel="noopener" data-moon="${p.moons.indexOf(m)}">
+            <span class="rk">#${m.rank}</span><span class="t">${esc(m.title)}</span><span class="d">${fmtDuration(m.seconds)}</span>
+          </a></li>`).join("")}</ol>`
+      : `<p class="empty">None of their songs are in your top 50 tracks. You listen to them across many songs instead of one favorite.</p>`;
+
+    panel.innerHTML = `
+      <button type="button" class="back" id="back">← Galaxy <kbd>Esc</kbd></button>
+      <div class="artist">
+        <div class="portrait" style="--c:${MOOD_COLORS[a.mood]}" role="img" aria-label="Photo of ${esc(a.name)}">${initials(a.name)}</div>
+        <p class="portrait-note">Artist photo from Spotify appears here</p>
+        <p class="eyebrow">Rank ${pad2(p.rank)} · Top artist · ${range}</p>
+        <h2>${esc(a.name)}</h2>
+        <p class="chip"><span class="dot" style="--c:${MOOD_COLORS[a.mood]}"></span>${a.mood}</p>
+      </div>
+      <dl class="stats four">
+        <div><dt>Popularity</dt><dd>${a.popularity}<small>/100</small></dd></div>
+        <div><dt>Followers</dt><dd>${fmtCount(a.followers)}</dd></div>
+        <div><dt>Moons</dt><dd>${p.moons.length}<small> ${p.moons.length === 1 ? "track" : "tracks"}</small></dd></div>
+      </dl>
+      <p class="genres">${a.genres.length ? a.genres.map(esc).join(" · ") : "Spotify has no genres for this artist, so the planet stays neutral gray."}</p>
+      <p class="section-title">Orbiting tracks</p>
+      ${tracks}
+      <p class="key">Color shows genre family · glow shows popularity · distance from the core shows rank</p>`;
+    panel.querySelector("#back").addEventListener("click", unfocus);
+    for (const link of panel.querySelectorAll("[data-moon]")) {
+      const m = p.moons[Number(link.dataset.moon)];
+      const star = constellation.stars.find((s) => s.track && s.track.moon === m);
+      const set = (v) => { m.highlightTarget = v; if (star) star.highlightTarget = v; };
+      link.addEventListener("pointerenter", () => set(1));
+      link.addEventListener("pointerleave", () => set(0));
+      link.addEventListener("focus", () => set(1));
+      link.addEventListener("blur", () => set(0));
+    }
+  }
+
+  function renderTracksPanel() {
+    const range = RANGES[state.range].label;
+    panel.innerHTML = `
+      <button type="button" class="back" id="back">← Galaxy <kbd>Esc</kbd></button>
+      <div class="artist">
+        <p class="eyebrow">Constellation · ${range}</p>
+        <h2>Top tracks</h2>
+        <p class="chip">Your ${topTracks.length} most-played songs, brightest first</p>
+      </div>
+      <ol class="tracks ranked">${topTracks.map((t, i) => `
+        <li><a href="https://open.spotify.com/search/${encodeURIComponent(`${t.title} ${t.artist}`)}" target="_blank" rel="noopener" data-slot="${i}">
+          <span class="rk">#${pad2(t.rank)}</span>
+          <span class="t"><b>${esc(t.title)}</b><small><span class="dot" style="--c:${MOOD_COLORS[t.mood]}"></span>${esc(t.artist)}${t.planet ? "" : " · not in your top 10 artists"}</small></span>
+          <span class="d">${fmtDuration(t.seconds)}</span>
+        </a></li>`).join("")}</ol>
+      <p class="key">Brightness shows rank · color shows the artist's genre family · hover a song to light up its moon in the galaxy behind</p>`;
+    panel.querySelector("#back").addEventListener("click", unfocus);
+    for (const link of panel.querySelectorAll("[data-slot]")) {
+      const slot = Number(link.dataset.slot);
+      link.addEventListener("pointerenter", () => linkTrack(slot, true));
+      link.addEventListener("pointerleave", () => linkTrack(slot, false));
+      link.addEventListener("focus", () => linkTrack(slot, true));
+      link.addEventListener("blur", () => linkTrack(slot, false));
+    }
+  }
+
+  function renderCorePanel() {
+    const range = RANGES[state.range].label;
+    const { dominant } = state.mood;
+    const active = planets.filter((p) => p.rank);
+    const moonCount = active.reduce((n, p) => n + p.moons.length, 0);
+    const seconds = topTracks.reduce((n, t) => n + t.seconds, 0);
+    const hrs = Math.floor(seconds / 3600), mins = Math.round((seconds % 3600) / 60);
+
+    // Musical era from release years of the top tracks
+    const dated = topTracks.filter((t) => t.year);
+    const decades = {};
+    for (const t of dated) { const d = Math.floor(t.year / 10) * 10; decades[d] = (decades[d] || 0) + 1; }
+    const rows = Object.entries(decades).sort((a, b) => b[0] - a[0]);
+    const top = rows.reduce((a, b) => (b[1] > a[1] ? b : a), rows[0] || ["", 0]);
+    const oldest = dated.reduce((a, b) => (b.year < a.year ? b : a), dated[0]);
+    const maxCount = Math.max(...rows.map((r) => r[1]), 1);
+
+    panel.innerHTML = `
+      <button type="button" class="back" id="back">← Galaxy <kbd>Esc</kbd></button>
+      <div class="artist">
+        <div class="portrait" style="--c:${MOOD_COLORS[dominant]}" role="img" aria-label="Your profile photo">${initials(USER.display_name)}</div>
+        <p class="portrait-note">Your Spotify profile photo appears here</p>
+        <p class="eyebrow">Your universe · ${range}</p>
+        <h2>${esc(USER.display_name)}</h2>
+        <p class="chip"><span class="dot" style="--c:${MOOD_COLORS[dominant]}"></span>${dominant} at heart</p>
+      </div>
+      <dl class="stats four">
+        <div><dt>Followers</dt><dd>${fmtCount(USER.followers)}</dd></div>
+        <div><dt>Planets</dt><dd>${active.length}<small> artists</small></dd></div>
+        <div><dt>Moons</dt><dd>${moonCount}<small> tracks</small></dd></div>
+        <div><dt>Top ${topTracks.length} runtime</dt><dd>${hrs ? `${hrs}<small> hr </small>` : ""}${mins}<small> min</small></dd></div>
+      </dl>
+      <p class="section-title">Musical era</p>
+      <p class="genres">Mostly the ${top[0]}s${oldest ? ` · oldest: ${esc(oldest.title)} (${oldest.year})` : ""}</p>
+      <ul class="era">${rows.map(([d, n]) => `
+        <li><span>${d}s</span><span class="bar"><i style="width:${(n / maxCount) * 100}%"></i></span><span class="n">${n}</span></li>`).join("")}</ul>
+      <a class="out" href="${USER.profile_url}" target="_blank" rel="noopener">Open your Spotify profile ↗</a>
+      <p class="key">From your Spotify profile and the release dates of your top ${topTracks.length} tracks</p>`;
+    panel.querySelector("#back").addEventListener("click", unfocus);
+  }
+
+  function renderNebulaPanel() {
+    const range = RANGES[state.range].label;
+    const { distribution, dominant, withGenres, total, topGenres } = state.mood;
+    const id = MOOD_IDENTITY[dominant];
+    const pct = Math.round(distribution[dominant] || 0);
+    panel.innerHTML = `
+      <button type="button" class="back" id="back">← Galaxy <kbd>Esc</kbd></button>
+      <div class="artist">
+        <p class="eyebrow">Mood nebula · ${range}</p>
+        <h2 style="color:${MOOD_COLORS[dominant]}">${dominant}</h2>
+        <p class="chip">${pct ? `Your dominant mood, ${pct}% of your genre mix` : "Not enough genre data to read a mood yet"}</p>
+      </div>
+      <p class="section-title">Mood mix</p>
+      <ul class="moods panel-moods" id="panel-moods">${moodRows(distribution)}</ul>
+      <p class="section-title">Top genres</p>
+      ${topGenres.length
+        ? `<ul class="chips">${topGenres.map(([g, n]) => `<li>${esc(g)}<b>×${n}</b></li>`).join("")}</ul>`
+        : `<p class="empty">Spotify has no genres for these artists yet.</p>`}
+      <p class="section-title">Visual identity</p>
+      <div class="swatches">
+        <span class="swatch"><i style="--c:${id.primary}"></i>Primary</span>
+        <span class="swatch"><i style="--c:${id.secondary}"></i>Secondary</span>
+        <span class="swatch"><i style="--c:${id.accent}"></i>Accent</span>
+      </div>
+      <p class="genres">Background style: ${id.background} · glow ${id.glow}</p>
+      <p class="key">Based on ${withGenres} of ${total} artists with genre data. Each mood colors a share of the nebula equal to its share of the mix.</p>`;
+    panel.querySelector("#back").addEventListener("click", unfocus);
+    bindMoodRows(panel.querySelector("#panel-moods"));
+  }
+
+  function openPanel(target, render) {
+    state.focus = target;
+    state.flying = true;
+    state.restoreHome = false;
+    state.linkedPlanet = null;
+    tracksBtn.setAttribute("aria-pressed", String(target === constellation));
+    render();
+    panel.classList.remove("closed");
+    document.body.classList.add("focused");
+    markInteracted();
+  }
+  function focusCore() { openPanel(core, renderCorePanel); }
+
+  // ------------------------------------------------------------------
+  // Start screen
+  // ------------------------------------------------------------------
+  const landingEl = document.getElementById("landing");
+  const toastEl = document.getElementById("toast");
+  // Codes the backend sends as /?login_error=<code>, plus a 403 from an account that isn't on the allowlist
+  const LOGIN_ERRORS = {
+    access_denied: "Spotify login was cancelled. You can try again, or explore the demo instead.",
+    invalid_state: "That login link expired. Please connect Spotify again.",
+    missing_code: "Spotify didn't finish the login. Please try again.",
+    token_exchange_failed: "Spotify couldn't complete the login. Please try again in a moment.",
+    not_invited: "This Spotify account isn't on the invite list yet. The demo universe shows the full experience.",
+  };
+  function showLoginError(code) {
+    const el = document.getElementById("login-error");
+    if (!code) { el.hidden = true; return; }
+    el.textContent = LOGIN_ERRORS[code] || LOGIN_ERRORS.token_exchange_failed;
+    el.hidden = false;
+  }
+  let toastTimer = null;
+  function toast(message) {
+    toastEl.textContent = message;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove("show"), 4200);
+  }
+
+  function enterUniverse() {
+    if (!state.landing) return;
+    state.landing = false;
+    state.flying = true;
+    state.restoreHome = true;
+    state.warp = reducedMotion ? 1 : 0;
+    showLoginError(null);
+    landingEl.classList.add("gone");
+    landingEl.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("landing-on");
+    controls.enabled = true;
+  }
+  function backToStart() {
+    if (state.landing) return;
+    unfocus();
+    state.landing = true;
+    state.flying = true;
+    state.restoreHome = true;
+    landingEl.classList.remove("gone");
+    landingEl.removeAttribute("aria-hidden");
+    document.body.classList.add("landing-on");
+    controls.enabled = false;
+    document.getElementById("demo-btn").focus({ preventScroll: true });
+  }
+
+  document.getElementById("demo-btn").addEventListener("click", enterUniverse);
+  document.getElementById("connect-btn").addEventListener("click", () => {
+    // Real app: window.location.href = "/api/v1/auth/login" (full-page redirect to Spotify)
+    enterUniverse();
+    toast("Spotify login isn't connected in this prototype, so here's the demo universe.");
+  });
+  document.getElementById("home-btn").addEventListener("click", backToStart);
+  function focusNebula() { openPanel(nebula, renderNebulaPanel); }
+
+  // Light a song's star, and its moon + planet when it has one
+  function linkTrack(slot, on) {
+    const star = constellation.stars[slot];
+    if (!star || !star.track) return;
+    star.highlightTarget = on ? 1 : 0;
+    if (star.track.moon) star.track.moon.highlightTarget = on ? 1 : 0;
+    state.linkedPlanet = on ? star.track.planet : null;
+  }
+
+  function focusConstellation(slot) {
+    state.focus = constellation;
+    state.flying = true;
+    state.restoreHome = false;
+    renderTracksPanel();
+    panel.classList.remove("closed");
+    document.body.classList.add("focused");
+    tracksBtn.setAttribute("aria-pressed", "true");
+    markInteracted();
+    if (slot != null) {
+      const link = panel.querySelector(`[data-slot="${slot}"]`);
+      if (link) {
+        link.classList.add("on");
+        link.scrollIntoView({ block: "nearest", behavior: reducedMotion ? "auto" : "smooth" });
+      }
+      linkTrack(slot, true);
+      setTimeout(() => { linkTrack(slot, false); if (link) link.classList.remove("on"); }, 1600);
+    }
+  }
+
+  function focusPlanet(p) {
+    if (!p.rank) return;
+    state.focus = p;
+    state.flying = true;
+    state.restoreHome = false;
+    state.linkedPlanet = null;
+    tracksBtn.setAttribute("aria-pressed", "false");
+    renderPanel(p);
+    panel.classList.remove("closed");
+    document.body.classList.add("focused");
+    markInteracted();
+  }
+  function unfocus() {
+    if (!state.focus) return;
+    if (state.focus === constellation || state.focus === nebula || state.focus === core) state.restoreHome = true;
+    state.focus = null;
+    state.linkedPlanet = null;
+    tracksBtn.setAttribute("aria-pressed", "false");
+    state.flying = true;
+    panel.classList.add("closed");
+    document.body.classList.remove("focused");
+  }
+  function markInteracted() {
+    if (state.interacted) return;
+    state.interacted = true;
+    hint.classList.add("gone");
+  }
+
+  document.querySelector(".ranges").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-range]");
+    if (b) setRange(b.dataset.range);
+  });
+  tracksBtn.addEventListener("click", () => (state.focus === constellation ? unfocus() : focusConstellation()));
+  window.addEventListener("keydown", (e) => { if (e.key === "Escape" && !state.landing) unfocus(); });
+  controls.addEventListener("start", () => { state.flying = false; state.restoreHome = false; markInteracted(); });
+
+  // ------------------------------------------------------------------
+  // Picking
+  // ------------------------------------------------------------------
+  const raycaster = new THREE.Raycaster();
+  const pointer = new THREE.Vector2();
+  let downAt = null;
+
+  function pick(clientX, clientY) {
+    pointer.set((clientX / window.innerWidth) * 2 - 1, -(clientY / window.innerHeight) * 2 + 1);
+    raycaster.setFromCamera(pointer, camera);
+    const targets = [sun];
+    for (const s of constellation.stars) if (s.track) targets.push(s.core);
+    if (state.focus !== constellation) targets.push(constellation.hitArea);
+    if (state.focus !== nebula) targets.push(nebula.hit);
+    for (const p of planets) {
+      if (!p.holder.visible) continue;
+      targets.push(p.mesh);
+      if (p === state.focus) for (const m of p.moons) targets.push(m.mesh);
+    }
+    const hit = raycaster.intersectObjects(targets, false)[0];
+    return hit ? hit.object.userData : null;
+  }
+
+  renderer.domElement.addEventListener("pointermove", (e) => {
+    if (e.pointerType === "touch") return;
+    const hit = pick(e.clientX, e.clientY);
+    state.hovered = hit && hit.id ? planetById[hit.id] : null;
+    state.hoveredStar = hit && hit.kind === "star" ? hit.slot : null;
+    state.skyHover = !!hit && (hit.kind === "sky" || hit.kind === "star") && state.focus !== constellation;
+    state.nebulaHover = !!hit && hit.kind === "nebula";
+    state.coreHover = !!hit && hit.kind === "sun" && state.focus !== core;
+    renderer.domElement.style.cursor = hit ? "pointer" : "grab";
+  });
+  renderer.domElement.addEventListener("pointerdown", (e) => { downAt = [e.clientX, e.clientY]; });
+  renderer.domElement.addEventListener("pointerup", (e) => {
+    if (!downAt) return;
+    const moved = Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]);
+    downAt = null;
+    if (moved > 6) return;
+    const hit = pick(e.clientX, e.clientY);
+    if (!hit) return;
+    if (hit.kind === "sun") return state.focus === core ? unfocus() : focusCore();
+    if (hit.kind === "nebula") return focusNebula();
+    if (hit.kind === "star") return focusConstellation(hit.slot);
+    if (hit.kind === "sky") return focusConstellation();
+    const p = planetById[hit.id];
+    if (state.focus !== p) focusPlanet(p);
+    if (hit.kind === "moon") {
+      const m = p.moons[hit.index];
+      m.highlightTarget = 1;
+      setTimeout(() => { m.highlightTarget = 0; }, 1400);
+    }
+  });
+
+  // ------------------------------------------------------------------
+  // Frame loop
+  // ------------------------------------------------------------------
+  const clock = new THREE.Clock();
+  const motion = reducedMotion ? 0.15 : 1;
+  const tmpA = new THREE.Vector3();
+  const tmpB = new THREE.Vector3();
+  const tmpC = new THREE.Vector3();
+  const prevTarget = new THREE.Vector3();
+  const ease = (rate, dt) => 1 - Math.pow(rate, dt);
+  let viewShift = 0;
+  let viewShiftY = 0;
+  let skyGlow = 0;
+  let nebulaGlow = 0;
+  const ORIGIN = new THREE.Vector3();
+  const sph = new THREE.Spherical();
+  const sphGoal = new THREE.Spherical();
+
+  // Distance at which the note fills the space beside (or above) the panel
+  function skyDistance(w = 28 * constellation.group.scale.x, h = 18 * constellation.group.scale.x) {
+    const halfW = w, halfH = h;
+    const tanV = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    const tanH = tanV * camera.aspect;
+    const wide = window.innerWidth > 720;
+    const usableW = wide ? 1 - Math.min(380, window.innerWidth * 0.3) / window.innerWidth : 1;
+    const usableH = wide ? 1 : 0.36;
+    return Math.max(halfH / (tanV * 0.66 * usableH), halfW / (tanH * 0.7 * usableW));
+  }
+
+  function focusDistance(p) {
+    const outer = p.moons.length ? p.radius * (1.9 + (p.moons.length - 1) * 0.65) : p.radius;
+    return Math.max(p.radius * 7.5, outer * 3.6);
+  }
+
+  function projectLabel(el, worldPos, worldRadius, opacity) {
+    tmpA.copy(worldPos).project(camera);
+    if (tmpA.z > 1 || opacity < 0.02) { el.style.opacity = "0"; el.style.visibility = "hidden"; return; }
+    const x = (tmpA.x * 0.5 + 0.5) * window.innerWidth;
+    const y = (-tmpA.y * 0.5 + 0.5) * window.innerHeight;
+    tmpB.copy(worldPos).addScaledVector(camera.up, worldRadius).project(camera);
+    const r = Math.abs(((-tmpB.y * 0.5 + 0.5) * window.innerHeight) - y);
+    el.style.visibility = "visible";
+    el.style.opacity = opacity.toFixed(3);
+    el.style.transform = `translate(${x.toFixed(1)}px, ${(y + r + 4).toFixed(1)}px) translateX(-50%)`;
+  }
+
+  function frame() {
+    const dt = Math.min(clock.getDelta(), 0.05);
+    const t = clock.elapsedTime;
+
+    // Mood tint drifts toward the dominant mood of the current range
+    moodTint.lerp(moodTintTarget, ease(0.2, dt));
+    sunHalo.material.color.copy(moodTint).lerp(new THREE.Color(0xffffff), 0.35);
+    sunCorona.material.color.copy(moodTint);
+    nebulae[0].material.color.copy(moodTint);
+    nebulae[2].material.color.copy(moodTint).lerp(new THREE.Color(0x6f7cff), 0.5);
+    nebulae[1].material.color.set(0x4a5bd8);
+    sunHalo.scale.setScalar(20 + Math.sin(t * 0.8) * 0.6 * motion);
+    dust.rotation.y += dt * 0.004 * motion;
+
+    for (const p of planets) {
+      p.orbit += (p.orbitTarget - p.orbit) * ease(0.15, dt);
+      p.radius += (p.radiusTarget - p.radius) * ease(0.08, dt);
+      if (p.radiusTarget === 0 && p.radius < 0.02) p.radius = 0;
+      const shown = p.radius > 0.001;
+      p.holder.visible = shown;
+      p.orbitLine.visible = shown;
+
+      p.dimTarget = state.highlightMood && p.artist.mood !== state.highlightMood ? 0.1
+        : state.focus === constellation ? 0.6 : state.focus && state.focus !== p ? 0.45 : 1;
+      p.dim += (p.dimTarget - p.dim) * ease(0.01, dt);
+      const hoverTarget = state.hovered === p || state.focus === p || state.linkedPlanet === p ? 1 : 0;
+      p.hover += (hoverTarget - p.hover) * ease(0.005, dt);
+
+      p.angle += dt * motion * (3.4 / Math.pow(p.orbit, 1.5));
+      p.holder.position.set(Math.cos(p.angle) * p.orbit, 0, Math.sin(p.angle) * p.orbit);
+      p.mesh.scale.setScalar(Math.max(p.radius, 0.0001));
+      p.mesh.rotation.y += dt * 0.12 * motion;
+      p.orbitLine.scale.setScalar(p.orbit);
+
+      const presence = Math.min(p.radius / Math.max(sizeFor(p.rank || 10), 0.01), 1);
+      const boost = state.highlightMood === p.artist.mood ? 0.9 : 0;
+      p.boost = (p.boost || 0) + (boost - (p.boost || 0)) * ease(0.01, dt);
+      const light = p.dim * (1 + p.hover * 0.6 + p.boost);
+      p.material.emissiveIntensity = (0.1 + p.glow * 0.22) * light;
+      p.material.color.copy(p.color).multiplyScalar(0.05 + 0.8 * Math.min(p.dim, 1));
+      p.halo.scale.setScalar(p.radius * (4.4 + p.hover * 1.2));
+      p.halo.material.opacity = (0.16 + p.glow * 0.3) * light * presence;
+      p.orbitLine.material.opacity = (0.07 + p.hover * 0.22) * p.dim * presence;
+
+      for (const m of p.moons) {
+        m.angle += dt * motion * m.speed;
+        m.highlight += (m.highlightTarget - m.highlight) * ease(0.002, dt);
+        const i = p.moons.indexOf(m);
+        const dist = p.radius * (1.9 + i * 0.65);
+        m.mesh.position.set(Math.cos(m.angle) * dist, 0, Math.sin(m.angle) * dist);
+        m.mesh.scale.setScalar(Math.max(p.radius * (0.17 + m.highlight * 0.1), 0.0001));
+        m.mesh.material.emissiveIntensity = (0.22 + m.highlight * 0.9) * p.dim;
+      }
+    }
+
+    // Constellation stars
+    const skyFocus = state.focus === constellation;
+    skyGlow += ((state.skyHover ? 1 : 0) - skyGlow) * ease(0.003, dt);
+    for (const s of constellation.stars) {
+      const visible = !!s.track;
+      s.core.visible = s.halo.visible = visible;
+      if (!visible) { s.label.style.opacity = "0"; s.label.style.visibility = "hidden"; continue; }
+      s.color.lerp(s.colorTarget, ease(0.05, dt));
+      const hovered = state.hoveredStar === s.slot ? 1 : 0;
+      s.highlight += (Math.max(s.highlightTarget, hovered) - s.highlight) * ease(0.002, dt);
+      s.dimTarget = state.highlightMood && s.track.mood !== state.highlightMood ? 0.15
+        : state.focus && !skyFocus ? 0.5 : 1;
+      s.dim += (s.dimTarget - s.dim) * ease(0.01, dt);
+      const lift = 1 + skyGlow * 0.35;
+      const size = lift * s.size * (1 + Math.sin(t * 1.3 + s.twinkle) * 0.07 * motion) * (1 + s.highlight * 0.6);
+      s.core.scale.setScalar(size);
+      s.core.material.color.copy(s.color);
+      s.core.material.opacity = Math.min(1, (0.55 + (1 - s.slot / STAR_COUNT) * 0.45) * s.dim + s.highlight * 0.3);
+      s.halo.scale.setScalar(size * 3.2);
+      s.halo.material.color.copy(s.color);
+      s.halo.material.opacity = (0.16 + s.highlight * 0.25) * s.dim;
+
+      const show = skyFocus ? (state.flying ? 0.35 : 0.85) : hovered ? 1 : 0;
+      s.label.classList.toggle("compact", skyFocus && s.highlight < 0.3);  // titles only on hover
+      if (!show) { s.label.style.opacity = "0"; s.label.style.visibility = "hidden"; }
+      else projectLabel(s.label, s.core.getWorldPosition(tmpC), size * 0.3, Math.min((show + s.highlight * 0.3) * Math.max(s.dim, 0.3), 1));
+    }
+    constellation.line.material.opacity = (skyFocus ? 0.4 : 0.28 + skyGlow * 0.3) * (state.focus && !skyFocus ? 0.5 : 1);
+    if (skyFocus) { constellation.caption.style.opacity = "0"; constellation.caption.style.visibility = "hidden"; }
+    else projectLabel(constellation.caption, constellation.captionPos, 0, state.focus ? 0.25 : 0.6 + skyGlow * 0.4);
+
+    // Mood nebula
+    const nebulaFocus = state.focus === nebula;
+    nebulaGlow += ((state.nebulaHover || nebulaFocus ? 1 : 0) - nebulaGlow) * ease(0.004, dt);
+    for (const puff of nebula.puffs) {
+      puff.color.lerp(puff.colorTarget, ease(0.08, dt));
+      const target = state.highlightMood ? (puff.mood === state.highlightMood ? 1.7 : 0.18)
+        : state.focus && !nebulaFocus ? 0.55 : 1;
+      puff.dim += (target - puff.dim) * ease(0.02, dt);
+      puff.sprite.material.color.copy(puff.color);
+      puff.sprite.material.opacity = 0.14 * puff.base * puff.dim * (1 + nebulaGlow * 0.5);
+      puff.sprite.material.rotation += puff.spin * dt * motion;
+    }
+    if (nebulaFocus) { nebula.caption.style.opacity = "0"; nebula.caption.style.visibility = "hidden"; }
+    else projectLabel(nebula.caption, nebula.captionPos, 0, state.focus ? 0.25 : 0.6 + nebulaGlow * 0.4);
+
+    // "You" label on the core, only while hovering it
+    if (state.coreHover) projectLabel(coreLabel, ORIGIN, 2.3, 0.9);
+    else { coreLabel.style.opacity = "0"; coreLabel.style.visibility = "hidden"; }
+
+    // Camera: follow the focus (planet, constellation, nebula or the core), and ease in while flying
+    const goal = state.landing ? LANDING_TARGET : skyFocus ? constellation.center : nebulaFocus ? nebula.center : state.focus === core ? ORIGIN
+      : state.focus ? state.focus.mesh.getWorldPosition(tmpC) : HOME_TARGET;
+
+    // Entering from the start screen: a quick widening of the view, like a jump to warp
+    if (state.warp < 1) {
+      state.warp = Math.min(1, state.warp + dt / 2.6);
+      camera.fov = 50 + Math.sin(state.warp * Math.PI) * 16;
+      camera.updateProjectionMatrix();
+    }
+    const diving = state.warp < 1;
+    prevTarget.copy(controls.target);
+    controls.target.lerp(goal, ease(diving ? 0.0004 : 0.002, dt));
+    camera.position.add(tmpA.subVectors(controls.target, prevTarget));
+    if (state.flying) {
+      const want = state.landing ? LANDING_DIST : skyFocus ? skyDistance() : nebulaFocus ? skyDistance(72, 52) : state.focus === core ? 22 : state.focus ? focusDistance(state.focus) : HOME_DIST;
+      const offset = tmpB.subVectors(camera.position, controls.target);
+      // Swing around the target on a sphere, so going to the far side of the
+      // constellation sweeps past it instead of cutting through it
+      const dir = skyFocus ? constellation.viewDir : state.restoreHome ? HOME_DIR : null;
+      sph.setFromVector3(offset);
+      const next = sph.radius + (want - sph.radius) * ease(diving ? 0.012 : 0.04, dt);
+      let aligned = true;
+      if (dir) {
+        sphGoal.setFromVector3(dir);
+        const dTheta = Math.atan2(Math.sin(sphGoal.theta - sph.theta), Math.cos(sphGoal.theta - sph.theta));
+        const k = ease(0.06, dt);
+        sph.theta += dTheta * k;
+        sph.phi += (sphGoal.phi - sph.phi) * k;
+        aligned = Math.abs(dTheta) < 0.01 && Math.abs(sphGoal.phi - sph.phi) < 0.01;
+      }
+      sph.radius = next;
+      offset.setFromSpherical(sph);
+      camera.position.copy(controls.target).add(offset);
+      if (aligned && Math.abs(next - want) < want * 0.01 && controls.target.distanceTo(goal) < 0.05) {
+        state.flying = false;
+        state.restoreHome = false;
+      }
+    }
+    // Slide the focused planet into the open space left of the panel
+    // (on phones the panel is a bottom sheet, so slide the view up instead)
+    const wide = window.innerWidth > 720;
+    const shiftX = state.focus && wide ? Math.min(380, window.innerWidth * 0.3) / 2 : 0;
+    const shiftY = state.focus && !wide ? window.innerHeight * 0.26 : 0;
+    viewShift += (shiftX - viewShift) * ease(0.02, dt);
+    viewShiftY += (shiftY - viewShiftY) * ease(0.02, dt);
+    if (Math.abs(viewShift) > 0.5 || Math.abs(viewShiftY) > 0.5) {
+      camera.setViewOffset(window.innerWidth, window.innerHeight, viewShift, viewShiftY, window.innerWidth, window.innerHeight);
+    }
+    else if (camera.view && camera.view.enabled) camera.clearViewOffset();
+
+    controls.minDistance = skyFocus ? 20 : nebulaFocus ? 30 : state.focus === core ? 5 : state.focus ? state.focus.radius * 2.2 : 6;
+    // A slow back-and-forth sway (not a full spin), so the constellation stays in view
+    controls.autoRotate = !state.focus && !reducedMotion;
+    // Start screen: a slow, steady turn. In the galaxy: a gentle sway that keeps the sky in view
+    controls.autoRotateSpeed = state.landing ? 0.35 : 0.2 * Math.cos(t * 0.06);
+    controls.update();
+
+    // Labels
+    for (const p of planets) {
+      if (!p.holder.visible) { p.label.style.opacity = "0"; p.label.style.visibility = "hidden"; }
+      else {
+        const presence = Math.min(p.radius / sizeFor(p.rank || 10), 1);
+        const base = state.focus === p ? 1 : state.focus === constellation ? 0.14 : state.focus ? 0.28 : 0.72;
+        const o = Math.min(base * (state.highlightMood ? p.dim * 1.1 : 1) + p.hover * 0.3, 1) * presence;
+        projectLabel(p.label, p.mesh.getWorldPosition(tmpC), p.radius, o);
+      }
+      for (const m of p.moons) {
+        const show = state.focus === p && !state.flying ? 0.85 : state.focus === p ? 0.4 : 0;
+        if (!show) { m.label.style.opacity = "0"; m.label.style.visibility = "hidden"; continue; }
+        projectLabel(m.label, m.mesh.getWorldPosition(tmpC), p.radius * 0.17, Math.min(show + m.highlight * 0.3, 1));
+      }
+    }
+
+    if (composer) composer.render(); else renderer.render(scene, camera);
+    requestAnimationFrame(frame);
+  }
+
+  window.addEventListener("resize", () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    if (composer) composer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  setRange("medium_term");
+  for (const p of planets) { p.orbit = p.orbitTarget; }
+  controls.target.copy(LANDING_TARGET);
+  controls.enabled = false;
+  document.body.classList.add("landing-on");
+  // Preview the error states from the artifact link with a bare anchor, e.g. #access_denied
+  const loginError = new URLSearchParams(window.location.search).get("login_error") || window.location.hash.slice(1);
+  if (LOGIN_ERRORS[loginError]) showLoginError(loginError);
+  renderer.domElement.style.cursor = "grab";
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
