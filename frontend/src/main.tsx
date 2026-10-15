@@ -1,17 +1,13 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
 
 import App from './App'
+import { createQueryClient } from './queryClient'
 import './styles/global.css'
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    // Listening stats change slowly, and each refetch costs Spotify API quota
-    queries: { staleTime: 5 * 60 * 1000, refetchOnWindowFocus: false },
-  },
-})
+const queryClient = createQueryClient()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -26,6 +26,20 @@ The backend's `.env` needs `FRONTEND_URL=http://127.0.0.1:5173` so Spotify login
   npm run gen:api
   ```
 
+## Sessions and protected pages
+
+Pages that need Spotify go inside the `RequireSession` layout route in `src/App.tsx`. It checks the session with `/spotify/me`, then:
+
+| Result | What happens |
+|---|---|
+| Signed in | The page renders; read the user with `useSessionUser()` |
+| 401, never signed in | Start screen |
+| 401 after being signed in | Start screen with "Your session ended…" |
+| 403 | Start screen with "This Spotify account isn't on the invite list yet…" |
+| Other errors | Error card with **Try again** |
+
+A 401 from any other request (an expired or revoked session, or a backend restart with in-memory sessions) re-checks the session, so these rules apply app-wide. Log out with `useLogout()`.
+
 ## Scripts
 
 | Script | What it does |
@@ -33,6 +47,7 @@ The backend's `.env` needs `FRONTEND_URL=http://127.0.0.1:5173` so Spotify login
 | `npm run dev` | Dev server at 127.0.0.1:5173 with the `/api` proxy |
 | `npm run build` | Type-check and build to `dist/` |
 | `npm run lint` | Lint with oxlint |
+| `npm test` | Run the tests once (Vitest + React Testing Library); `npm run test:watch` to keep them running |
 | `npm run gen:api` | Regenerate API types from the backend's OpenAPI schema |
 
 ## Routes
@@ -40,5 +55,5 @@ The backend's `.env` needs `FRONTEND_URL=http://127.0.0.1:5173` so Spotify login
 | Path | Page |
 |---|---|
 | `/` | Start screen: Connect Spotify, demo entry, login error messages |
-| `/galaxy` | Signed-in app (currently the profile card; the 3D galaxy arrives in Ticket 17) |
+| `/galaxy` | Signed-in app (currently the profile card; the 3D galaxy arrives in Ticket 17). Protected |
 | `/demo` | Demo universe placeholder |

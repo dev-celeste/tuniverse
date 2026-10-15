@@ -1,11 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { ApiError, api } from './client'
+import { markSignedIn } from '../session'
+import { api } from './client'
 
-// 401 (no session) and 403 (account not on the Spotify allowlist) won't fix themselves on retry
-const shouldRetry = (failureCount: number, error: Error) =>
-  !(error instanceof ApiError && (error.status === 401 || error.status === 403)) && failureCount < 2
+export const ME_KEY = ['me'] as const
 
+/** The current Spotify user; doubles as the "is there a session?" check. */
 export function useMe() {
-  return useQuery({ queryKey: ['me'], queryFn: api.me, retry: shouldRetry })
+  return useQuery({
+    queryKey: ME_KEY,
+    queryFn: async () => {
+      const user = await api.me()
+      markSignedIn()
+      return user
+    },
+  })
 }
