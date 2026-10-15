@@ -1,0 +1,1345 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Tuniverse API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Root",
+        "operationId": "root__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1": {
+      "get": {
+        "summary": "Api Root",
+        "operationId": "api_root_api_v1_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Health Check",
+        "operationId": "health_check_api_v1_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Spotify Login",
+        "operationId": "spotify_login_api_v1_auth_login_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/callback": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Spotify Callback",
+        "description": "With FRONTEND_URL set, redirects back to the app (to /galaxy, or to /?login_error=<code>).\nWithout it (backend-only mode), returns JSON / a 400.",
+        "operationId": "spotify_callback_api_v1_auth_callback_get",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Code"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "State"
+            }
+          },
+          {
+            "name": "error",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Error"
+            }
+          },
+          {
+            "name": "tuniverse_oauth_state",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tuniverse Oauth State"
+            }
+          },
+          {
+            "name": "tuniverse_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tuniverse Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Logout",
+        "operationId": "logout_api_v1_auth_logout_post",
+        "parameters": [
+          {
+            "name": "tuniverse_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tuniverse Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/spotify/me": {
+      "get": {
+        "tags": [
+          "Spotify"
+        ],
+        "summary": "Get Current User",
+        "operationId": "get_current_user_api_v1_spotify_me_get",
+        "parameters": [
+          {
+            "name": "tuniverse_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tuniverse Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpotifyUser"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/spotify/top-artists": {
+      "get": {
+        "tags": [
+          "Spotify"
+        ],
+        "summary": "Get Top Artists",
+        "operationId": "get_top_artists_api_v1_spotify_top_artists_get",
+        "parameters": [
+          {
+            "name": "time_range",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "short_term",
+                "medium_term",
+                "long_term"
+              ],
+              "type": "string",
+              "default": "medium_term",
+              "title": "Time Range"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 10,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "tuniverse_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tuniverse Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopArtistsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/spotify/top-tracks": {
+      "get": {
+        "tags": [
+          "Spotify"
+        ],
+        "summary": "Get Top Tracks",
+        "operationId": "get_top_tracks_api_v1_spotify_top_tracks_get",
+        "parameters": [
+          {
+            "name": "time_range",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "short_term",
+                "medium_term",
+                "long_term"
+              ],
+              "type": "string",
+              "default": "medium_term",
+              "title": "Time Range"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 10,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "tuniverse_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tuniverse Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopTracksResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/spotify/galaxy": {
+      "get": {
+        "tags": [
+          "Spotify"
+        ],
+        "summary": "Get Music Galaxy",
+        "operationId": "get_music_galaxy_api_v1_spotify_galaxy_get",
+        "parameters": [
+          {
+            "name": "time_range",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "short_term",
+                "medium_term",
+                "long_term"
+              ],
+              "type": "string",
+              "default": "medium_term",
+              "title": "Time Range"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 10,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "tuniverse_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tuniverse Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GalaxyResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/spotify/mood": {
+      "get": {
+        "tags": [
+          "Spotify"
+        ],
+        "summary": "Get Music Mood",
+        "operationId": "get_music_mood_api_v1_spotify_mood_get",
+        "parameters": [
+          {
+            "name": "time_range",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "short_term",
+                "medium_term",
+                "long_term"
+              ],
+              "type": "string",
+              "default": "medium_term",
+              "title": "Time Range"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "tuniverse_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tuniverse Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MoodResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/spotify/track-insights": {
+      "get": {
+        "tags": [
+          "Spotify"
+        ],
+        "summary": "Get Track Insights",
+        "operationId": "get_track_insights_api_v1_spotify_track_insights_get",
+        "parameters": [
+          {
+            "name": "time_range",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "short_term",
+                "medium_term",
+                "long_term"
+              ],
+              "type": "string",
+              "default": "medium_term",
+              "title": "Time Range"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "tuniverse_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tuniverse Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackInsightsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AlbumSummary": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "release_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Release Date"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          }
+        },
+        "type": "object",
+        "title": "AlbumSummary"
+      },
+      "Artist": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "genres": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Genres"
+          },
+          "popularity": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Popularity"
+          },
+          "followers": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Followers"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "spotify_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Spotify Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "genres"
+        ],
+        "title": "Artist"
+      },
+      "GalaxyResponse": {
+        "properties": {
+          "time_range": {
+            "type": "string",
+            "enum": [
+              "short_term",
+              "medium_term",
+              "long_term"
+            ],
+            "title": "Time Range"
+          },
+          "total_planets": {
+            "type": "integer",
+            "title": "Total Planets"
+          },
+          "planets": {
+            "items": {
+              "$ref": "#/components/schemas/Planet"
+            },
+            "type": "array",
+            "title": "Planets"
+          }
+        },
+        "type": "object",
+        "required": [
+          "time_range",
+          "total_planets",
+          "planets"
+        ],
+        "title": "GalaxyResponse"
+      },
+      "GenreCount": {
+        "properties": {
+          "genre": {
+            "type": "string",
+            "title": "Genre"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "genre",
+          "count"
+        ],
+        "title": "GenreCount"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "MoodResponse": {
+        "properties": {
+          "time_range": {
+            "type": "string",
+            "enum": [
+              "short_term",
+              "medium_term",
+              "long_term"
+            ],
+            "title": "Time Range"
+          },
+          "top_genres": {
+            "items": {
+              "$ref": "#/components/schemas/GenreCount"
+            },
+            "type": "array",
+            "title": "Top Genres"
+          },
+          "mood_distribution": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Mood Distribution"
+          },
+          "dominant_mood": {
+            "type": "string",
+            "title": "Dominant Mood"
+          },
+          "visual_identity": {
+            "$ref": "#/components/schemas/VisualIdentity"
+          },
+          "total_artists_analyzed": {
+            "type": "integer",
+            "title": "Total Artists Analyzed"
+          },
+          "artists_with_genres": {
+            "type": "integer",
+            "title": "Artists With Genres"
+          }
+        },
+        "type": "object",
+        "required": [
+          "time_range",
+          "top_genres",
+          "mood_distribution",
+          "dominant_mood",
+          "visual_identity",
+          "total_artists_analyzed",
+          "artists_with_genres"
+        ],
+        "title": "MoodResponse"
+      },
+      "Moon": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "rank": {
+            "type": "integer",
+            "title": "Rank"
+          },
+          "popularity": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Popularity"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "album_image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Album Image Url"
+          },
+          "spotify_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Spotify Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "rank"
+        ],
+        "title": "Moon",
+        "description": "One of the user's top tracks, orbiting the planet of its artist."
+      },
+      "Planet": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "rank": {
+            "type": "integer",
+            "title": "Rank"
+          },
+          "orbit_radius": {
+            "type": "integer",
+            "title": "Orbit Radius"
+          },
+          "planet_size": {
+            "type": "integer",
+            "title": "Planet Size"
+          },
+          "glow_intensity": {
+            "type": "number",
+            "title": "Glow Intensity"
+          },
+          "mood": {
+            "type": "string",
+            "title": "Mood"
+          },
+          "color": {
+            "type": "string",
+            "title": "Color"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "genres": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Genres"
+          },
+          "popularity": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Popularity"
+          },
+          "spotify_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Spotify Url"
+          },
+          "moons": {
+            "items": {
+              "$ref": "#/components/schemas/Moon"
+            },
+            "type": "array",
+            "title": "Moons"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "rank",
+          "orbit_radius",
+          "planet_size",
+          "glow_intensity",
+          "mood",
+          "color",
+          "genres",
+          "moons"
+        ],
+        "title": "Planet",
+        "description": "One of the user's top artists."
+      },
+      "SpotifyUser": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "profile_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile Url"
+          },
+          "followers": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Followers"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "SpotifyUser"
+      },
+      "TopArtistsResponse": {
+        "properties": {
+          "time_range": {
+            "type": "string",
+            "enum": [
+              "short_term",
+              "medium_term",
+              "long_term"
+            ],
+            "title": "Time Range"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "artists": {
+            "items": {
+              "$ref": "#/components/schemas/Artist"
+            },
+            "type": "array",
+            "title": "Artists"
+          }
+        },
+        "type": "object",
+        "required": [
+          "time_range",
+          "total",
+          "artists"
+        ],
+        "title": "TopArtistsResponse"
+      },
+      "TopTracksResponse": {
+        "properties": {
+          "time_range": {
+            "type": "string",
+            "enum": [
+              "short_term",
+              "medium_term",
+              "long_term"
+            ],
+            "title": "Time Range"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "tracks": {
+            "items": {
+              "$ref": "#/components/schemas/Track"
+            },
+            "type": "array",
+            "title": "Tracks"
+          }
+        },
+        "type": "object",
+        "required": [
+          "time_range",
+          "total",
+          "tracks"
+        ],
+        "title": "TopTracksResponse"
+      },
+      "Track": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "artists": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Artists"
+          },
+          "album": {
+            "$ref": "#/components/schemas/AlbumSummary"
+          },
+          "popularity": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Popularity"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "explicit": {
+            "type": "boolean",
+            "title": "Explicit",
+            "default": false
+          },
+          "spotify_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Spotify Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "artists",
+          "album"
+        ],
+        "title": "Track"
+      },
+      "TrackInsightsResponse": {
+        "properties": {
+          "time_range": {
+            "type": "string",
+            "enum": [
+              "short_term",
+              "medium_term",
+              "long_term"
+            ],
+            "title": "Time Range"
+          },
+          "total_tracks": {
+            "type": "integer",
+            "title": "Total Tracks"
+          },
+          "tracks": {
+            "items": {
+              "$ref": "#/components/schemas/Track"
+            },
+            "type": "array",
+            "title": "Tracks"
+          }
+        },
+        "type": "object",
+        "required": [
+          "time_range",
+          "total_tracks",
+          "tracks"
+        ],
+        "title": "TrackInsightsResponse"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VisualIdentity": {
+        "properties": {
+          "primary_color": {
+            "type": "string",
+            "title": "Primary Color"
+          },
+          "secondary_color": {
+            "type": "string",
+            "title": "Secondary Color"
+          },
+          "accent_color": {
+            "type": "string",
+            "title": "Accent Color"
+          },
+          "planet_glow_intensity": {
+            "type": "number",
+            "title": "Planet Glow Intensity"
+          },
+          "background_style": {
+            "type": "string",
+            "title": "Background Style"
+          }
+        },
+        "type": "object",
+        "required": [
+          "primary_color",
+          "secondary_color",
+          "accent_color",
+          "planet_glow_intensity",
+          "background_style"
+        ],
+        "title": "VisualIdentity"
+      }
+    }
+  }
+}
