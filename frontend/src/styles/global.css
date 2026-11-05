@@ -214,6 +214,13 @@ a { color: inherit; }
 
 /* ---------- Galaxy (3D) ---------- */
 .galaxy-page { position: fixed; inset: 0; overflow: hidden; }
+/* A live backdrop blur over the animating canvas has to be recomputed every frame and halved the
+   frame rate; over this dark scene a near-opaque fill looks almost the same and costs nothing */
+.galaxy-page .glass {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: rgba(9, 9, 18, 0.86);
+}
 .galaxy-page .scene { position: absolute; inset: 0; }
 .scene-labels { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .overlay-top {
@@ -240,7 +247,9 @@ a { color: inherit; }
   top: 0;
   visibility: hidden;
   will-change: transform;
-  pointer-events: none;
+  border: 0;
+  background: none;
+  padding: 3px 6px;
   white-space: nowrap;
   font-size: 12px;
   font-weight: 500;
@@ -249,7 +258,12 @@ a { color: inherit; }
   opacity: 0.72;
   text-shadow: 0 0 10px #000, 0 0 2px #000;
   user-select: none;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: opacity 0.4s;
 }
+.planet-label.hovered, .planet-label.focused { opacity: 1; }
+.planet-label.dimmed { opacity: 0.28; }
 .planet-label .rk {
   margin-right: 6px;
   font-family: var(--mono);
@@ -257,8 +271,152 @@ a { color: inherit; }
   font-weight: 400;
   color: var(--muted);
 }
+.core-label { pointer-events: none; opacity: 0; }
+.core-label.show { opacity: 0.9; }
+
+/* ---------- Header controls ---------- */
+.actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: flex-end; }
+.ranges { display: flex; padding: 4px; gap: 2px; }
+.ranges button {
+  border: 0;
+  background: transparent;
+  padding: 7px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s;
+}
+.ranges button:hover { color: var(--ink); }
+.ranges button[aria-checked="true"] { background: var(--lift); color: var(--ink); }
+.ranges button.loading { animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: 0.5; } }
+
+/* ---------- Detail panel ---------- */
+.panel {
+  position: absolute;
+  z-index: 3;
+  top: calc(84px + env(safe-area-inset-top, 0px));
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  width: min(360px, calc(100vw - 32px));
+  padding: 20px 22px 22px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  transition: opacity 0.5s, transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.panel.closed { opacity: 0; transform: translateX(28px); pointer-events: none; }
+.back {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--hair);
+  background: transparent;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.back:hover { color: var(--ink); border-color: rgba(236, 232, 244, 0.2); }
+kbd {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 1px 5px;
+  border: 1px solid var(--hair);
+  border-radius: 4px;
+  color: var(--faint);
+}
+.headline { display: grid; gap: 8px; justify-items: start; }
+.headline h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 44px;
+  line-height: 0.95;
+  text-wrap: balance;
+}
+.portrait {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--hair);
+}
+.portrait-fallback {
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 32% 28%, color-mix(in srgb, var(--c) 45%, transparent), rgba(12, 12, 22, 0.9) 72%);
+  font-family: var(--display);
+  font-size: 28px;
+}
+.chip { display: inline-flex; align-items: center; gap: 8px; margin: 0; font-size: 13px; color: var(--muted); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c); box-shadow: 0 0 8px var(--c); }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 12px; margin: 0; }
+.stats div { display: grid; gap: 6px; }
+.stats dt { font-size: 11px; color: var(--faint); letter-spacing: 0.04em; }
+.stats dd { margin: 0; font-family: var(--mono); font-size: 18px; font-variant-numeric: tabular-nums; }
+.stats dd small { font-size: 11px; color: var(--faint); }
+.genres { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.5; }
+.section-title {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.tracks { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.tracks a, .tracks .row {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 6px 8px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--ink);
+}
+.tracks a:hover, .tracks a:focus-visible, .tracks .row:hover, .tracks .row:focus-visible { background: var(--lift); }
+.tracks .art { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; }
+.tracks .art-fallback { background: linear-gradient(135deg, rgba(236, 232, 244, 0.12), rgba(236, 232, 244, 0.03)); }
+.tracks .t { display: grid; gap: 2px; min-width: 0; }
+.tracks .t b { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tracks .t small { font-size: 11px; color: var(--faint); }
+.tracks .d { font-family: var(--mono); font-size: 11px; color: var(--faint); font-variant-numeric: tabular-nums; }
+.empty { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.55; }
+.out {
+  align-self: flex-start;
+  font-size: 12px;
+  color: var(--champagne);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(216, 196, 156, 0.3);
+  padding-bottom: 2px;
+}
+.out:hover { border-bottom-color: var(--champagne); }
+.key {
+  margin: auto 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--hair);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--faint);
+}
 
 @media (max-width: 720px) {
   .wordmark { font-size: 26px; }
   .card h1 { font-size: 34px; }
+  /* The panel becomes a bottom sheet */
+  .panel { top: auto; left: 16px; right: 16px; width: auto; max-height: 56%; gap: 14px; }
+  .panel.closed { transform: translateY(28px); }
+  .headline h2 { font-size: 34px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel, .planet-label { transition: none; }
+  .ranges button.loading { animation: none; }
 }

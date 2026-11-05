@@ -97,6 +97,8 @@ def test_galaxy_maps_artists_to_planets(api):
     sleep_token, dua, new_artist = body["planets"]
     assert sleep_token["name"] == "Sleep Token"
     assert sleep_token["glow_intensity"] == 0.85
+    assert sleep_token["followers"] == 1000
+    assert dua["followers"] is None
     assert dua["image_url"] is None
     assert dua["glow_intensity"] == 0.5  # no popularity → default
     assert (sleep_token["mood"], sleep_token["color"]) == ("Aggressive", "#E63946")

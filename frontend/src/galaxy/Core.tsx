@@ -1,14 +1,22 @@
-import { useFrame } from '@react-three/fiber'
+import { type ThreeEvent, useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
 import { AdditiveBlending, type Sprite } from 'three'
 
+import type { AnchorStore } from './anchorStore'
 import { glowTexture } from './textures'
 
 // Warm white for now; step 3 tints the halo with the dominant mood from /mood
 const HALO_COLOR = '#f3d9c9'
 
-/** The glowing core at the center of the galaxy: the listener. */
-export default function Core({ motion }: { motion: number }) {
+type Props = {
+  motion: number
+  anchors: AnchorStore
+  onHover: (hovered: boolean) => void
+  onSelect: () => void
+}
+
+/** The glowing core at the center of the galaxy: the listener. Looks the same until clicked. */
+export default function Core({ motion, anchors, onHover, onSelect }: Props) {
   const halo = useRef<Sprite>(null)
 
   useFrame(({ clock }) => {
@@ -19,7 +27,19 @@ export default function Core({ motion }: { motion: number }) {
     <group>
       {/* Legacy-style light (no distance falloff) so outer planets are lit like the inner ones */}
       <pointLight color="#fff1dd" intensity={3.6} decay={0} />
-      <mesh>
+      <mesh
+        ref={(m) => anchors.setAnchor('core', m)}
+        onPointerOver={(e: ThreeEvent<PointerEvent>) => {
+          e.stopPropagation()
+          onHover(true)
+        }}
+        onPointerOut={() => onHover(false)}
+        onClick={(e: ThreeEvent<MouseEvent>) => {
+          if (e.delta > 6) return
+          e.stopPropagation()
+          onSelect()
+        }}
+      >
         <sphereGeometry args={[2.3, 48, 48]} />
         <meshBasicMaterial color="#fff4e6" />
       </mesh>

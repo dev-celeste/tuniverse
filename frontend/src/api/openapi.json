@@ -1021,6 +1021,17 @@
             ],
             "title": "Popularity"
           },
+          "followers": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Followers"
+          },
           "spotify_url": {
             "anyOf": [
               {

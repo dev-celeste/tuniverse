@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 
 import { markSignedIn } from '../session'
 import { api } from './client'
@@ -20,5 +20,10 @@ export function useMe() {
 
 /** Top artists as planets, with their top tracks as moons. */
 export function useGalaxy(timeRange: TimeRange) {
-  return useQuery({ queryKey: ['galaxy', timeRange], queryFn: () => api.galaxy(timeRange) })
+  return useQuery({
+    queryKey: ['galaxy', timeRange],
+    queryFn: () => api.galaxy(timeRange),
+    // Keep the current galaxy on screen while another time range loads
+    placeholderData: keepPreviousData,
+  })
 }

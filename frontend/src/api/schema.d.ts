@@ -334,6 +334,8 @@ export interface components {
             genres: string[];
             /** Popularity */
             popularity?: number | null;
+            /** Followers */
+            followers?: number | null;
             /** Spotify Url */
             spotify_url?: string | null;
             /** Moons */

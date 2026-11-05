@@ -1,23 +1,25 @@
 import { useFrame, useThree } from '@react-three/fiber'
-import { Vector3 } from 'three'
+import { type Mesh, Vector3 } from 'three'
 
-import type { LabelStore } from './labelStore'
+import type { AnchorStore } from './anchorStore'
 
 const world = new Vector3()
 const edge = new Vector3()
 
 /**
- * Lives inside the Canvas: projects every planet to the screen and moves its label just below it.
- * Planet meshes are unit spheres scaled to their radius, so the mesh's scale is the radius.
+ * Lives inside the Canvas: projects every anchor to the screen and moves its label just below it.
  */
-export default function LabelProjector({ store }: { store: LabelStore }) {
+export default function LabelProjector({ store }: { store: AnchorStore }) {
   const camera = useThree((s) => s.camera)
   const size = useThree((s) => s.size)
 
   useFrame(() => {
     for (const { anchor, element } of store.all()) {
       if (!anchor || !element) continue
-      const radius = anchor.scale.x
+      // Rendered radius = the geometry's own radius × the mesh's (animated) scale
+      const geometry = (anchor as Mesh).geometry
+      if (geometry && !geometry.boundingSphere) geometry.computeBoundingSphere()
+      const radius = anchor.scale.x * (geometry?.boundingSphere?.radius ?? 1)
       anchor.getWorldPosition(world)
       edge.copy(world).addScaledVector(camera.up, radius)
       world.project(camera)

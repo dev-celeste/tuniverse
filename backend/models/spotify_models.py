@@ -97,6 +97,7 @@ class Planet(BaseModel):
     image_url: Optional[str] = None
     genres: list[str]
     popularity: Optional[int] = None
+    followers: Optional[int] = None
     spotify_url: Optional[str] = None
     moons: list[Moon]
 

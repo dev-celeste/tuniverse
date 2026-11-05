@@ -99,6 +99,7 @@ def transform_top_artists_to_planets(
             image_url=_first_image_url(artist.get("images")),
             genres=artist.get("genres", []),
             popularity=artist.get("popularity"),
+            followers=(artist.get("followers") or {}).get("total"),
             spotify_url=artist.get("external_urls", {}).get("spotify"),
             moons=[],
         )
