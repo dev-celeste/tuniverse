@@ -1,4 +1,4 @@
-import type { SpotifyUser } from './types'
+import type { GalaxyResponse, SpotifyUser, TimeRange } from './types'
 
 export const API_BASE = '/api/v1'
 
@@ -37,5 +37,6 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
 export const api = {
   me: () => request<SpotifyUser>('/spotify/me'),
+  galaxy: (timeRange: TimeRange) => request<GalaxyResponse>(`/spotify/galaxy?time_range=${timeRange}`),
   logout: () => request<{ logged_out: boolean }>('/auth/logout', { method: 'POST' }),
 }

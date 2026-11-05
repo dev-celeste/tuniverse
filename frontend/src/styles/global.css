@@ -212,6 +212,52 @@ a { color: inherit; }
 .stat { font-family: var(--mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .status { position: relative; z-index: 1; color: var(--muted); letter-spacing: 0.04em; }
 
+/* ---------- Galaxy (3D) ---------- */
+.galaxy-page { position: fixed; inset: 0; overflow: hidden; }
+.galaxy-page .scene { position: absolute; inset: 0; }
+.scene-labels { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.overlay-top {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  left: 16px;
+  right: 16px;
+  pointer-events: none;
+}
+.overlay-top > * { pointer-events: auto; }
+.overlay-center {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  padding-inline: 16px;
+  pointer-events: none;
+}
+.overlay-center > * { pointer-events: auto; }
+.planet-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  visibility: hidden;
+  will-change: transform;
+  pointer-events: none;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--ink);
+  opacity: 0.72;
+  text-shadow: 0 0 10px #000, 0 0 2px #000;
+  user-select: none;
+}
+.planet-label .rk {
+  margin-right: 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
 @media (max-width: 720px) {
   .wordmark { font-size: 26px; }
   .card h1 { font-size: 34px; }

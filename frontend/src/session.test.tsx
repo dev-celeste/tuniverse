@@ -4,30 +4,57 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type { Planet } from './api/types'
 import { ApiError } from './api/client'
 import App from './App'
 import { createQueryClient } from './queryClient'
 import { markSignedIn, wasSignedIn } from './session'
+
+// WebGL doesn't exist in jsdom: stand in for the 3D scene with a list of the planets it was given
+vi.mock('./galaxy/GalaxyScene', () => ({
+  default: ({ planets }: { planets: Planet[] }) => (
+    <ul aria-label="Planets">
+      {planets.map((p) => (
+        <li key={p.id}>{p.name}</li>
+      ))}
+    </ul>
+  ),
+}))
 
 type Reply = { status: number; body?: unknown }
 
 const USER = { id: 'me', display_name: 'Celeste', image_url: null, profile_url: null, followers: 12 }
 const OK: Reply = { status: 200, body: USER }
 const NO_SESSION: Reply = { status: 401, body: { detail: 'No Spotify session found. Please log in first.' } }
+const GALAXY_PATH = 'GET /api/v1/spotify/galaxy?time_range=medium_term'
+const planet = (rank: number, name: string) => ({
+  id: `a${rank}`, name, rank, orbit_radius: 0, planet_size: 0, glow_intensity: 0.8,
+  mood: 'Aggressive', color: '#E63946', image_url: null, genres: ['metalcore'], popularity: 80, spotify_url: null, moons: [],
+})
+const GALAXY: Reply = {
+  status: 200,
+  body: { time_range: 'medium_term', total_planets: 2, planets: [planet(1, 'Sleep Token'), planet(2, 'Phoebe Bridgers')] },
+}
 
-// Fake backend: tests set what each "METHOD path" answers, and can change it mid-test
-let routes: Record<string, Reply>
+// Fake backend: tests set what each "METHOD path" answers, and can change it mid-test.
+// A list answers with its items in turn, repeating the last one.
+let routes: Record<string, Reply | Reply[]>
 const calls: string[] = []
 
 beforeEach(() => {
   calls.length = 0
-  routes = { 'GET /api/v1/spotify/me': OK, 'POST /api/v1/auth/logout': { status: 200, body: { logged_out: true } } }
+  routes = {
+    'GET /api/v1/spotify/me': OK,
+    [GALAXY_PATH]: GALAXY,
+    'POST /api/v1/auth/logout': { status: 200, body: { logged_out: true } },
+  }
   vi.stubGlobal(
     'fetch',
     vi.fn(async (url: string, init?: RequestInit) => {
       const key = `${init?.method ?? 'GET'} ${url}`
       calls.push(key)
-      const reply = routes[key] ?? { status: 404, body: { detail: 'Not Found' } }
+      const route = routes[key] ?? { status: 404, body: { detail: 'Not Found' } }
+      const reply = Array.isArray(route) ? (route.length > 1 ? route.shift()! : route[0]) : route
       return new Response(JSON.stringify(reply.body ?? {}), {
         status: reply.status,
         headers: { 'Content-Type': 'application/json' },
@@ -53,8 +80,9 @@ describe('protected routes', () => {
     renderAt('/galaxy')
 
     expect(screen.getByRole('status')).toHaveTextContent('Charting your universe')
-    expect(await screen.findByRole('heading', { name: 'Celeste' })).toBeInTheDocument()
-    expect(screen.getByText('12 followers')).toBeInTheDocument()
+    const planets = await screen.findByRole('list', { name: 'Planets' })
+    expect(planets).toHaveTextContent('Sleep Token')
+    expect(planets).toHaveTextContent('Phoebe Bridgers')
     expect(wasSignedIn()).toBe(true)
   })
 
@@ -92,12 +120,12 @@ describe('protected routes', () => {
 
     routes['GET /api/v1/spotify/me'] = OK
     await userEvent.click(screen.getByRole('button', { name: 'Try again' }))
-    expect(await screen.findByRole('heading', { name: 'Celeste' })).toBeInTheDocument()
+    expect(await screen.findByRole('list', { name: 'Planets' })).toBeInTheDocument()
   })
 
   it('sends the user to log in when any request finds the session gone', async () => {
     const client = renderAt('/galaxy')
-    await screen.findByRole('heading', { name: 'Celeste' })
+    await screen.findByRole('list', { name: 'Planets' })
 
     // e.g. the backend restarted and forgot the session
     routes['GET /api/v1/spotify/me'] = NO_SESSION
@@ -126,7 +154,7 @@ describe('start screen', () => {
 
   it('logs out back to the start screen', async () => {
     renderAt('/galaxy')
-    await screen.findByRole('heading', { name: 'Celeste' })
+    await screen.findByRole('list', { name: 'Planets' })
 
     routes['GET /api/v1/spotify/me'] = NO_SESSION
     await userEvent.click(screen.getByRole('button', { name: 'Log out' }))
@@ -135,5 +163,36 @@ describe('start screen', () => {
     expect(calls).toContain('POST /api/v1/auth/logout')
     expect(wasSignedIn()).toBe(false)
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+})
+
+describe('galaxy page', () => {
+  it('explains an empty galaxy for an account with no listening history', async () => {
+    routes[GALAXY_PATH] = { status: 200, body: { time_range: 'medium_term', total_planets: 0, planets: [] } }
+    renderAt('/galaxy')
+
+    expect(await screen.findByRole('heading', { name: 'Still forming' })).toBeInTheDocument()
+    expect(screen.queryByRole('list', { name: 'Planets' })).not.toBeInTheDocument()
+  })
+
+  it('offers a retry when the galaxy fails to load', async () => {
+    routes[GALAXY_PATH] = { status: 502, body: { detail: 'Spotify API error 503 for /me/top/artists' } }
+    renderAt('/galaxy')
+
+    expect(await screen.findByRole('alert', {}, { timeout: 5000 })).toHaveTextContent("couldn't load your galaxy")
+
+    routes[GALAXY_PATH] = GALAXY
+    await userEvent.click(screen.getByRole('button', { name: 'Try again' }))
+    expect(await screen.findByRole('list', { name: 'Planets' })).toHaveTextContent('Sleep Token')
+  })
+
+  it('sends the user to log in if the galaxy request finds the session gone', async () => {
+    // The session dies between the /me check and the galaxy request
+    routes['GET /api/v1/spotify/me'] = [OK, NO_SESSION]
+    routes[GALAXY_PATH] = NO_SESSION
+    renderAt('/galaxy')
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Your session ended')
+    expect(screen.queryByText(/couldn't load your galaxy/)).not.toBeInTheDocument()
   })
 })
