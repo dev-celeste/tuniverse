@@ -27,3 +27,21 @@ export function useGalaxy(timeRange: TimeRange) {
     placeholderData: keepPreviousData,
   })
 }
+
+/** Top 20 tracks: the constellation, plus the musical era in the core panel. */
+export function useTopTracks(timeRange: TimeRange) {
+  return useQuery({
+    queryKey: ['top-tracks', timeRange],
+    queryFn: () => api.topTracks(timeRange),
+    placeholderData: keepPreviousData,
+  })
+}
+
+/** Mood mix from your top artists' genres: the nebula, the mood card and the core's tint. */
+export function useMood(timeRange: TimeRange) {
+  return useQuery({
+    queryKey: ['mood', timeRange],
+    queryFn: () => api.mood(timeRange),
+    placeholderData: keepPreviousData,
+  })
+}

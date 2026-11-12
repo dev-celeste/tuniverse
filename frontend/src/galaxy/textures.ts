@@ -50,3 +50,30 @@ export function bandTexture(seed: number): CanvasTexture {
   texture.wrapS = RepeatWrapping
   return texture
 }
+
+const clouds = new Map<number, CanvasTexture>()
+
+/** A soft, irregular puff for the mood nebula: overlapping radial blobs that fade at the edges. */
+export function cloudTexture(seed: number): CanvasTexture {
+  const cached = clouds.get(seed)
+  if (cached) return cached
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = 256
+  const g = canvas.getContext('2d')!
+  const rand = rng(seed)
+  for (let i = 0; i < 70; i++) {
+    const r = Math.pow(rand(), 1.6) * 90
+    const a = rand() * Math.PI * 2
+    const x = 128 + Math.cos(a) * r
+    const y = 128 + Math.sin(a) * r * 0.7
+    const size = 14 + rand() * 46
+    const grad = g.createRadialGradient(x, y, 0, x, y, size)
+    grad.addColorStop(0, `rgba(255,255,255,${0.05 + rand() * 0.08})`)
+    grad.addColorStop(1, 'rgba(255,255,255,0)')
+    g.fillStyle = grad
+    g.fillRect(0, 0, 256, 256)
+  }
+  const texture = new CanvasTexture(canvas)
+  clouds.set(seed, texture)
+  return texture
+}

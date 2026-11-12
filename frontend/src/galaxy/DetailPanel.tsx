@@ -1,23 +1,39 @@
-import type { CSSProperties } from 'react'
+import { type CSSProperties, useEffect, useRef } from 'react'
 
-import type { Planet, SpotifyUser, TimeRange } from '../api/types'
+import type { MoodResponse, Planet, SpotifyUser, TimeRange, Track } from '../api/types'
+import { musicalEra } from '../era'
 import { formatCount, formatDuration, initials, pad2 } from '../format'
+import MoodRows from '../components/MoodRows'
+import { moodColor } from '../moods'
 import { rangeLabel } from '../timeRanges'
 import type { Focus } from './focus'
+import type { Star } from './stars'
 
 type Props = {
   focus: Focus
   planets: Planet[]
+  stars: Star[]
+  tracks: Track[]
+  mood: MoodResponse | null
   user: SpotifyUser
   timeRange: TimeRange
+  moodFilter: string | null
   onClose: () => void
-  onHighlightMoon: (moonId: string | null) => void
+  /** Light up a track's star, moon and planet (null to clear). Moon ids are track ids. */
+  onHighlightTrack: (trackId: string | null) => void
+  onMoodFilter: (mood: string | null) => void
 }
 
-/** The panel that slides in when you visit a planet or the core. */
-export default function DetailPanel({ focus, planets, user, timeRange, onClose, onHighlightMoon }: Props) {
+const swatch = (color: string) => ({ '--c': color }) as CSSProperties
+
+/** The panel that slides in when you visit a planet, the core, the constellation or the nebula. */
+export default function DetailPanel({ focus, planets, stars, tracks, mood, user, timeRange, moodFilter, onClose, onHighlightTrack, onMoodFilter }: Props) {
   const planet = focus?.kind === 'planet' ? planets.find((p) => p.id === focus.id) : undefined
-  const open = focus?.kind === 'core' || planet !== undefined
+  const open =
+    planet !== undefined ||
+    focus?.kind === 'core' ||
+    (focus?.kind === 'constellation' && stars.length > 0) ||
+    (focus?.kind === 'nebula' && mood !== null)
 
   return (
     // inert while closed: hidden from assistive tech and unreachable by keyboard
@@ -27,8 +43,14 @@ export default function DetailPanel({ focus, planets, user, timeRange, onClose, 
           ← Galaxy <kbd>Esc</kbd>
         </button>
       )}
-      {planet && <PlanetDetails planet={planet} timeRange={timeRange} onHighlightMoon={onHighlightMoon} />}
-      {focus?.kind === 'core' && <CoreDetails user={user} planets={planets} timeRange={timeRange} />}
+      {planet && <PlanetDetails planet={planet} timeRange={timeRange} onHighlightMoon={onHighlightTrack} />}
+      {focus?.kind === 'core' && <CoreDetails user={user} planets={planets} tracks={tracks} timeRange={timeRange} />}
+      {focus?.kind === 'constellation' && stars.length > 0 && (
+        <TracksDetails stars={stars} timeRange={timeRange} selectedTrackId={focus.trackId} onHighlightTrack={onHighlightTrack} />
+      )}
+      {focus?.kind === 'nebula' && mood && (
+        <NebulaDetails mood={mood} timeRange={timeRange} moodFilter={moodFilter} onMoodFilter={onMoodFilter} />
+      )}
     </aside>
   )
 }
@@ -37,7 +59,7 @@ function Portrait({ src, name, color, label }: { src: string | null | undefined;
   return src ? (
     <img className="portrait" src={src} alt={label} />
   ) : (
-    <span className="portrait portrait-fallback" style={{ '--c': color } as CSSProperties} role="img" aria-label={label}>
+    <span className="portrait portrait-fallback" style={swatch(color)} role="img" aria-label={label}>
       {initials(name)}
     </span>
   )
@@ -55,7 +77,7 @@ function PlanetDetails({ planet, timeRange, onHighlightMoon }: { planet: Planet;
         </p>
         <h2>{planet.name}</h2>
         <p className="chip">
-          <span className="dot" style={{ '--c': planet.color } as CSSProperties} />
+          <span className="dot" style={swatch(planet.color)} />
           {planet.mood}
         </p>
       </div>
@@ -142,9 +164,14 @@ function PlanetDetails({ planet, timeRange, onHighlightMoon }: { planet: Planet;
   )
 }
 
-function CoreDetails({ user, planets, timeRange }: { user: SpotifyUser; planets: Planet[]; timeRange: TimeRange }) {
+function CoreDetails({ user, planets, tracks, timeRange }: { user: SpotifyUser; planets: Planet[]; tracks: Track[]; timeRange: TimeRange }) {
   const name = user.display_name ?? 'You'
   const moonCount = planets.reduce((n, p) => n + p.moons.length, 0)
+  const era = musicalEra(tracks)
+  const runtimeMs = tracks.reduce((n, t) => n + (t.duration_ms ?? 0), 0)
+  const hours = Math.floor(runtimeMs / 3_600_000)
+  const minutes = Math.round((runtimeMs % 3_600_000) / 60_000)
+  const maxCount = era ? Math.max(...era.decades.map((d) => d.count)) : 1
 
   return (
     <>
@@ -175,14 +202,162 @@ function CoreDetails({ user, planets, timeRange }: { user: SpotifyUser; planets:
             <small> {moonCount === 1 ? 'track' : 'tracks'}</small>
           </dd>
         </div>
+        {runtimeMs > 0 && (
+          <div>
+            <dt>Top {tracks.length} runtime</dt>
+            <dd>
+              {hours > 0 && (
+                <>
+                  {hours}
+                  <small> hr </small>
+                </>
+              )}
+              {minutes}
+              <small> min</small>
+            </dd>
+          </div>
+        )}
       </dl>
+
+      {era && (
+        <>
+          <p className="section-title">Musical era</p>
+          <p className="genres">
+            Mostly the {era.topDecade}s · oldest: {era.oldest.name} ({era.oldest.year})
+          </p>
+          <ul className="era" aria-label="Top tracks by decade">
+            {era.decades.map(({ decade, count }) => (
+              <li key={decade}>
+                <span>{decade}s</span>
+                <span className="bar">
+                  <i style={{ width: `${(count / maxCount) * 100}%` }} />
+                </span>
+                <span className="n">{count}</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
       {user.profile_url && (
         <a className="out" href={user.profile_url} target="_blank" rel="noopener noreferrer">
           Open your Spotify profile ↗
         </a>
       )}
-      <p className="key">Planets are your top artists, moons are your top tracks, and you're the light at the center.</p>
+      <p className="key">From your Spotify profile and your top tracks{era ? "' release dates" : ''}</p>
+    </>
+  )
+}
+
+function TracksDetails({ stars, timeRange, selectedTrackId, onHighlightTrack }: { stars: Star[]; timeRange: TimeRange; selectedTrackId?: string; onHighlightTrack: (id: string | null) => void }) {
+  const list = useRef<HTMLOListElement>(null)
+
+  // Clicking a star opens the list at its song and lights it up for a moment
+  useEffect(() => {
+    if (!selectedTrackId) return
+    list.current?.querySelector(`[data-track="${selectedTrackId}"]`)?.scrollIntoView({ block: 'nearest' })
+    onHighlightTrack(selectedTrackId)
+    const timer = setTimeout(() => onHighlightTrack(null), 1600)
+    return () => clearTimeout(timer)
+  }, [selectedTrackId, onHighlightTrack])
+
+  return (
+    <>
+      <div className="headline">
+        <p className="eyebrow">Constellation · {rangeLabel(timeRange)}</p>
+        <h2>Top tracks</h2>
+        <p className="chip">Your {stars.length} most-played songs, brightest first</p>
+      </div>
+
+      <ol className="tracks ranked" ref={list}>
+        {stars.map(({ track, rank, color, planetId }) => {
+          const content = (
+            <>
+              {track.album.image_url ? <img className="art" src={track.album.image_url} alt="" /> : <span className="art art-fallback" aria-hidden="true" />}
+              <span className="t">
+                <b>
+                  <span className="rk">#{pad2(rank)}</span> {track.name}
+                </b>
+                <small>
+                  <span className="dot" style={swatch(color)} />
+                  {track.artists.join(', ')}
+                  {planetId ? '' : ' · not in your top artists'}
+                </small>
+              </span>
+              {track.duration_ms != null && <span className="d">{formatDuration(track.duration_ms)}</span>}
+            </>
+          )
+          const props = {
+            'data-track': track.id,
+            className: selectedTrackId === track.id ? 'on' : undefined,
+            onPointerEnter: () => onHighlightTrack(track.id),
+            onPointerLeave: () => onHighlightTrack(null),
+            onFocus: () => onHighlightTrack(track.id),
+            onBlur: () => onHighlightTrack(null),
+          }
+          return (
+            <li key={track.id}>
+              {track.spotify_url ? (
+                <a href={track.spotify_url} target="_blank" rel="noopener noreferrer" aria-label={`${rank}. ${track.name}, open in Spotify`} {...props}>
+                  {content}
+                </a>
+              ) : (
+                <div tabIndex={0} {...props} className={`row${props.className ? ' on' : ''}`}>
+                  {content}
+                </div>
+              )}
+            </li>
+          )
+        })}
+      </ol>
+
+      <p className="key">Brightness shows rank · color shows the artist&apos;s genre family · hover a song to light up its moon</p>
+    </>
+  )
+}
+
+function NebulaDetails({ mood, timeRange, moodFilter, onMoodFilter }: { mood: MoodResponse; timeRange: TimeRange; moodFilter: string | null; onMoodFilter: (mood: string | null) => void }) {
+  const share = Math.round(mood.mood_distribution[mood.dominant_mood] ?? 0)
+  const id = mood.visual_identity
+
+  return (
+    <>
+      <div className="headline">
+        <p className="eyebrow">Mood nebula · {rangeLabel(timeRange)}</p>
+        <h2 style={{ color: moodColor(mood.dominant_mood) }}>{mood.dominant_mood}</h2>
+        <p className="chip">{share ? `Your dominant mood, ${share}% of your genre mix` : 'Not enough genre data to read a mood yet'}</p>
+      </div>
+
+      <p className="section-title">Mood mix</p>
+      <MoodRows distribution={mood.mood_distribution} moodFilter={moodFilter} onMoodFilter={onMoodFilter} />
+
+      <p className="section-title">Top genres</p>
+      {mood.top_genres.length ? (
+        <ul className="chips">
+          {mood.top_genres.map(({ genre, count }) => (
+            <li key={genre}>
+              {genre}
+              <b>×{count}</b>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="empty">Spotify has no genres for these artists yet.</p>
+      )}
+
+      <p className="section-title">Visual identity</p>
+      <div className="swatches">
+        <span className="swatch"><i style={swatch(id.primary_color)} />Primary</span>
+        <span className="swatch"><i style={swatch(id.secondary_color)} />Secondary</span>
+        <span className="swatch"><i style={swatch(id.accent_color)} />Accent</span>
+      </div>
+      <p className="genres">
+        Background style: {id.background_style} · glow {id.planet_glow_intensity}
+      </p>
+
+      <p className="key">
+        Based on {mood.artists_with_genres} of {mood.total_artists_analyzed} artists with genre data. Each mood colors a share of the nebula equal to its share of the mix.
+      </p>
     </>
   )
 }

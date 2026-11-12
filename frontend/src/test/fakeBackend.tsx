@@ -32,6 +32,34 @@ export const galaxyReply = (planets: ReturnType<typeof planet>[], range = 'mediu
 
 export const GALAXY = galaxyReply([planet(1, 'Sleep Token'), planet(2, 'Phoebe Bridgers')])
 
+export const topTracksPath = (range = 'medium_term') => `GET /api/v1/spotify/top-tracks?time_range=${range}&limit=20`
+export const moodPath = (range = 'medium_term') => `GET /api/v1/spotify/mood?time_range=${range}`
+
+export const track = (id: string, name: string, artists: string[], releaseDate: string, extra: Record<string, unknown> = {}) => ({
+  id, name, artists, popularity: 70, duration_ms: 240000, explicit: false,
+  spotify_url: `https://open.spotify.com/track/${id}`,
+  album: { name: `${name} (album)`, release_date: releaseDate, image_url: `https://img.test/${id}-album.jpg` },
+  ...extra,
+})
+
+export const tracksReply = (tracks: ReturnType<typeof track>[], range = 'medium_term'): Reply => ({
+  status: 200,
+  body: { time_range: range, total: tracks.length, tracks },
+})
+
+export const MOOD: Reply = {
+  status: 200,
+  body: {
+    time_range: 'medium_term',
+    top_genres: [{ genre: 'metalcore', count: 2 }, { genre: 'indie folk', count: 1 }],
+    mood_distribution: { Aggressive: 55.56, Reflective: 33.33, Other: 11.11 },
+    dominant_mood: 'Aggressive',
+    visual_identity: { primary_color: '#E63946', secondary_color: '#1D3557', accent_color: '#99F67A', planet_glow_intensity: 0.9, background_style: 'supernova' },
+    total_artists_analyzed: 3,
+    artists_with_genres: 2,
+  },
+}
+
 // Fake backend: tests set what each "METHOD path" answers, and can change it mid-test.
 // A list answers with its items in turn, repeating the last one.
 export const backend = { routes: {} as Record<string, Reply | Reply[]>, calls: [] as string[] }
@@ -41,6 +69,8 @@ export function installFakeBackend() {
   backend.routes = {
     'GET /api/v1/spotify/me': OK,
     [galaxyPath()]: GALAXY,
+    [topTracksPath()]: tracksReply([]),
+    [moodPath()]: MOOD,
     'POST /api/v1/auth/logout': { status: 200, body: { logged_out: true } },
   }
   vi.stubGlobal(
