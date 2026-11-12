@@ -103,7 +103,7 @@ def test_galaxy_maps_artists_to_planets(api):
     assert dua["glow_intensity"] == 0.5  # no popularity → default
     assert (sleep_token["mood"], sleep_token["color"]) == ("Aggressive", "#E63946")
     assert dua["mood"] == "Upbeat"
-    assert (new_artist["mood"], new_artist["color"]) == ("Other", "#ADB5BD")
+    assert (new_artist["mood"], new_artist["color"]) == ("Uncharted", "#C7D2E4")
 
 
 def test_galaxy_attaches_tracks_as_moons(api):
@@ -185,6 +185,6 @@ def test_mood_without_any_genres_falls_back_to_other():
 
     assert response.status_code == 200
     body = response.json()
-    assert body["dominant_mood"] == "Other"
+    assert body["dominant_mood"] == "Uncharted"
     assert body["mood_distribution"] == {}
     assert body["artists_with_genres"] == 0

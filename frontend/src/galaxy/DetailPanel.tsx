@@ -108,7 +108,7 @@ function PlanetDetails({ planet, timeRange, onHighlightMoon }: { planet: Planet;
       </dl>
 
       <p className="genres">
-        {planet.genres.length ? planet.genres.join(' · ') : 'Spotify has no genres for this artist, so the planet stays neutral gray.'}
+        {planet.genres.length ? planet.genres.join(' · ') : "Spotify hasn't mapped this artist's genres yet, so their planet stays uncharted silver."}
       </p>
 
       <p className="section-title">Orbiting tracks</p>

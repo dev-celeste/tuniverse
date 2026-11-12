@@ -2,7 +2,7 @@ import { type ThreeEvent, useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import { AdditiveBlending, Color, type Sprite, type SpriteMaterial, Vector3 } from 'three'
 
-import { moodColor, moodRows } from '../moods'
+import { UNCHARTED, moodColor, moodRows } from '../moods'
 import type { AnchorStore } from './anchorStore'
 import { rng } from './layout'
 import { NEBULA_CENTER } from './places'
@@ -32,7 +32,7 @@ type Props = {
 export default function Nebula({ distribution, motion, anchors, focused, receded, moodFilter, onHover, onSelect }: Props) {
   const sprites = useRef<(Sprite | null)[]>([])
   const hovered = useRef(false)
-  const anim = useRef({ glow: 0, dims: Array<number>(PUFF_COUNT).fill(1), colors: Array.from({ length: PUFF_COUNT }, () => new Color(moodColor('Other'))) })
+  const anim = useRef({ glow: 0, dims: Array<number>(PUFF_COUNT).fill(1), colors: Array.from({ length: PUFF_COUNT }, () => new Color(moodColor(UNCHARTED))) })
 
   const puffs = useMemo<Puff[]>(() => {
     const rand = rng(0.909)
@@ -62,7 +62,7 @@ export default function Nebula({ distribution, motion, anchors, focused, receded
         acc += pct / 100
         if (puff.pick <= acc) return mood
       }
-      return 'Other'
+      return UNCHARTED
     })
   }, [distribution, puffs])
 

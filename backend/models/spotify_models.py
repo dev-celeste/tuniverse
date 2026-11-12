@@ -92,7 +92,7 @@ class Planet(BaseModel):
     orbit_radius: int
     planet_size: int
     glow_intensity: float  # 0–1, from artist popularity
-    mood: str  # genre family of this artist, e.g. "Aggressive"; "Other" when Spotify has no genres
+    mood: str  # genre family of this artist, e.g. "Aggressive"; "Uncharted" when no genre maps to a mood
     color: str  # hex primary color for that mood
     image_url: Optional[str] = None
     genres: list[str]

@@ -52,7 +52,7 @@ export const MOOD: Reply = {
   body: {
     time_range: 'medium_term',
     top_genres: [{ genre: 'metalcore', count: 2 }, { genre: 'indie folk', count: 1 }],
-    mood_distribution: { Aggressive: 55.56, Reflective: 33.33, Other: 11.11 },
+    mood_distribution: { Aggressive: 55.56, Reflective: 33.33, Uncharted: 11.11 },
     dominant_mood: 'Aggressive',
     visual_identity: { primary_color: '#E63946', secondary_color: '#1D3557', accent_color: '#99F67A', planet_glow_intensity: 0.9, background_style: 'supernova' },
     total_artists_analyzed: 3,

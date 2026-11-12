@@ -12,7 +12,7 @@ const SLEEP_TOKEN = planet(1, 'Sleep Token', {
   spotify_url: 'https://open.spotify.com/artist/st',
   moons: [moon('t2', 'Granite', 6), moon('t1', 'The Summoning', 1)],
 })
-const HIATUS = planet(2, 'Hiatus Kaiyote', { mood: 'Other', color: '#ADB5BD', genres: [], followers: null, moons: [] })
+const HIATUS = planet(2, 'Hiatus Kaiyote', { mood: 'Uncharted', color: '#C7D2E4', genres: [], followers: null, moons: [] })
 
 // #1 and #2 are moons of Sleep Token; #3 is by an artist outside the galaxy
 const TOP_TRACKS = [
@@ -63,7 +63,7 @@ describe('visiting a planet', () => {
     const details = within(panel())
     expect(details.getByRole('img', { name: 'Photo of Hiatus Kaiyote' })).toHaveTextContent('HK')
     expect(details.queryByText('Followers')).not.toBeInTheDocument()
-    expect(details.getByText(/no genres for this artist/)).toBeInTheDocument()
+    expect(details.getByText(/hasn't mapped this artist's genres/)).toBeInTheDocument()
     expect(details.getByText(/None of their songs are in your top 50/)).toBeInTheDocument()
   })
 
