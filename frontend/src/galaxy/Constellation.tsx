@@ -16,6 +16,8 @@ type Props = {
   motion: number
   anchors: AnchorStore
   focused: boolean
+  /** False on the start screen: the constellation fades in as you dive into the galaxy. */
+  shown: boolean
   /** Something else is focused: recede a little. */
   receded: boolean
   moodFilter: string | null
@@ -27,14 +29,14 @@ type Props = {
 }
 
 /** Top tracks as a constellation: one path from #1 (biggest, brightest) to #20. */
-export default function Constellation({ stars, motion, anchors, focused, receded, moodFilter, highlightTrackId, hoveredTrackId, onHoverStar, onHoverWhole, onSelect }: Props) {
+export default function Constellation({ stars, motion, anchors, focused, shown, receded, moodFilter, highlightTrackId, hoveredTrackId, onHoverStar, onHoverWhole, onSelect }: Props) {
   const width = useThree((s) => s.size.width)
   const frame = useMemo(() => constellationFrame(width), [width])
   const line = useRef<LineBasicMaterial>(null)
   const coreRefs = useRef<(Sprite | null)[]>([])
   const haloRefs = useRef<(Sprite | null)[]>([])
   const wholeHover = useRef(false)
-  const anim = useRef({ glow: 0, stars: new Map<string, { highlight: number; dim: number; color: Color; from: string }>() })
+  const anim = useRef({ glow: 0, presence: shown ? 1 : 0, stars: new Map<string, { highlight: number; dim: number; color: Color; from: string }>() })
 
   const points = useMemo(
     () => CONSTELLATION_PATH.slice(0, stars.length).map(([x, y], i) => new Vector3(-x, y, (hash(`star${i}`) - 0.5) * 6)),
@@ -47,6 +49,7 @@ export default function Constellation({ stars, motion, anchors, focused, receded
 
   useFrame(({ clock }, dt) => {
     const a = anim.current
+    a.presence += ((shown ? 1 : 0) - a.presence) * ease(0.15, dt)
     a.glow += ((wholeHover.current && !focused ? 1 : 0) - a.glow) * ease(0.003, dt)
 
     stars.forEach((star, i) => {
@@ -61,6 +64,7 @@ export default function Constellation({ stars, motion, anchors, focused, receded
       s.highlight += (lit - s.highlight) * ease(0.002, dt)
       const dimTarget = moodFilter && star.mood !== moodFilter ? 0.15 : receded ? 0.5 : 1
       s.dim += (dimTarget - s.dim) * ease(0.01, dt)
+      const fade = s.dim * a.presence
 
       const size = (4.6 - i * 0.13) * (1 + Math.sin(clock.elapsedTime * 1.3 + hash(id) * 6.28) * 0.07 * motion) * (1 + s.highlight * 0.6) * (1 + a.glow * 0.35)
       const core = coreRefs.current[i]
@@ -69,20 +73,20 @@ export default function Constellation({ stars, motion, anchors, focused, receded
         core.scale.setScalar(size)
         const m = core.material as SpriteMaterial
         m.color.copy(s.color)
-        m.opacity = Math.min(1, (0.55 + (1 - i / 20) * 0.45) * s.dim + s.highlight * 0.3)
+        m.opacity = Math.min(1, (0.55 + (1 - i / 20) * 0.45) * fade + s.highlight * 0.3 * a.presence)
       }
       if (halo) {
         halo.scale.setScalar(size * 2.6)
         const m = halo.material as SpriteMaterial
         m.color.copy(s.color)
-        m.opacity = (0.08 + s.highlight * 0.2) * s.dim
+        m.opacity = (0.08 + s.highlight * 0.2) * fade
       }
     })
 
-    if (line.current) line.current.opacity = (focused ? 0.4 : 0.28 + a.glow * 0.3) * (receded ? 0.5 : 1)
+    if (line.current) line.current.opacity = (focused ? 0.4 : 0.28 + a.glow * 0.3) * (receded ? 0.5 : 1) * a.presence
   })
 
-  const pickWhole = !focused
+  const pickWhole = !focused && shown
 
   return (
     <group position={frame.center} quaternion={frame.quaternion} scale={frame.scale}>

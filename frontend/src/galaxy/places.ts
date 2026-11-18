@@ -7,6 +7,15 @@ export const HOME_TARGET = new Vector3(0, 7, 0)
 export const HOME_DIR = new Vector3(0, 0.42, 1).normalize()
 export const homeDistance = (width: number) => (width < 720 ? 96 : 70)
 
+/**
+ * Start screen: far out, looking above the galaxy so it sits low, under the title. Phones look
+ * higher still, because the text takes up more of a narrow screen.
+ */
+const LANDING_TARGET_WIDE = new Vector3(0, 64, 0)
+const LANDING_TARGET_NARROW = new Vector3(0, 110, 0)
+export const landingTarget = (width: number) => (width < 720 ? LANDING_TARGET_NARROW : LANDING_TARGET_WIDE)
+export const landingDistance = (width: number) => (width < 720 ? 300 : 190)
+
 /** Phones get a smaller constellation so it fits their narrow view. */
 export const constellationScale = (width: number) => (width < 720 ? 0.8 : 1)
 

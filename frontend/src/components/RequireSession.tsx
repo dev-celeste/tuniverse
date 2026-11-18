@@ -3,11 +3,11 @@ import { Navigate, Outlet } from 'react-router'
 import { ApiError } from '../api/client'
 import { useMe } from '../api/queries'
 import { wasSignedIn } from '../session'
-import Starfield from './Starfield'
 
 /**
  * Layout route for every page that needs a Spotify session. Renders the page with the
- * signed-in user (read it with useSessionUser), or sends the visitor to the start screen.
+ * signed-in user as its outlet context, or sends the visitor to the start screen. Its own
+ * states float over the shared 3D scene.
  */
 export default function RequireSession() {
   const me = useMe()
@@ -21,31 +21,25 @@ export default function RequireSession() {
       return <Navigate to="/?login_error=not_invited" replace />
     }
     return (
-      <div className="shell">
-        <Starfield />
-        <main className="center">
-          <section className="card glass" role="alert">
-            <p className="eyebrow">Something went wrong</p>
-            <p>Tuniverse couldn't reach Spotify: {me.error.message}</p>
-            <button type="button" className="btn btn-ghost btn-small" onClick={() => me.refetch()}>
-              Try again
-            </button>
-          </section>
-        </main>
-      </div>
+      <main className="overlay-center">
+        <section className="card glass" role="alert">
+          <p className="eyebrow">Something went wrong</p>
+          <p>Tuniverse couldn't reach Spotify: {me.error.message}</p>
+          <button type="button" className="btn btn-ghost btn-small" onClick={() => me.refetch()}>
+            Try again
+          </button>
+        </section>
+      </main>
     )
   }
 
   if (me.isPending) {
     return (
-      <div className="shell">
-        <Starfield />
-        <main className="center">
-          <p className="status" role="status">
-            Charting your universe…
-          </p>
-        </main>
-      </div>
+      <main className="overlay-center">
+        <p className="status" role="status">
+          Charting your universe…
+        </p>
+      </main>
     )
   }
 

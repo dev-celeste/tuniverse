@@ -126,13 +126,13 @@ def frontend(store, monkeypatch):
     return store
 
 
-def test_successful_login_redirects_to_galaxy_with_cookie(frontend, api):
+def test_successful_login_redirects_to_start_screen_with_cookie(frontend, api):
     state = login(api)
 
     response = api.get(f"/api/v1/auth/callback?code=abc&state={state}", follow_redirects=False)
 
     assert response.status_code == 303
-    assert response.headers["location"] == "http://127.0.0.1:5173/galaxy"
+    assert response.headers["location"] == "http://127.0.0.1:5173/?welcome=1"
     assert frontend.get(api.cookies[SESSION_COOKIE_NAME]) is not None
 
 

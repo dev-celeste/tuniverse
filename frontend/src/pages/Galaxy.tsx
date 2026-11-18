@@ -1,19 +1,18 @@
-import { type ReactNode, Suspense, lazy, useEffect, useMemo, useState } from 'react'
+import { type ReactNode, useEffect, useMemo, useState } from 'react'
+import { useOutletContext } from 'react-router'
 
 import { ApiError } from '../api/client'
-import { useGalaxy, useMood, useTopTracks } from '../api/queries'
-import type { TimeRange } from '../api/types'
+import { type Source, useDemoUser, useGalaxy, useMood, useTopTracks } from '../api/queries'
+import type { SpotifyUser, TimeRange } from '../api/types'
+import { startLogin } from '../auth'
 import Brand from '../components/Brand'
 import MoodCard from '../components/MoodCard'
 import RangeSwitch from '../components/RangeSwitch'
 import DetailPanel from '../galaxy/DetailPanel'
 import type { Focus } from '../galaxy/focus'
+import { useSceneConfig } from '../galaxy/sceneContext'
 import { toStars } from '../galaxy/stars'
 import { useLogout } from '../useLogout'
-import { useSessionUser } from '../useSessionUser'
-
-// three.js is large: load the scene only when someone reaches their galaxy
-const GalaxyScene = lazy(() => import('../galaxy/GalaxyScene'))
 
 function Status({ children }: { children: ReactNode }) {
   return (
@@ -25,21 +24,29 @@ function Status({ children }: { children: ReactNode }) {
   )
 }
 
-export default function Galaxy() {
-  const user = useSessionUser()
+/**
+ * Your galaxy (source "live", inside RequireSession) or the demo universe (source "demo", sample
+ * data, no login). Draws the panels and controls; the 3D scene itself lives in the Universe layout.
+ */
+export default function Galaxy({ source }: { source: Source }) {
+  const demo = source === 'demo'
+  // Live: the signed-in user from RequireSession. Demo: the sample listener.
+  const sessionUser = useOutletContext<SpotifyUser | undefined>()
+  const demoUser = useDemoUser().data
+  const user = demo ? demoUser : sessionUser
   const logout = useLogout()
   const [timeRange, setTimeRange] = useState<TimeRange>('medium_term')
   const [focus, setFocus] = useState<Focus>(null)
   const [highlightTrackId, setHighlightTrackId] = useState<string | null>(null)
   const [moodFilter, setMoodFilter] = useState<string | null>(null)
 
-  const galaxy = useGalaxy(timeRange)
+  const galaxy = useGalaxy(timeRange, source)
   const planets = useMemo(() => galaxy.data?.planets ?? [], [galaxy.data])
   // The constellation and nebula are extras: if they fail to load, the galaxy still works
-  const topTracks = useTopTracks(timeRange)
+  const topTracks = useTopTracks(timeRange, source)
   const tracks = useMemo(() => topTracks.data?.tracks ?? [], [topTracks.data])
   const stars = useMemo(() => toStars(tracks, planets), [tracks, planets])
-  const mood = useMood(timeRange).data ?? null
+  const mood = useMood(timeRange, source).data ?? null
   // A 401 means the session is gone and RequireSession is about to redirect: keep showing the loader
   const sessionGone = galaxy.error instanceof ApiError && galaxy.error.status === 401
   // While a new range loads, the previous galaxy stays on screen
@@ -55,6 +62,17 @@ export default function Galaxy() {
     setHighlightTrackId(null)
   }
 
+  // Point the shared scene at this galaxy once it has loaded (until then the previous scene,
+  // e.g. the start screen's, stays and the camera dives in as the planets swap)
+  const scene = useMemo(
+    () =>
+      galaxy.data
+        ? { mode: 'galaxy' as const, planets, stars, mood, focus: visibleFocus, onFocus: setFocus, highlightTrackId, moodFilter }
+        : null,
+    [galaxy.data, planets, stars, mood, visibleFocus, highlightTrackId, moodFilter],
+  )
+  useSceneConfig(scene)
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setFocus(null)
@@ -65,22 +83,8 @@ export default function Galaxy() {
 
   return (
     <div className={`galaxy-page${visibleFocus ? ' focused' : ''}`}>
-      {planets.length > 0 && (
-        <Suspense fallback={<Status>Charting your universe…</Status>}>
-          <GalaxyScene
-            planets={planets}
-            stars={stars}
-            mood={mood}
-            focus={visibleFocus}
-            onFocus={setFocus}
-            highlightTrackId={highlightTrackId}
-            moodFilter={moodFilter}
-          />
-        </Suspense>
-      )}
-
       <header className="top overlay-top">
-        <Brand caption="Your universe" />
+        <Brand caption={demo ? 'Demo universe · sample data' : 'Your universe'} />
         <div className="actions">
           {stars.length > 0 && (
             <button
@@ -93,13 +97,19 @@ export default function Galaxy() {
             </button>
           )}
           <RangeSwitch value={timeRange} onChange={setTimeRange} busy={switchingRange} />
-          <button type="button" className="btn btn-ghost btn-small" onClick={logout}>
-            Log out
-          </button>
+          {demo ? (
+            <button type="button" className="btn btn-primary btn-small" onClick={startLogin}>
+              Connect Spotify
+            </button>
+          ) : (
+            <button type="button" className="btn btn-ghost btn-small" onClick={logout}>
+              Log out
+            </button>
+          )}
         </div>
       </header>
 
-      {planets.length > 0 && (
+      {planets.length > 0 && user && (
         <DetailPanel
           focus={visibleFocus}
           planets={planets}

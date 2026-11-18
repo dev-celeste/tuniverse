@@ -20,6 +20,7 @@ import { useDisplayedPlanets } from './useDisplayedPlanets'
 const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 type Props = {
+  mode: 'landing' | 'galaxy'
   planets: Planet[]
   /** Top tracks for the constellation; empty while loading or if unavailable. */
   stars: Star[]
@@ -37,7 +38,7 @@ type Props = {
  * a constellation, and the mood mix as a nebula. Loaded lazily from the Galaxy page so
  * three.js stays out of the start screen's bundle.
  */
-export default function GalaxyScene({ planets, stars, mood, focus, onFocus, highlightTrackId, moodFilter }: Props) {
+export default function GalaxyScene({ mode, planets, stars, mood, focus, onFocus, highlightTrackId, moodFilter }: Props) {
   const motion = reducedMotion ? 0.15 : 1
   const anchors = useAnchorStore()
   const displayed = useDisplayedPlanets(planets)
@@ -118,6 +119,7 @@ export default function GalaxyScene({ planets, stars, mood, focus, onFocus, high
             motion={motion}
             anchors={anchors}
             focused={skyFocus}
+            shown={mode === 'galaxy'}
             receded={focus !== null && !skyFocus}
             moodFilter={moodFilter}
             highlightTrackId={highlightTrackId}
@@ -141,7 +143,7 @@ export default function GalaxyScene({ planets, stars, mood, focus, onFocus, high
           />
         )}
 
-        <CameraRig reducedMotion={reducedMotion} focus={focus} anchors={anchors} planetDistance={planetDistance} />
+        <CameraRig mode={mode} reducedMotion={reducedMotion} focus={focus} anchors={anchors} planetDistance={planetDistance} />
         <LabelProjector store={anchors} />
 
         <EffectComposer>
@@ -182,6 +184,20 @@ export default function GalaxyScene({ planets, stars, mood, focus, onFocus, high
             </button>
           )
         })}
+
+        {/* Visiting a planet shows its moons' track titles */}
+        {displayed.flatMap((planet) =>
+          planet.moons.map((moon) => (
+            <span
+              key={moon.id}
+              className={`moon-label${focusedPlanetId === planet.id ? ' show' : ''}${litTrack === moon.id ? ' lit' : ''}`}
+              ref={(el) => anchors.setElement(`moon:${moon.id}`, el)}
+              aria-hidden="true"
+            >
+              {moon.name}
+            </span>
+          )),
+        )}
 
         {stars.map((star) => {
           const lit = hoveredStar === star.track.id || highlightTrackId === star.track.id

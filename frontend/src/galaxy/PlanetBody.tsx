@@ -167,6 +167,7 @@ export default function PlanetBody({ planet, motion, anchors, hovered, focused, 
             key={moon.id}
             ref={(m) => {
               moonRefs.current[i] = m
+              anchors.setAnchor(`moon:${moon.id}`, m)
             }}
           >
             <sphereGeometry args={[1, 24, 16]} />

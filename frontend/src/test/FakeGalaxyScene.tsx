@@ -7,9 +7,9 @@ import type GalaxyScene from '../galaxy/GalaxyScene'
  * the core, each star and the nebula, wired to the same onFocus, with the highlighted track,
  * mood filter and core tint exposed for assertions.
  */
-export default function FakeGalaxyScene({ planets, stars, mood, onFocus, highlightTrackId, moodFilter }: ComponentProps<typeof GalaxyScene>) {
+export default function FakeGalaxyScene({ mode, planets, stars, mood, onFocus, highlightTrackId, moodFilter }: ComponentProps<typeof GalaxyScene>) {
   return (
-    <div data-testid="scene" data-highlight={highlightTrackId ?? ''} data-mood-filter={moodFilter ?? ''} data-tint={mood?.visual_identity.primary_color ?? ''}>
+    <div data-testid="scene" data-mode={mode} data-highlight={highlightTrackId ?? ''} data-mood-filter={moodFilter ?? ''} data-tint={mood?.visual_identity.primary_color ?? ''}>
       <ul aria-label="Planets">
         {planets.map((p) => (
           <li key={p.id}>

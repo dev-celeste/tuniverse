@@ -1,0 +1,2369 @@
+{
+  "me": {
+    "id": "demo",
+    "display_name": "Demo Listener",
+    "image_url": null,
+    "profile_url": null,
+    "followers": 48
+  },
+  "ranges": {
+    "short_term": {
+      "galaxy": {
+        "time_range": "short_term",
+        "total_planets": 10,
+        "planets": [
+          {
+            "id": "john-summit",
+            "name": "John Summit",
+            "rank": 1,
+            "orbit_radius": 100,
+            "planet_size": 100,
+            "glow_intensity": 0.78,
+            "mood": "Euphoric",
+            "color": "#6E6BFF",
+            "image_url": null,
+            "genres": [
+              "house",
+              "tech house",
+              "edm"
+            ],
+            "popularity": 78,
+            "followers": 866000,
+            "spotify_url": "https://open.spotify.com/search/John%20Summit",
+            "moons": [
+              {
+                "id": "john-summit--shiver",
+                "name": "Shiver",
+                "rank": 1,
+                "popularity": 70,
+                "duration_ms": 234000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Shiver%20John%20Summit"
+              },
+              {
+                "id": "john-summit--where-you-are",
+                "name": "Where You Are",
+                "rank": 6,
+                "popularity": 70,
+                "duration_ms": 236000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Where%20You%20Are%20John%20Summit"
+              }
+            ]
+          },
+          {
+            "id": "bad-bunny",
+            "name": "Bad Bunny",
+            "rank": 2,
+            "orbit_radius": 140,
+            "planet_size": 95,
+            "glow_intensity": 0.98,
+            "mood": "Fiery",
+            "color": "#FF8A3D",
+            "image_url": null,
+            "genres": [
+              "reggaeton",
+              "trap latino",
+              "latin",
+              "urbano latino"
+            ],
+            "popularity": 98,
+            "followers": 126000000,
+            "spotify_url": "https://open.spotify.com/search/Bad%20Bunny",
+            "moons": [
+              {
+                "id": "bad-bunny--baile-inolvidable",
+                "name": "BAILE INoLVIDABLE",
+                "rank": 2,
+                "popularity": 70,
+                "duration_ms": 368000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/BAILE%20INoLVIDABLE%20Bad%20Bunny"
+              },
+              {
+                "id": "bad-bunny--dtmf",
+                "name": "DtMF",
+                "rank": 7,
+                "popularity": 70,
+                "duration_ms": 237000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/DtMF%20Bad%20Bunny"
+              },
+              {
+                "id": "bad-bunny--tití-me-preguntó",
+                "name": "Tití Me Preguntó",
+                "rank": 11,
+                "popularity": 70,
+                "duration_ms": 244000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Tit%C3%AD%20Me%20Pregunt%C3%B3%20Bad%20Bunny"
+              }
+            ]
+          },
+          {
+            "id": "olivia-dean",
+            "name": "Olivia Dean",
+            "rank": 3,
+            "orbit_radius": 180,
+            "planet_size": 90,
+            "glow_intensity": 0.9,
+            "mood": "Upbeat",
+            "color": "#FFD166",
+            "image_url": null,
+            "genres": [
+              "pop soul"
+            ],
+            "popularity": 90,
+            "followers": 5600000,
+            "spotify_url": "https://open.spotify.com/search/Olivia%20Dean",
+            "moons": [
+              {
+                "id": "olivia-dean--man-i-need",
+                "name": "Man I Need",
+                "rank": 3,
+                "popularity": 70,
+                "duration_ms": 184000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Man%20I%20Need%20Olivia%20Dean"
+              },
+              {
+                "id": "olivia-dean--dive",
+                "name": "Dive",
+                "rank": 8,
+                "popularity": 70,
+                "duration_ms": 201000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Dive%20Olivia%20Dean"
+              }
+            ]
+          },
+          {
+            "id": "ariana-grande",
+            "name": "Ariana Grande",
+            "rank": 4,
+            "orbit_radius": 220,
+            "planet_size": 85,
+            "glow_intensity": 0.95,
+            "mood": "Upbeat",
+            "color": "#FFD166",
+            "image_url": null,
+            "genres": [
+              "pop"
+            ],
+            "popularity": 95,
+            "followers": 117000000,
+            "spotify_url": "https://open.spotify.com/search/Ariana%20Grande",
+            "moons": [
+              {
+                "id": "ariana-grande--7-rings",
+                "name": "7 rings",
+                "rank": 4,
+                "popularity": 70,
+                "duration_ms": 179000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/7%20rings%20Ariana%20Grande"
+              },
+              {
+                "id": "ariana-grande--we-can't-be-friends-(wait-for-your-love)",
+                "name": "we can't be friends (wait for your love)",
+                "rank": 15,
+                "popularity": 70,
+                "duration_ms": 229000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/we%20can%27t%20be%20friends%20%28wait%20for%20your%20love%29%20Ariana%20Grande"
+              }
+            ]
+          },
+          {
+            "id": "linkin-park",
+            "name": "Linkin Park",
+            "rank": 5,
+            "orbit_radius": 260,
+            "planet_size": 80,
+            "glow_intensity": 0.92,
+            "mood": "Aggressive",
+            "color": "#E63946",
+            "image_url": null,
+            "genres": [
+              "nu metal",
+              "rap metal",
+              "rock",
+              "alternative metal"
+            ],
+            "popularity": 92,
+            "followers": 36900000,
+            "spotify_url": "https://open.spotify.com/search/Linkin%20Park",
+            "moons": [
+              {
+                "id": "linkin-park--numb",
+                "name": "Numb",
+                "rank": 9,
+                "popularity": 70,
+                "duration_ms": 188000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Numb%20Linkin%20Park"
+              },
+              {
+                "id": "linkin-park--in-the-end",
+                "name": "In the End",
+                "rank": 12,
+                "popularity": 70,
+                "duration_ms": 217000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/In%20the%20End%20Linkin%20Park"
+              },
+              {
+                "id": "linkin-park--the-emptiness-machine",
+                "name": "The Emptiness Machine",
+                "rank": 16,
+                "popularity": 70,
+                "duration_ms": 190000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/The%20Emptiness%20Machine%20Linkin%20Park"
+              }
+            ]
+          },
+          {
+            "id": "tame-impala",
+            "name": "Tame Impala",
+            "rank": 6,
+            "orbit_radius": 300,
+            "planet_size": 75,
+            "glow_intensity": 0.89,
+            "mood": "Reflective",
+            "color": "#EF8DC1",
+            "image_url": null,
+            "genres": [
+              "neo-psychedelic",
+              "indie"
+            ],
+            "popularity": 89,
+            "followers": 12400000,
+            "spotify_url": "https://open.spotify.com/search/Tame%20Impala",
+            "moons": [
+              {
+                "id": "tame-impala--let-it-happen",
+                "name": "Let It Happen",
+                "rank": 13,
+                "popularity": 70,
+                "duration_ms": 468000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Let%20It%20Happen%20Tame%20Impala"
+              },
+              {
+                "id": "tame-impala--the-less-i-know-the-better",
+                "name": "The Less I Know The Better",
+                "rank": 14,
+                "popularity": 70,
+                "duration_ms": 216000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/The%20Less%20I%20Know%20The%20Better%20Tame%20Impala"
+              }
+            ]
+          },
+          {
+            "id": "j-cole",
+            "name": "J. Cole",
+            "rank": 7,
+            "orbit_radius": 340,
+            "planet_size": 70,
+            "glow_intensity": 0.87,
+            "mood": "Confident",
+            "color": "#30B8E6",
+            "image_url": null,
+            "genres": [
+              "rap"
+            ],
+            "popularity": 87,
+            "followers": 29300000,
+            "spotify_url": "https://open.spotify.com/search/J.%20Cole",
+            "moons": [
+              {
+                "id": "j-cole--middle-child",
+                "name": "MIDDLE CHILD",
+                "rank": 17,
+                "popularity": 70,
+                "duration_ms": 214000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/MIDDLE%20CHILD%20J.%20Cole"
+              },
+              {
+                "id": "j-cole--no-role-modelz",
+                "name": "No Role Modelz",
+                "rank": 19,
+                "popularity": 70,
+                "duration_ms": 293000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/No%20Role%20Modelz%20J.%20Cole"
+              }
+            ]
+          },
+          {
+            "id": "shakira",
+            "name": "Shakira",
+            "rank": 8,
+            "orbit_radius": 380,
+            "planet_size": 65,
+            "glow_intensity": 0.9,
+            "mood": "Fiery",
+            "color": "#FF8A3D",
+            "image_url": null,
+            "genres": [
+              "latin pop"
+            ],
+            "popularity": 90,
+            "followers": 47100000,
+            "spotify_url": "https://open.spotify.com/search/Shakira",
+            "moons": [
+              {
+                "id": "shakira--whenever,-wherever",
+                "name": "Whenever, Wherever",
+                "rank": 18,
+                "popularity": 70,
+                "duration_ms": 196000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Whenever%2C%20Wherever%20Shakira"
+              },
+              {
+                "id": "shakira--hips-don't-lie",
+                "name": "Hips Don't Lie",
+                "rank": 24,
+                "popularity": 70,
+                "duration_ms": 220000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Hips%20Don%27t%20Lie%20Shakira"
+              }
+            ]
+          },
+          {
+            "id": "arctic-monkeys",
+            "name": "Arctic Monkeys",
+            "rank": 9,
+            "orbit_radius": 420,
+            "planet_size": 60,
+            "glow_intensity": 0.88,
+            "mood": "Reflective",
+            "color": "#EF8DC1",
+            "image_url": null,
+            "genres": [
+              "indie",
+              "garage rock"
+            ],
+            "popularity": 88,
+            "followers": 36300000,
+            "spotify_url": "https://open.spotify.com/search/Arctic%20Monkeys",
+            "moons": [
+              {
+                "id": "arctic-monkeys--do-i-wanna-know?",
+                "name": "Do I Wanna Know?",
+                "rank": 20,
+                "popularity": 70,
+                "duration_ms": 273000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Do%20I%20Wanna%20Know%3F%20Arctic%20Monkeys"
+              },
+              {
+                "id": "arctic-monkeys--i-wanna-be-yours",
+                "name": "I Wanna Be Yours",
+                "rank": 22,
+                "popularity": 70,
+                "duration_ms": 184000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/I%20Wanna%20Be%20Yours%20Arctic%20Monkeys"
+              },
+              {
+                "id": "arctic-monkeys--505",
+                "name": "505",
+                "rank": 23,
+                "popularity": 70,
+                "duration_ms": 254000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/505%20Arctic%20Monkeys"
+              }
+            ]
+          },
+          {
+            "id": "my-chemical-romance",
+            "name": "My Chemical Romance",
+            "rank": 10,
+            "orbit_radius": 460,
+            "planet_size": 55,
+            "glow_intensity": 0.83,
+            "mood": "Intense",
+            "color": "#8A2ECC",
+            "image_url": null,
+            "genres": [
+              "emo",
+              "pop punk"
+            ],
+            "popularity": 83,
+            "followers": 11600000,
+            "spotify_url": "https://open.spotify.com/search/My%20Chemical%20Romance",
+            "moons": []
+          }
+        ]
+      },
+      "top_tracks": {
+        "time_range": "short_term",
+        "total": 20,
+        "tracks": [
+          {
+            "id": "john-summit--shiver",
+            "name": "Shiver",
+            "artists": [
+              "John Summit"
+            ],
+            "album": {
+              "name": "Shiver",
+              "release_date": "2024-02-14",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 234000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Shiver%20John%20Summit"
+          },
+          {
+            "id": "bad-bunny--baile-inolvidable",
+            "name": "BAILE INoLVIDABLE",
+            "artists": [
+              "Bad Bunny"
+            ],
+            "album": {
+              "name": "BAILE INoLVIDABLE",
+              "release_date": "2025-01-05",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 368000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/BAILE%20INoLVIDABLE%20Bad%20Bunny"
+          },
+          {
+            "id": "olivia-dean--man-i-need",
+            "name": "Man I Need",
+            "artists": [
+              "Olivia Dean"
+            ],
+            "album": {
+              "name": "Man I Need",
+              "release_date": "2025-08-15",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 184000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Man%20I%20Need%20Olivia%20Dean"
+          },
+          {
+            "id": "ariana-grande--7-rings",
+            "name": "7 rings",
+            "artists": [
+              "Ariana Grande"
+            ],
+            "album": {
+              "name": "7 rings",
+              "release_date": "2019-02-08",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 179000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/7%20rings%20Ariana%20Grande"
+          },
+          {
+            "id": "taylor-swift--cruel-summer",
+            "name": "Cruel Summer",
+            "artists": [
+              "Taylor Swift"
+            ],
+            "album": {
+              "name": "Cruel Summer",
+              "release_date": "2019-08-23",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 178000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Cruel%20Summer%20Taylor%20Swift"
+          },
+          {
+            "id": "john-summit--where-you-are",
+            "name": "Where You Are",
+            "artists": [
+              "John Summit"
+            ],
+            "album": {
+              "name": "Where You Are",
+              "release_date": "2023-03-03",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 236000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Where%20You%20Are%20John%20Summit"
+          },
+          {
+            "id": "bad-bunny--dtmf",
+            "name": "DtMF",
+            "artists": [
+              "Bad Bunny"
+            ],
+            "album": {
+              "name": "DtMF",
+              "release_date": "2025-01-05",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 237000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/DtMF%20Bad%20Bunny"
+          },
+          {
+            "id": "olivia-dean--dive",
+            "name": "Dive",
+            "artists": [
+              "Olivia Dean"
+            ],
+            "album": {
+              "name": "Dive",
+              "release_date": "2023-03-28",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 201000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Dive%20Olivia%20Dean"
+          },
+          {
+            "id": "linkin-park--numb",
+            "name": "Numb",
+            "artists": [
+              "Linkin Park"
+            ],
+            "album": {
+              "name": "Numb",
+              "release_date": "2003-03-25",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 188000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Numb%20Linkin%20Park"
+          },
+          {
+            "id": "hozier--too-sweet",
+            "name": "Too Sweet",
+            "artists": [
+              "Hozier"
+            ],
+            "album": {
+              "name": "Too Sweet",
+              "release_date": "2024-03-22",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 251000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Too%20Sweet%20Hozier"
+          },
+          {
+            "id": "bad-bunny--tití-me-preguntó",
+            "name": "Tití Me Preguntó",
+            "artists": [
+              "Bad Bunny"
+            ],
+            "album": {
+              "name": "Tití Me Preguntó",
+              "release_date": "2022-05-06",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 244000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Tit%C3%AD%20Me%20Pregunt%C3%B3%20Bad%20Bunny"
+          },
+          {
+            "id": "linkin-park--in-the-end",
+            "name": "In the End",
+            "artists": [
+              "Linkin Park"
+            ],
+            "album": {
+              "name": "In the End",
+              "release_date": "2000-10-24",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 217000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/In%20the%20End%20Linkin%20Park"
+          },
+          {
+            "id": "tame-impala--let-it-happen",
+            "name": "Let It Happen",
+            "artists": [
+              "Tame Impala"
+            ],
+            "album": {
+              "name": "Let It Happen",
+              "release_date": "2015-07-17",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 468000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Let%20It%20Happen%20Tame%20Impala"
+          },
+          {
+            "id": "tame-impala--the-less-i-know-the-better",
+            "name": "The Less I Know The Better",
+            "artists": [
+              "Tame Impala"
+            ],
+            "album": {
+              "name": "The Less I Know The Better",
+              "release_date": "2015-07-17",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 216000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/The%20Less%20I%20Know%20The%20Better%20Tame%20Impala"
+          },
+          {
+            "id": "ariana-grande--we-can't-be-friends-(wait-for-your-love)",
+            "name": "we can't be friends (wait for your love)",
+            "artists": [
+              "Ariana Grande"
+            ],
+            "album": {
+              "name": "we can't be friends (wait for your love)",
+              "release_date": "2024-03-08",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 229000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/we%20can%27t%20be%20friends%20%28wait%20for%20your%20love%29%20Ariana%20Grande"
+          },
+          {
+            "id": "linkin-park--the-emptiness-machine",
+            "name": "The Emptiness Machine",
+            "artists": [
+              "Linkin Park"
+            ],
+            "album": {
+              "name": "The Emptiness Machine",
+              "release_date": "2024-09-05",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 190000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/The%20Emptiness%20Machine%20Linkin%20Park"
+          },
+          {
+            "id": "j-cole--middle-child",
+            "name": "MIDDLE CHILD",
+            "artists": [
+              "J. Cole"
+            ],
+            "album": {
+              "name": "MIDDLE CHILD",
+              "release_date": "2019-01-23",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 214000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/MIDDLE%20CHILD%20J.%20Cole"
+          },
+          {
+            "id": "shakira--whenever,-wherever",
+            "name": "Whenever, Wherever",
+            "artists": [
+              "Shakira"
+            ],
+            "album": {
+              "name": "Whenever, Wherever",
+              "release_date": "2001-11-13",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 196000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Whenever%2C%20Wherever%20Shakira"
+          },
+          {
+            "id": "j-cole--no-role-modelz",
+            "name": "No Role Modelz",
+            "artists": [
+              "J. Cole"
+            ],
+            "album": {
+              "name": "No Role Modelz",
+              "release_date": "2014-12-09",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 293000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/No%20Role%20Modelz%20J.%20Cole"
+          },
+          {
+            "id": "arctic-monkeys--do-i-wanna-know?",
+            "name": "Do I Wanna Know?",
+            "artists": [
+              "Arctic Monkeys"
+            ],
+            "album": {
+              "name": "Do I Wanna Know?",
+              "release_date": "2013-09-09",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 273000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Do%20I%20Wanna%20Know%3F%20Arctic%20Monkeys"
+          }
+        ]
+      },
+      "mood": {
+        "time_range": "short_term",
+        "top_genres": [
+          {
+            "genre": "indie",
+            "count": 2
+          },
+          {
+            "genre": "house",
+            "count": 1
+          },
+          {
+            "genre": "tech house",
+            "count": 1
+          },
+          {
+            "genre": "edm",
+            "count": 1
+          },
+          {
+            "genre": "reggaeton",
+            "count": 1
+          },
+          {
+            "genre": "trap latino",
+            "count": 1
+          },
+          {
+            "genre": "latin",
+            "count": 1
+          },
+          {
+            "genre": "urbano latino",
+            "count": 1
+          },
+          {
+            "genre": "pop soul",
+            "count": 1
+          },
+          {
+            "genre": "pop",
+            "count": 1
+          }
+        ],
+        "mood_distribution": {
+          "Euphoric": 16.81,
+          "Fiery": 26.89,
+          "Upbeat": 8.4,
+          "Aggressive": 15.13,
+          "Confident": 11.76,
+          "Uncharted": 2.1,
+          "Reflective": 9.24,
+          "Intense": 9.66
+        },
+        "dominant_mood": "Fiery",
+        "visual_identity": {
+          "primary_color": "#FF8A3D",
+          "secondary_color": "#4A1A0A",
+          "accent_color": "#FFD3A8",
+          "planet_glow_intensity": 0.85,
+          "background_style": "solarFlare"
+        },
+        "total_artists_analyzed": 10,
+        "artists_with_genres": 10
+      }
+    },
+    "medium_term": {
+      "galaxy": {
+        "time_range": "medium_term",
+        "total_planets": 10,
+        "planets": [
+          {
+            "id": "arctic-monkeys",
+            "name": "Arctic Monkeys",
+            "rank": 1,
+            "orbit_radius": 100,
+            "planet_size": 100,
+            "glow_intensity": 0.88,
+            "mood": "Reflective",
+            "color": "#EF8DC1",
+            "image_url": null,
+            "genres": [
+              "indie",
+              "garage rock"
+            ],
+            "popularity": 88,
+            "followers": 36300000,
+            "spotify_url": "https://open.spotify.com/search/Arctic%20Monkeys",
+            "moons": [
+              {
+                "id": "arctic-monkeys--do-i-wanna-know?",
+                "name": "Do I Wanna Know?",
+                "rank": 1,
+                "popularity": 70,
+                "duration_ms": 273000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Do%20I%20Wanna%20Know%3F%20Arctic%20Monkeys"
+              },
+              {
+                "id": "arctic-monkeys--505",
+                "name": "505",
+                "rank": 4,
+                "popularity": 70,
+                "duration_ms": 254000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/505%20Arctic%20Monkeys"
+              },
+              {
+                "id": "arctic-monkeys--i-wanna-be-yours",
+                "name": "I Wanna Be Yours",
+                "rank": 6,
+                "popularity": 70,
+                "duration_ms": 184000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/I%20Wanna%20Be%20Yours%20Arctic%20Monkeys"
+              }
+            ]
+          },
+          {
+            "id": "tame-impala",
+            "name": "Tame Impala",
+            "rank": 2,
+            "orbit_radius": 140,
+            "planet_size": 95,
+            "glow_intensity": 0.89,
+            "mood": "Reflective",
+            "color": "#EF8DC1",
+            "image_url": null,
+            "genres": [
+              "neo-psychedelic",
+              "indie"
+            ],
+            "popularity": 89,
+            "followers": 12400000,
+            "spotify_url": "https://open.spotify.com/search/Tame%20Impala",
+            "moons": [
+              {
+                "id": "tame-impala--the-less-i-know-the-better",
+                "name": "The Less I Know The Better",
+                "rank": 2,
+                "popularity": 70,
+                "duration_ms": 216000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/The%20Less%20I%20Know%20The%20Better%20Tame%20Impala"
+              },
+              {
+                "id": "tame-impala--let-it-happen",
+                "name": "Let It Happen",
+                "rank": 5,
+                "popularity": 70,
+                "duration_ms": 468000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Let%20It%20Happen%20Tame%20Impala"
+              }
+            ]
+          },
+          {
+            "id": "bad-bunny",
+            "name": "Bad Bunny",
+            "rank": 3,
+            "orbit_radius": 180,
+            "planet_size": 90,
+            "glow_intensity": 0.98,
+            "mood": "Fiery",
+            "color": "#FF8A3D",
+            "image_url": null,
+            "genres": [
+              "reggaeton",
+              "trap latino",
+              "latin",
+              "urbano latino"
+            ],
+            "popularity": 98,
+            "followers": 126000000,
+            "spotify_url": "https://open.spotify.com/search/Bad%20Bunny",
+            "moons": [
+              {
+                "id": "bad-bunny--tití-me-preguntó",
+                "name": "Tití Me Preguntó",
+                "rank": 3,
+                "popularity": 70,
+                "duration_ms": 244000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Tit%C3%AD%20Me%20Pregunt%C3%B3%20Bad%20Bunny"
+              },
+              {
+                "id": "bad-bunny--dtmf",
+                "name": "DtMF",
+                "rank": 10,
+                "popularity": 70,
+                "duration_ms": 237000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/DtMF%20Bad%20Bunny"
+              },
+              {
+                "id": "bad-bunny--baile-inolvidable",
+                "name": "BAILE INoLVIDABLE",
+                "rank": 12,
+                "popularity": 70,
+                "duration_ms": 368000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/BAILE%20INoLVIDABLE%20Bad%20Bunny"
+              }
+            ]
+          },
+          {
+            "id": "linkin-park",
+            "name": "Linkin Park",
+            "rank": 4,
+            "orbit_radius": 220,
+            "planet_size": 85,
+            "glow_intensity": 0.92,
+            "mood": "Aggressive",
+            "color": "#E63946",
+            "image_url": null,
+            "genres": [
+              "nu metal",
+              "rap metal",
+              "rock",
+              "alternative metal"
+            ],
+            "popularity": 92,
+            "followers": 36900000,
+            "spotify_url": "https://open.spotify.com/search/Linkin%20Park",
+            "moons": [
+              {
+                "id": "linkin-park--in-the-end",
+                "name": "In the End",
+                "rank": 7,
+                "popularity": 70,
+                "duration_ms": 217000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/In%20the%20End%20Linkin%20Park"
+              },
+              {
+                "id": "linkin-park--numb",
+                "name": "Numb",
+                "rank": 14,
+                "popularity": 70,
+                "duration_ms": 188000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Numb%20Linkin%20Park"
+              },
+              {
+                "id": "linkin-park--the-emptiness-machine",
+                "name": "The Emptiness Machine",
+                "rank": 15,
+                "popularity": 70,
+                "duration_ms": 190000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/The%20Emptiness%20Machine%20Linkin%20Park"
+              }
+            ]
+          },
+          {
+            "id": "ariana-grande",
+            "name": "Ariana Grande",
+            "rank": 5,
+            "orbit_radius": 260,
+            "planet_size": 80,
+            "glow_intensity": 0.95,
+            "mood": "Upbeat",
+            "color": "#FFD166",
+            "image_url": null,
+            "genres": [
+              "pop"
+            ],
+            "popularity": 95,
+            "followers": 117000000,
+            "spotify_url": "https://open.spotify.com/search/Ariana%20Grande",
+            "moons": [
+              {
+                "id": "ariana-grande--we-can't-be-friends-(wait-for-your-love)",
+                "name": "we can't be friends (wait for your love)",
+                "rank": 8,
+                "popularity": 70,
+                "duration_ms": 229000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/we%20can%27t%20be%20friends%20%28wait%20for%20your%20love%29%20Ariana%20Grande"
+              },
+              {
+                "id": "ariana-grande--7-rings",
+                "name": "7 rings",
+                "rank": 17,
+                "popularity": 70,
+                "duration_ms": 179000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/7%20rings%20Ariana%20Grande"
+              }
+            ]
+          },
+          {
+            "id": "j-cole",
+            "name": "J. Cole",
+            "rank": 6,
+            "orbit_radius": 300,
+            "planet_size": 75,
+            "glow_intensity": 0.87,
+            "mood": "Confident",
+            "color": "#30B8E6",
+            "image_url": null,
+            "genres": [
+              "rap"
+            ],
+            "popularity": 87,
+            "followers": 29300000,
+            "spotify_url": "https://open.spotify.com/search/J.%20Cole",
+            "moons": [
+              {
+                "id": "j-cole--no-role-modelz",
+                "name": "No Role Modelz",
+                "rank": 18,
+                "popularity": 70,
+                "duration_ms": 293000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/No%20Role%20Modelz%20J.%20Cole"
+              },
+              {
+                "id": "j-cole--middle-child",
+                "name": "MIDDLE CHILD",
+                "rank": 19,
+                "popularity": 70,
+                "duration_ms": 214000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/MIDDLE%20CHILD%20J.%20Cole"
+              }
+            ]
+          },
+          {
+            "id": "my-chemical-romance",
+            "name": "My Chemical Romance",
+            "rank": 7,
+            "orbit_radius": 340,
+            "planet_size": 70,
+            "glow_intensity": 0.83,
+            "mood": "Intense",
+            "color": "#8A2ECC",
+            "image_url": null,
+            "genres": [
+              "emo",
+              "pop punk"
+            ],
+            "popularity": 83,
+            "followers": 11600000,
+            "spotify_url": "https://open.spotify.com/search/My%20Chemical%20Romance",
+            "moons": [
+              {
+                "id": "my-chemical-romance--welcome-to-the-black-parade",
+                "name": "Welcome to the Black Parade",
+                "rank": 13,
+                "popularity": 70,
+                "duration_ms": 311000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Welcome%20to%20the%20Black%20Parade%20My%20Chemical%20Romance"
+              },
+              {
+                "id": "my-chemical-romance--helena",
+                "name": "Helena",
+                "rank": 20,
+                "popularity": 70,
+                "duration_ms": 205000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Helena%20My%20Chemical%20Romance"
+              }
+            ]
+          },
+          {
+            "id": "john-summit",
+            "name": "John Summit",
+            "rank": 8,
+            "orbit_radius": 380,
+            "planet_size": 65,
+            "glow_intensity": 0.78,
+            "mood": "Euphoric",
+            "color": "#6E6BFF",
+            "image_url": null,
+            "genres": [
+              "house",
+              "tech house",
+              "edm"
+            ],
+            "popularity": 78,
+            "followers": 866000,
+            "spotify_url": "https://open.spotify.com/search/John%20Summit",
+            "moons": [
+              {
+                "id": "john-summit--where-you-are",
+                "name": "Where You Are",
+                "rank": 16,
+                "popularity": 70,
+                "duration_ms": 236000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Where%20You%20Are%20John%20Summit"
+              },
+              {
+                "id": "john-summit--shiver",
+                "name": "Shiver",
+                "rank": 24,
+                "popularity": 70,
+                "duration_ms": 234000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Shiver%20John%20Summit"
+              }
+            ]
+          },
+          {
+            "id": "the-beatles",
+            "name": "The Beatles",
+            "rank": 9,
+            "orbit_radius": 420,
+            "planet_size": 60,
+            "glow_intensity": 0.86,
+            "mood": "Confident",
+            "color": "#30B8E6",
+            "image_url": null,
+            "genres": [
+              "classic rock",
+              "psychedelic rock"
+            ],
+            "popularity": 86,
+            "followers": 33100000,
+            "spotify_url": "https://open.spotify.com/search/The%20Beatles",
+            "moons": [
+              {
+                "id": "the-beatles--here-comes-the-sun",
+                "name": "Here Comes The Sun",
+                "rank": 21,
+                "popularity": 70,
+                "duration_ms": 186000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Here%20Comes%20The%20Sun%20The%20Beatles"
+              },
+              {
+                "id": "the-beatles--let-it-be",
+                "name": "Let It Be",
+                "rank": 23,
+                "popularity": 70,
+                "duration_ms": 243000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Let%20It%20Be%20The%20Beatles"
+              }
+            ]
+          },
+          {
+            "id": "britney-spears",
+            "name": "Britney Spears",
+            "rank": 10,
+            "orbit_radius": 460,
+            "planet_size": 55,
+            "glow_intensity": 0.86,
+            "mood": "Upbeat",
+            "color": "#FFD166",
+            "image_url": null,
+            "genres": [
+              "pop"
+            ],
+            "popularity": 86,
+            "followers": 20500000,
+            "spotify_url": "https://open.spotify.com/search/Britney%20Spears",
+            "moons": []
+          }
+        ]
+      },
+      "top_tracks": {
+        "time_range": "medium_term",
+        "total": 20,
+        "tracks": [
+          {
+            "id": "arctic-monkeys--do-i-wanna-know?",
+            "name": "Do I Wanna Know?",
+            "artists": [
+              "Arctic Monkeys"
+            ],
+            "album": {
+              "name": "Do I Wanna Know?",
+              "release_date": "2013-09-09",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 273000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Do%20I%20Wanna%20Know%3F%20Arctic%20Monkeys"
+          },
+          {
+            "id": "tame-impala--the-less-i-know-the-better",
+            "name": "The Less I Know The Better",
+            "artists": [
+              "Tame Impala"
+            ],
+            "album": {
+              "name": "The Less I Know The Better",
+              "release_date": "2015-07-17",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 216000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/The%20Less%20I%20Know%20The%20Better%20Tame%20Impala"
+          },
+          {
+            "id": "bad-bunny--tití-me-preguntó",
+            "name": "Tití Me Preguntó",
+            "artists": [
+              "Bad Bunny"
+            ],
+            "album": {
+              "name": "Tití Me Preguntó",
+              "release_date": "2022-05-06",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 244000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Tit%C3%AD%20Me%20Pregunt%C3%B3%20Bad%20Bunny"
+          },
+          {
+            "id": "arctic-monkeys--505",
+            "name": "505",
+            "artists": [
+              "Arctic Monkeys"
+            ],
+            "album": {
+              "name": "505",
+              "release_date": "2007-04-24",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 254000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/505%20Arctic%20Monkeys"
+          },
+          {
+            "id": "tame-impala--let-it-happen",
+            "name": "Let It Happen",
+            "artists": [
+              "Tame Impala"
+            ],
+            "album": {
+              "name": "Let It Happen",
+              "release_date": "2015-07-17",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 468000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Let%20It%20Happen%20Tame%20Impala"
+          },
+          {
+            "id": "arctic-monkeys--i-wanna-be-yours",
+            "name": "I Wanna Be Yours",
+            "artists": [
+              "Arctic Monkeys"
+            ],
+            "album": {
+              "name": "I Wanna Be Yours",
+              "release_date": "2013-09-09",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 184000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/I%20Wanna%20Be%20Yours%20Arctic%20Monkeys"
+          },
+          {
+            "id": "linkin-park--in-the-end",
+            "name": "In the End",
+            "artists": [
+              "Linkin Park"
+            ],
+            "album": {
+              "name": "In the End",
+              "release_date": "2000-10-24",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 217000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/In%20the%20End%20Linkin%20Park"
+          },
+          {
+            "id": "ariana-grande--we-can't-be-friends-(wait-for-your-love)",
+            "name": "we can't be friends (wait for your love)",
+            "artists": [
+              "Ariana Grande"
+            ],
+            "album": {
+              "name": "we can't be friends (wait for your love)",
+              "release_date": "2024-03-08",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 229000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/we%20can%27t%20be%20friends%20%28wait%20for%20your%20love%29%20Ariana%20Grande"
+          },
+          {
+            "id": "hozier--too-sweet",
+            "name": "Too Sweet",
+            "artists": [
+              "Hozier"
+            ],
+            "album": {
+              "name": "Too Sweet",
+              "release_date": "2024-03-22",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 251000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Too%20Sweet%20Hozier"
+          },
+          {
+            "id": "bad-bunny--dtmf",
+            "name": "DtMF",
+            "artists": [
+              "Bad Bunny"
+            ],
+            "album": {
+              "name": "DtMF",
+              "release_date": "2025-01-05",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 237000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/DtMF%20Bad%20Bunny"
+          },
+          {
+            "id": "taylor-swift--cruel-summer",
+            "name": "Cruel Summer",
+            "artists": [
+              "Taylor Swift"
+            ],
+            "album": {
+              "name": "Cruel Summer",
+              "release_date": "2019-08-23",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 178000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Cruel%20Summer%20Taylor%20Swift"
+          },
+          {
+            "id": "bad-bunny--baile-inolvidable",
+            "name": "BAILE INoLVIDABLE",
+            "artists": [
+              "Bad Bunny"
+            ],
+            "album": {
+              "name": "BAILE INoLVIDABLE",
+              "release_date": "2025-01-05",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 368000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/BAILE%20INoLVIDABLE%20Bad%20Bunny"
+          },
+          {
+            "id": "my-chemical-romance--welcome-to-the-black-parade",
+            "name": "Welcome to the Black Parade",
+            "artists": [
+              "My Chemical Romance"
+            ],
+            "album": {
+              "name": "Welcome to the Black Parade",
+              "release_date": "2006-10-20",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 311000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Welcome%20to%20the%20Black%20Parade%20My%20Chemical%20Romance"
+          },
+          {
+            "id": "linkin-park--numb",
+            "name": "Numb",
+            "artists": [
+              "Linkin Park"
+            ],
+            "album": {
+              "name": "Numb",
+              "release_date": "2003-03-25",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 188000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Numb%20Linkin%20Park"
+          },
+          {
+            "id": "linkin-park--the-emptiness-machine",
+            "name": "The Emptiness Machine",
+            "artists": [
+              "Linkin Park"
+            ],
+            "album": {
+              "name": "The Emptiness Machine",
+              "release_date": "2024-09-05",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 190000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/The%20Emptiness%20Machine%20Linkin%20Park"
+          },
+          {
+            "id": "john-summit--where-you-are",
+            "name": "Where You Are",
+            "artists": [
+              "John Summit"
+            ],
+            "album": {
+              "name": "Where You Are",
+              "release_date": "2023-03-03",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 236000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Where%20You%20Are%20John%20Summit"
+          },
+          {
+            "id": "ariana-grande--7-rings",
+            "name": "7 rings",
+            "artists": [
+              "Ariana Grande"
+            ],
+            "album": {
+              "name": "7 rings",
+              "release_date": "2019-02-08",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 179000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/7%20rings%20Ariana%20Grande"
+          },
+          {
+            "id": "j-cole--no-role-modelz",
+            "name": "No Role Modelz",
+            "artists": [
+              "J. Cole"
+            ],
+            "album": {
+              "name": "No Role Modelz",
+              "release_date": "2014-12-09",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 293000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/No%20Role%20Modelz%20J.%20Cole"
+          },
+          {
+            "id": "j-cole--middle-child",
+            "name": "MIDDLE CHILD",
+            "artists": [
+              "J. Cole"
+            ],
+            "album": {
+              "name": "MIDDLE CHILD",
+              "release_date": "2019-01-23",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 214000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/MIDDLE%20CHILD%20J.%20Cole"
+          },
+          {
+            "id": "my-chemical-romance--helena",
+            "name": "Helena",
+            "artists": [
+              "My Chemical Romance"
+            ],
+            "album": {
+              "name": "Helena",
+              "release_date": "2004-06-08",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 205000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Helena%20My%20Chemical%20Romance"
+          }
+        ]
+      },
+      "mood": {
+        "time_range": "medium_term",
+        "top_genres": [
+          {
+            "genre": "indie",
+            "count": 2
+          },
+          {
+            "genre": "pop",
+            "count": 2
+          },
+          {
+            "genre": "garage rock",
+            "count": 1
+          },
+          {
+            "genre": "neo-psychedelic",
+            "count": 1
+          },
+          {
+            "genre": "reggaeton",
+            "count": 1
+          },
+          {
+            "genre": "trap latino",
+            "count": 1
+          },
+          {
+            "genre": "latin",
+            "count": 1
+          },
+          {
+            "genre": "urbano latino",
+            "count": 1
+          },
+          {
+            "genre": "nu metal",
+            "count": 1
+          },
+          {
+            "genre": "rap metal",
+            "count": 1
+          }
+        ],
+        "mood_distribution": {
+          "Reflective": 9.09,
+          "Confident": 18.18,
+          "Uncharted": 2.07,
+          "Fiery": 21.49,
+          "Aggressive": 14.88,
+          "Upbeat": 8.26,
+          "Intense": 9.5,
+          "Euphoric": 16.53
+        },
+        "dominant_mood": "Fiery",
+        "visual_identity": {
+          "primary_color": "#FF8A3D",
+          "secondary_color": "#4A1A0A",
+          "accent_color": "#FFD3A8",
+          "planet_glow_intensity": 0.85,
+          "background_style": "solarFlare"
+        },
+        "total_artists_analyzed": 10,
+        "artists_with_genres": 10
+      }
+    },
+    "long_term": {
+      "galaxy": {
+        "time_range": "long_term",
+        "total_planets": 10,
+        "planets": [
+          {
+            "id": "the-beatles",
+            "name": "The Beatles",
+            "rank": 1,
+            "orbit_radius": 100,
+            "planet_size": 100,
+            "glow_intensity": 0.86,
+            "mood": "Confident",
+            "color": "#30B8E6",
+            "image_url": null,
+            "genres": [
+              "classic rock",
+              "psychedelic rock"
+            ],
+            "popularity": 86,
+            "followers": 33100000,
+            "spotify_url": "https://open.spotify.com/search/The%20Beatles",
+            "moons": [
+              {
+                "id": "the-beatles--let-it-be",
+                "name": "Let It Be",
+                "rank": 1,
+                "popularity": 70,
+                "duration_ms": 243000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Let%20It%20Be%20The%20Beatles"
+              },
+              {
+                "id": "the-beatles--here-comes-the-sun",
+                "name": "Here Comes The Sun",
+                "rank": 2,
+                "popularity": 70,
+                "duration_ms": 186000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Here%20Comes%20The%20Sun%20The%20Beatles"
+              }
+            ]
+          },
+          {
+            "id": "linkin-park",
+            "name": "Linkin Park",
+            "rank": 2,
+            "orbit_radius": 140,
+            "planet_size": 95,
+            "glow_intensity": 0.92,
+            "mood": "Aggressive",
+            "color": "#E63946",
+            "image_url": null,
+            "genres": [
+              "nu metal",
+              "rap metal",
+              "rock",
+              "alternative metal"
+            ],
+            "popularity": 92,
+            "followers": 36900000,
+            "spotify_url": "https://open.spotify.com/search/Linkin%20Park",
+            "moons": [
+              {
+                "id": "linkin-park--in-the-end",
+                "name": "In the End",
+                "rank": 6,
+                "popularity": 70,
+                "duration_ms": 217000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/In%20the%20End%20Linkin%20Park"
+              },
+              {
+                "id": "linkin-park--numb",
+                "name": "Numb",
+                "rank": 7,
+                "popularity": 70,
+                "duration_ms": 188000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Numb%20Linkin%20Park"
+              },
+              {
+                "id": "linkin-park--the-emptiness-machine",
+                "name": "The Emptiness Machine",
+                "rank": 13,
+                "popularity": 70,
+                "duration_ms": 190000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/The%20Emptiness%20Machine%20Linkin%20Park"
+              }
+            ]
+          },
+          {
+            "id": "my-chemical-romance",
+            "name": "My Chemical Romance",
+            "rank": 3,
+            "orbit_radius": 180,
+            "planet_size": 90,
+            "glow_intensity": 0.83,
+            "mood": "Intense",
+            "color": "#8A2ECC",
+            "image_url": null,
+            "genres": [
+              "emo",
+              "pop punk"
+            ],
+            "popularity": 83,
+            "followers": 11600000,
+            "spotify_url": "https://open.spotify.com/search/My%20Chemical%20Romance",
+            "moons": [
+              {
+                "id": "my-chemical-romance--welcome-to-the-black-parade",
+                "name": "Welcome to the Black Parade",
+                "rank": 3,
+                "popularity": 70,
+                "duration_ms": 311000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Welcome%20to%20the%20Black%20Parade%20My%20Chemical%20Romance"
+              },
+              {
+                "id": "my-chemical-romance--helena",
+                "name": "Helena",
+                "rank": 10,
+                "popularity": 70,
+                "duration_ms": 205000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Helena%20My%20Chemical%20Romance"
+              }
+            ]
+          },
+          {
+            "id": "arctic-monkeys",
+            "name": "Arctic Monkeys",
+            "rank": 4,
+            "orbit_radius": 220,
+            "planet_size": 85,
+            "glow_intensity": 0.88,
+            "mood": "Reflective",
+            "color": "#EF8DC1",
+            "image_url": null,
+            "genres": [
+              "indie",
+              "garage rock"
+            ],
+            "popularity": 88,
+            "followers": 36300000,
+            "spotify_url": "https://open.spotify.com/search/Arctic%20Monkeys",
+            "moons": [
+              {
+                "id": "arctic-monkeys--505",
+                "name": "505",
+                "rank": 8,
+                "popularity": 70,
+                "duration_ms": 254000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/505%20Arctic%20Monkeys"
+              },
+              {
+                "id": "arctic-monkeys--do-i-wanna-know?",
+                "name": "Do I Wanna Know?",
+                "rank": 9,
+                "popularity": 70,
+                "duration_ms": 273000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Do%20I%20Wanna%20Know%3F%20Arctic%20Monkeys"
+              },
+              {
+                "id": "arctic-monkeys--i-wanna-be-yours",
+                "name": "I Wanna Be Yours",
+                "rank": 15,
+                "popularity": 70,
+                "duration_ms": 184000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/I%20Wanna%20Be%20Yours%20Arctic%20Monkeys"
+              }
+            ]
+          },
+          {
+            "id": "led-zeppelin",
+            "name": "Led Zeppelin",
+            "rank": 5,
+            "orbit_radius": 260,
+            "planet_size": 80,
+            "glow_intensity": 0.79,
+            "mood": "Confident",
+            "color": "#30B8E6",
+            "image_url": null,
+            "genres": [
+              "classic rock",
+              "rock",
+              "hard rock",
+              "rock and roll"
+            ],
+            "popularity": 79,
+            "followers": 17300000,
+            "spotify_url": "https://open.spotify.com/search/Led%20Zeppelin",
+            "moons": [
+              {
+                "id": "led-zeppelin--immigrant-song",
+                "name": "Immigrant Song",
+                "rank": 11,
+                "popularity": 70,
+                "duration_ms": 146000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Immigrant%20Song%20Led%20Zeppelin"
+              },
+              {
+                "id": "led-zeppelin--stairway-to-heaven",
+                "name": "Stairway to Heaven",
+                "rank": 16,
+                "popularity": 70,
+                "duration_ms": 483000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Stairway%20to%20Heaven%20Led%20Zeppelin"
+              }
+            ]
+          },
+          {
+            "id": "britney-spears",
+            "name": "Britney Spears",
+            "rank": 6,
+            "orbit_radius": 300,
+            "planet_size": 75,
+            "glow_intensity": 0.86,
+            "mood": "Upbeat",
+            "color": "#FFD166",
+            "image_url": null,
+            "genres": [
+              "pop"
+            ],
+            "popularity": 86,
+            "followers": 20500000,
+            "spotify_url": "https://open.spotify.com/search/Britney%20Spears",
+            "moons": [
+              {
+                "id": "britney-spears--...baby-one-more-time",
+                "name": "...Baby One More Time",
+                "rank": 12,
+                "popularity": 70,
+                "duration_ms": 211000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/...Baby%20One%20More%20Time%20Britney%20Spears"
+              },
+              {
+                "id": "britney-spears--toxic",
+                "name": "Toxic",
+                "rank": 14,
+                "popularity": 70,
+                "duration_ms": 199000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Toxic%20Britney%20Spears"
+              }
+            ]
+          },
+          {
+            "id": "kiss",
+            "name": "KISS",
+            "rank": 7,
+            "orbit_radius": 340,
+            "planet_size": 70,
+            "glow_intensity": 0.75,
+            "mood": "Confident",
+            "color": "#30B8E6",
+            "image_url": null,
+            "genres": [
+              "glam rock",
+              "glam metal",
+              "hard rock",
+              "rock",
+              "classic rock"
+            ],
+            "popularity": 75,
+            "followers": 12400000,
+            "spotify_url": "https://open.spotify.com/search/KISS",
+            "moons": [
+              {
+                "id": "kiss--i-was-made-for-lovin'-you",
+                "name": "I Was Made For Lovin' You",
+                "rank": 18,
+                "popularity": 70,
+                "duration_ms": 271000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/I%20Was%20Made%20For%20Lovin%27%20You%20KISS"
+              },
+              {
+                "id": "kiss--rock-and-roll-all-nite",
+                "name": "Rock And Roll All Nite",
+                "rank": 21,
+                "popularity": 70,
+                "duration_ms": 168000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Rock%20And%20Roll%20All%20Nite%20KISS"
+              }
+            ]
+          },
+          {
+            "id": "tame-impala",
+            "name": "Tame Impala",
+            "rank": 8,
+            "orbit_radius": 380,
+            "planet_size": 65,
+            "glow_intensity": 0.89,
+            "mood": "Reflective",
+            "color": "#EF8DC1",
+            "image_url": null,
+            "genres": [
+              "neo-psychedelic",
+              "indie"
+            ],
+            "popularity": 89,
+            "followers": 12400000,
+            "spotify_url": "https://open.spotify.com/search/Tame%20Impala",
+            "moons": [
+              {
+                "id": "tame-impala--the-less-i-know-the-better",
+                "name": "The Less I Know The Better",
+                "rank": 19,
+                "popularity": 70,
+                "duration_ms": 216000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/The%20Less%20I%20Know%20The%20Better%20Tame%20Impala"
+              },
+              {
+                "id": "tame-impala--let-it-happen",
+                "name": "Let It Happen",
+                "rank": 22,
+                "popularity": 70,
+                "duration_ms": 468000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Let%20It%20Happen%20Tame%20Impala"
+              }
+            ]
+          },
+          {
+            "id": "shakira",
+            "name": "Shakira",
+            "rank": 9,
+            "orbit_radius": 420,
+            "planet_size": 60,
+            "glow_intensity": 0.9,
+            "mood": "Fiery",
+            "color": "#FF8A3D",
+            "image_url": null,
+            "genres": [
+              "latin pop"
+            ],
+            "popularity": 90,
+            "followers": 47100000,
+            "spotify_url": "https://open.spotify.com/search/Shakira",
+            "moons": [
+              {
+                "id": "shakira--hips-don't-lie",
+                "name": "Hips Don't Lie",
+                "rank": 20,
+                "popularity": 70,
+                "duration_ms": 220000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Hips%20Don%27t%20Lie%20Shakira"
+              },
+              {
+                "id": "shakira--whenever,-wherever",
+                "name": "Whenever, Wherever",
+                "rank": 23,
+                "popularity": 70,
+                "duration_ms": 196000,
+                "album_image_url": null,
+                "spotify_url": "https://open.spotify.com/search/Whenever%2C%20Wherever%20Shakira"
+              }
+            ]
+          },
+          {
+            "id": "j-cole",
+            "name": "J. Cole",
+            "rank": 10,
+            "orbit_radius": 460,
+            "planet_size": 55,
+            "glow_intensity": 0.87,
+            "mood": "Confident",
+            "color": "#30B8E6",
+            "image_url": null,
+            "genres": [
+              "rap"
+            ],
+            "popularity": 87,
+            "followers": 29300000,
+            "spotify_url": "https://open.spotify.com/search/J.%20Cole",
+            "moons": []
+          }
+        ]
+      },
+      "top_tracks": {
+        "time_range": "long_term",
+        "total": 20,
+        "tracks": [
+          {
+            "id": "the-beatles--let-it-be",
+            "name": "Let It Be",
+            "artists": [
+              "The Beatles"
+            ],
+            "album": {
+              "name": "Let It Be",
+              "release_date": "1970-05-08",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 243000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Let%20It%20Be%20The%20Beatles"
+          },
+          {
+            "id": "the-beatles--here-comes-the-sun",
+            "name": "Here Comes The Sun",
+            "artists": [
+              "The Beatles"
+            ],
+            "album": {
+              "name": "Here Comes The Sun",
+              "release_date": "1969-09-26",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 186000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Here%20Comes%20The%20Sun%20The%20Beatles"
+          },
+          {
+            "id": "my-chemical-romance--welcome-to-the-black-parade",
+            "name": "Welcome to the Black Parade",
+            "artists": [
+              "My Chemical Romance"
+            ],
+            "album": {
+              "name": "Welcome to the Black Parade",
+              "release_date": "2006-10-20",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 311000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Welcome%20to%20the%20Black%20Parade%20My%20Chemical%20Romance"
+          },
+          {
+            "id": "phoebe-bridgers--motion-sickness",
+            "name": "Motion Sickness",
+            "artists": [
+              "Phoebe Bridgers"
+            ],
+            "album": {
+              "name": "Motion Sickness",
+              "release_date": "2017-07-18",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 230000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Motion%20Sickness%20Phoebe%20Bridgers"
+          },
+          {
+            "id": "taylor-swift--cruel-summer",
+            "name": "Cruel Summer",
+            "artists": [
+              "Taylor Swift"
+            ],
+            "album": {
+              "name": "Cruel Summer",
+              "release_date": "2019-08-23",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 178000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Cruel%20Summer%20Taylor%20Swift"
+          },
+          {
+            "id": "linkin-park--in-the-end",
+            "name": "In the End",
+            "artists": [
+              "Linkin Park"
+            ],
+            "album": {
+              "name": "In the End",
+              "release_date": "2000-10-24",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 217000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/In%20the%20End%20Linkin%20Park"
+          },
+          {
+            "id": "linkin-park--numb",
+            "name": "Numb",
+            "artists": [
+              "Linkin Park"
+            ],
+            "album": {
+              "name": "Numb",
+              "release_date": "2003-03-25",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 188000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Numb%20Linkin%20Park"
+          },
+          {
+            "id": "arctic-monkeys--505",
+            "name": "505",
+            "artists": [
+              "Arctic Monkeys"
+            ],
+            "album": {
+              "name": "505",
+              "release_date": "2007-04-24",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 254000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/505%20Arctic%20Monkeys"
+          },
+          {
+            "id": "arctic-monkeys--do-i-wanna-know?",
+            "name": "Do I Wanna Know?",
+            "artists": [
+              "Arctic Monkeys"
+            ],
+            "album": {
+              "name": "Do I Wanna Know?",
+              "release_date": "2013-09-09",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 273000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Do%20I%20Wanna%20Know%3F%20Arctic%20Monkeys"
+          },
+          {
+            "id": "my-chemical-romance--helena",
+            "name": "Helena",
+            "artists": [
+              "My Chemical Romance"
+            ],
+            "album": {
+              "name": "Helena",
+              "release_date": "2004-06-08",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 205000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Helena%20My%20Chemical%20Romance"
+          },
+          {
+            "id": "led-zeppelin--immigrant-song",
+            "name": "Immigrant Song",
+            "artists": [
+              "Led Zeppelin"
+            ],
+            "album": {
+              "name": "Immigrant Song",
+              "release_date": "1970-10-05",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 146000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Immigrant%20Song%20Led%20Zeppelin"
+          },
+          {
+            "id": "britney-spears--...baby-one-more-time",
+            "name": "...Baby One More Time",
+            "artists": [
+              "Britney Spears"
+            ],
+            "album": {
+              "name": "...Baby One More Time",
+              "release_date": "1999-01-12",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 211000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/...Baby%20One%20More%20Time%20Britney%20Spears"
+          },
+          {
+            "id": "linkin-park--the-emptiness-machine",
+            "name": "The Emptiness Machine",
+            "artists": [
+              "Linkin Park"
+            ],
+            "album": {
+              "name": "The Emptiness Machine",
+              "release_date": "2024-09-05",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 190000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/The%20Emptiness%20Machine%20Linkin%20Park"
+          },
+          {
+            "id": "britney-spears--toxic",
+            "name": "Toxic",
+            "artists": [
+              "Britney Spears"
+            ],
+            "album": {
+              "name": "Toxic",
+              "release_date": "2003-11-13",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 199000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Toxic%20Britney%20Spears"
+          },
+          {
+            "id": "arctic-monkeys--i-wanna-be-yours",
+            "name": "I Wanna Be Yours",
+            "artists": [
+              "Arctic Monkeys"
+            ],
+            "album": {
+              "name": "I Wanna Be Yours",
+              "release_date": "2013-09-09",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 184000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/I%20Wanna%20Be%20Yours%20Arctic%20Monkeys"
+          },
+          {
+            "id": "led-zeppelin--stairway-to-heaven",
+            "name": "Stairway to Heaven",
+            "artists": [
+              "Led Zeppelin"
+            ],
+            "album": {
+              "name": "Stairway to Heaven",
+              "release_date": "1971-11-08",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 483000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Stairway%20to%20Heaven%20Led%20Zeppelin"
+          },
+          {
+            "id": "hozier--too-sweet",
+            "name": "Too Sweet",
+            "artists": [
+              "Hozier"
+            ],
+            "album": {
+              "name": "Too Sweet",
+              "release_date": "2024-03-22",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 251000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Too%20Sweet%20Hozier"
+          },
+          {
+            "id": "kiss--i-was-made-for-lovin'-you",
+            "name": "I Was Made For Lovin' You",
+            "artists": [
+              "KISS"
+            ],
+            "album": {
+              "name": "I Was Made For Lovin' You",
+              "release_date": "1979-05-23",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 271000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/I%20Was%20Made%20For%20Lovin%27%20You%20KISS"
+          },
+          {
+            "id": "tame-impala--the-less-i-know-the-better",
+            "name": "The Less I Know The Better",
+            "artists": [
+              "Tame Impala"
+            ],
+            "album": {
+              "name": "The Less I Know The Better",
+              "release_date": "2015-07-17",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 216000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/The%20Less%20I%20Know%20The%20Better%20Tame%20Impala"
+          },
+          {
+            "id": "shakira--hips-don't-lie",
+            "name": "Hips Don't Lie",
+            "artists": [
+              "Shakira"
+            ],
+            "album": {
+              "name": "Hips Don't Lie",
+              "release_date": "2006-02-28",
+              "image_url": null
+            },
+            "popularity": 70,
+            "duration_ms": 220000,
+            "explicit": false,
+            "spotify_url": "https://open.spotify.com/search/Hips%20Don%27t%20Lie%20Shakira"
+          }
+        ]
+      },
+      "mood": {
+        "time_range": "long_term",
+        "top_genres": [
+          {
+            "genre": "classic rock",
+            "count": 3
+          },
+          {
+            "genre": "rock",
+            "count": 3
+          },
+          {
+            "genre": "indie",
+            "count": 2
+          },
+          {
+            "genre": "hard rock",
+            "count": 2
+          },
+          {
+            "genre": "psychedelic rock",
+            "count": 1
+          },
+          {
+            "genre": "nu metal",
+            "count": 1
+          },
+          {
+            "genre": "rap metal",
+            "count": 1
+          },
+          {
+            "genre": "alternative metal",
+            "count": 1
+          },
+          {
+            "genre": "emo",
+            "count": 1
+          },
+          {
+            "genre": "pop punk",
+            "count": 1
+          }
+        ],
+        "mood_distribution": {
+          "Confident": 39.32,
+          "Aggressive": 29.91,
+          "Intense": 9.83,
+          "Reflective": 9.4,
+          "Upbeat": 4.27,
+          "Uncharted": 2.14,
+          "Fiery": 5.13
+        },
+        "dominant_mood": "Confident",
+        "visual_identity": {
+          "primary_color": "#30B8E6",
+          "secondary_color": "#073B4C",
+          "accent_color": "#443995",
+          "planet_glow_intensity": 0.6,
+          "background_style": "orbit"
+        },
+        "total_artists_analyzed": 10,
+        "artists_with_genres": 10
+      }
+    }
+  }
+}

@@ -74,6 +74,14 @@ Then open http://127.0.0.1:8000/api/v1/auth/login to log in, and http://127.0.0.
 
 Use `127.0.0.1`, not `localhost` — it must match the Spotify redirect URI. Sessions are in-memory unless `REDIS_URL` is set, so restarting the server logs you out.
 
+### Demo universe
+The demo's sample data is produced by the real backend pipeline, so it always matches what users get. After changing the transformers or `backend/demo/universe.py`, regenerate it:
+
+```bash
+cd backend
+.venv/bin/python -m demo.universe
+```
+
 ### Tests
 ```bash
 cd backend

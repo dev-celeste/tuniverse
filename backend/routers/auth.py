@@ -26,8 +26,9 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 STATE_COOKIE_NAME = "tuniverse_oauth_state"
 STATE_TTL_SECONDS = 600
 
-# Where the frontend lands after a successful login
-POST_LOGIN_PATH = "/galaxy"
+# Where the frontend lands after a successful login: the start screen, which then dives into
+# the user's galaxy (so the demo planets visibly give way to theirs)
+POST_LOGIN_PATH = "/?welcome=1"
 
 
 class LoginError(Exception):

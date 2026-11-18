@@ -14,15 +14,21 @@ import {
   constellationFrame,
   fitDistance,
   homeDistance,
+  landingDistance,
+  landingTarget,
 } from './places'
 
 const INTRO_DISTANCE = 320
 const CORE_DISTANCE = 22
+const FOV = 50
+const WARP_SECONDS = 2.6
 const ORIGIN = new Vector3()
 
 const ease = (rate: number, dt: number) => 1 - Math.pow(rate, dt)
 
 type Props = {
+  /** Start screen (far out, idle) or the explorable galaxy. */
+  mode: 'landing' | 'galaxy'
   reducedMotion: boolean
   focus: Focus
   anchors: AnchorStore
@@ -35,7 +41,7 @@ type Props = {
  * focused (following planets as they orbit), sweeping around behind the constellation,
  * sliding the focus clear of the detail panel, and an idle sway.
  */
-export default function CameraRig({ reducedMotion, focus, anchors, planetDistance }: Props) {
+export default function CameraRig({ mode, reducedMotion, focus, anchors, planetDistance }: Props) {
   const controls = useRef<ComponentRef<typeof OrbitControls>>(null)
   const camera = useThree((s) => s.camera) as PerspectiveCamera
   const width = useThree((s) => s.size.width)
@@ -46,11 +52,29 @@ export default function CameraRig({ reducedMotion, focus, anchors, planetDistanc
   const lastFocus = useRef<Focus>(null)
   const shift = useRef({ x: 0, y: 0 })
 
-  // Start far out (or already home, for reduced motion) looking at the galaxy
+  // Where the camera starts: the start-screen view, or (arriving straight at a galaxy, e.g. after
+  // logging in) far out for the intro fly-in, or already home for reduced motion
+  const initialMode = useRef(mode)
   useEffect(() => {
-    camera.position.copy(HOME_TARGET).addScaledVector(HOME_DIR, reducedMotion ? homeDistance(window.innerWidth) : INTRO_DISTANCE)
-    camera.lookAt(HOME_TARGET)
+    const landing = initialMode.current === 'landing'
+    const target = landing ? landingTarget(window.innerWidth) : HOME_TARGET
+    const distance = landing ? landingDistance(window.innerWidth) : reducedMotion ? homeDistance(window.innerWidth) : INTRO_DISTANCE
+    camera.position.copy(target).addScaledVector(HOME_DIR, distance)
+    camera.lookAt(target)
+    controls.current?.target.copy(target)
   }, [camera, reducedMotion])
+
+  // Entering from the start screen dives in with a brief widening of the view, like a jump to
+  // warp; going back to the start screen flies out
+  const warp = useRef(1)
+  const lastMode = useRef(mode)
+  useEffect(() => {
+    if (mode === lastMode.current) return
+    flying.current = true
+    restoreHome.current = true
+    if (mode === 'galaxy' && !reducedMotion) warp.current = 0
+    lastMode.current = mode
+  }, [mode, reducedMotion])
 
   // Every change of focus starts a flight
   useEffect(() => {
@@ -65,24 +89,35 @@ export default function CameraRig({ reducedMotion, focus, anchors, planetDistanc
   const sph = useRef(new Spherical())
   const sphGoal = useRef(new Spherical())
 
-  useFrame(({ clock, size }, dt) => {
+  useFrame(({ clock, size, camera: frameCamera }, dt) => {
     const c = controls.current
     if (!c) return
-    const kind = focus?.kind
+    const landing = mode === 'landing'
+    const kind = landing ? undefined : focus?.kind
+
+    if (warp.current < 1) {
+      warp.current = Math.min(1, warp.current + dt / WARP_SECONDS)
+      const lens = frameCamera as PerspectiveCamera
+      lens.fov = FOV + Math.sin(warp.current * Math.PI) * 16
+      lens.updateProjectionMatrix()
+    }
+    const diving = warp.current < 1
 
     // Follow the focus (planets keep orbiting, so this runs every frame)
-    const anchor = focus?.kind === 'planet' ? anchors.getAnchor(focus.id) : null
+    const anchor = !landing && focus?.kind === 'planet' ? anchors.getAnchor(focus.id) : null
     if (anchor) anchor.getWorldPosition(goal.current)
+    else if (landing) goal.current.copy(landingTarget(size.width))
     else if (kind === 'constellation') goal.current.copy(frame.center)
     else if (kind === 'nebula') goal.current.copy(NEBULA_CENTER)
     else goal.current.copy(kind === 'core' ? ORIGIN : HOME_TARGET)
     previous.current.copy(c.target)
-    c.target.lerp(goal.current, ease(0.002, dt))
+    c.target.lerp(goal.current, ease(diving ? 0.0004 : 0.002, dt))
     camera.position.add(offset.current.subVectors(c.target, previous.current))
 
     if (flying.current) {
-      const want =
-        focus?.kind === 'planet'
+      const want = landing
+        ? landingDistance(size.width)
+        : focus?.kind === 'planet'
           ? planetDistance(focus.id)
           : kind === 'constellation'
             ? fitDistance(CONSTELLATION_HALF_SIZE.w * frame.scale, CONSTELLATION_HALF_SIZE.h * frame.scale, camera, size.width)
@@ -96,7 +131,7 @@ export default function CameraRig({ reducedMotion, focus, anchors, planetDistanc
       const dir = kind === 'constellation' ? frame.viewDir : restoreHome.current ? HOME_DIR : null
       offset.current.subVectors(camera.position, c.target)
       sph.current.setFromVector3(offset.current)
-      sph.current.radius += (want - sph.current.radius) * ease(0.04, dt)
+      sph.current.radius += (want - sph.current.radius) * ease(diving ? 0.012 : 0.04, dt)
       let aligned = true
       if (dir) {
         sphGoal.current.setFromVector3(dir)
@@ -116,8 +151,9 @@ export default function CameraRig({ reducedMotion, focus, anchors, planetDistanc
 
     // Slide the focus into the open space beside the panel (above it on phones, where it's a bottom sheet)
     const wide = size.width > 720
-    const wantX = focus && wide ? Math.min(380, size.width * 0.3) / 2 : 0
-    const wantY = focus && !wide ? size.height * 0.26 : 0
+    const panelOpen = !landing && focus !== null
+    const wantX = panelOpen && wide ? Math.min(380, size.width * 0.3) / 2 : 0
+    const wantY = panelOpen && !wide ? size.height * 0.26 : 0
     shift.current.x += (wantX - shift.current.x) * ease(0.02, dt)
     shift.current.y += (wantY - shift.current.y) * ease(0.02, dt)
     if (Math.abs(shift.current.x) > 0.5 || Math.abs(shift.current.y) > 0.5) {
@@ -128,9 +164,11 @@ export default function CameraRig({ reducedMotion, focus, anchors, planetDistanc
 
     c.minDistance =
       focus?.kind === 'planet' ? planetDistance(focus.id) * 0.3 : kind === 'constellation' ? 20 : kind === 'nebula' ? 30 : kind === 'core' ? 5 : 6
-    c.autoRotate = !focus && !reducedMotion
-    // Sway back and forth; starting this direction drifts the nebula toward the middle first
-    c.autoRotateSpeed = -0.2 * Math.cos(clock.elapsedTime * 0.06)
+    c.enabled = !landing
+    c.autoRotate = (landing || !focus) && !reducedMotion
+    // Start screen: a slow, steady turn. Galaxy: sway back and forth, starting in the direction
+    // that drifts the nebula toward the middle first
+    c.autoRotateSpeed = landing ? 0.35 : -0.2 * Math.cos(clock.elapsedTime * 0.06)
     c.update()
   })
 
@@ -143,7 +181,7 @@ export default function CameraRig({ reducedMotion, focus, anchors, planetDistanc
       dampingFactor={0.06}
       enablePan={false}
       minDistance={6}
-      maxDistance={320}
+      maxDistance={360}
       rotateSpeed={0.55}
       zoomSpeed={0.7}
       // Grabbing the camera ends any automatic flight

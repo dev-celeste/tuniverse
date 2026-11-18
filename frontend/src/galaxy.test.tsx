@@ -29,7 +29,8 @@ beforeEach(() => {
 
 async function openGalaxy() {
   renderAt('/galaxy')
-  return within(await screen.findByRole('list', { name: 'Planets' }))
+  // The first render loads the (lazily split) scene and data, so allow it a moment
+  return within(await screen.findByRole('list', { name: 'Planets' }, { timeout: 4000 }))
 }
 
 // Found directly: a closed panel is inert, so role queries rightly skip it

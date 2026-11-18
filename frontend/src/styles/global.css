@@ -212,8 +212,29 @@ a { color: inherit; }
 .stat { font-family: var(--mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .status { position: relative; z-index: 1; color: var(--muted); letter-spacing: 0.04em; }
 
-/* ---------- Galaxy (3D) ---------- */
-.galaxy-page { position: fixed; inset: 0; overflow: hidden; }
+/* ---------- Universe: one 3D scene under the start screen, demo and galaxy ---------- */
+.universe { position: fixed; inset: 0; overflow: hidden; }
+.universe .scene { position: absolute; inset: 0; transition: opacity 1.2s ease; }
+/* Start screen: the scene is backdrop only */
+.universe.landing .scene { pointer-events: none; }
+.universe .scene-labels { transition: opacity 0.9s ease; }
+.universe.landing .scene-labels { opacity: 0; }
+.universe .landing { position: relative; z-index: 2; }
+/* Keep the title readable over the brightest part of the scene */
+.universe .landing::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(ellipse 70% 55% at 50% 42%, rgba(5, 5, 10, 0.55), rgba(5, 5, 10, 0) 70%);
+  pointer-events: none;
+}
+.universe .landing-inner { transform: translateY(-10vh); gap: 18px; }
+
+/* ---------- Galaxy pages (your galaxy, the demo) ---------- */
+/* Overlay over the scene: lets clicks through to the canvas except on its own controls */
+.galaxy-page { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 2; }
+.galaxy-page > .panel, .galaxy-page > .mood-card { pointer-events: auto; }
 /* A live backdrop blur over the animating canvas has to be recomputed every frame and halved the
    frame rate; over this dark scene a near-opaque fill looks almost the same and costs nothing */
 .galaxy-page .glass {
@@ -221,7 +242,6 @@ a { color: inherit; }
   backdrop-filter: none;
   background: rgba(9, 9, 18, 0.86);
 }
-.galaxy-page .scene { position: absolute; inset: 0; }
 .scene-labels { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .overlay-top {
   position: absolute;
@@ -293,6 +313,24 @@ a { color: inherit; }
 .star-label.show { opacity: 0.85; }
 .star-label.compact .tt { display: none; }
 .star-label .rk { margin-right: 6px; font-family: var(--mono); font-size: 10px; color: var(--muted); }
+
+/* Moon track titles: only around the planet you're visiting */
+.moon-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  visibility: hidden;
+  will-change: transform;
+  pointer-events: none;
+  white-space: nowrap;
+  font-size: 11px;
+  color: var(--muted);
+  text-shadow: 0 0 10px #000, 0 0 2px #000;
+  opacity: 0;
+  transition: opacity 0.6s, color 0.3s;
+}
+.moon-label.show { opacity: 0.85; }
+.moon-label.show.lit { color: var(--ink); opacity: 1; }
 
 /* "Top tracks" and "Mood nebula" captions under their objects */
 .caption-label {
@@ -545,6 +583,6 @@ kbd {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .panel, .planet-label, .star-label, .caption-label, .mood-card, .bar i { transition: none; }
+  .panel, .planet-label, .star-label, .moon-label, .caption-label, .mood-card, .bar i { transition: none; }
   .ranges button.loading { animation: none; }
 }

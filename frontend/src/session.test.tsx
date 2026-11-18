@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -109,7 +109,8 @@ describe('galaxy page', () => {
     renderAt('/galaxy')
 
     expect(await screen.findByRole('heading', { name: 'Still forming' })).toBeInTheDocument()
-    expect(screen.queryByRole('list', { name: 'Planets' })).not.toBeInTheDocument()
+    // An empty sky behind the card, not the start screen's demo planets
+    expect(within(screen.getByRole('list', { name: 'Planets' })).queryAllByRole('listitem')).toHaveLength(0)
   })
 
   it('offers a retry when the galaxy fails to load', async () => {
