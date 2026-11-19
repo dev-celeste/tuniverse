@@ -234,7 +234,7 @@ a { color: inherit; }
 /* ---------- Galaxy pages (your galaxy, the demo) ---------- */
 /* Overlay over the scene: lets clicks through to the canvas except on its own controls */
 .galaxy-page { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 2; }
-.galaxy-page > .panel, .galaxy-page > .mood-card, .galaxy-page > .galaxy-list { pointer-events: auto; }
+.galaxy-page > .panel, .galaxy-page > .mood-card, .galaxy-page > .galaxy-list, .galaxy-page > .now-playing { pointer-events: auto; }
 /* A live backdrop blur over the animating canvas has to be recomputed every frame and halved the
    frame rate; over this dark scene a near-opaque fill looks almost the same and costs nothing */
 .galaxy-page .glass {
@@ -468,6 +468,12 @@ kbd {
 }
 .tracks { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
 .tracks a, .tracks .row {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
   display: grid;
   grid-template-columns: 40px 1fr auto;
   gap: 12px;
@@ -545,6 +551,35 @@ kbd {
 .galaxy-list .rk { font-family: var(--mono); font-size: 10px; color: var(--muted); }
 .galaxy-list .dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--c); box-shadow: 0 0 8px var(--c); align-self: center; }
 
+/* ---------- Now playing dock (bottom left, above the mood card) ---------- */
+.galaxy-page { --dock-h: 128px; }
+.now-playing {
+  position: absolute;
+  z-index: 2;
+  left: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  width: min(320px, calc(100vw - 32px));
+  padding: 8px 10px 10px;
+  display: grid;
+  gap: 6px;
+}
+.np-head { display: flex; align-items: center; justify-content: space-between; padding-left: 4px; }
+.np-close {
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+.np-close:hover, .np-close:focus-visible { color: var(--ink); background: var(--lift); }
+.now-playing iframe { display: block; width: 100%; height: 80px; border: 0; border-radius: 12px; color-scheme: normal; }
+.galaxy-page.playing .mood-card { bottom: calc(16px + var(--dock-h) + 8px + env(safe-area-inset-bottom, 0px)); }
+.galaxy-page.playing .galaxy-list { bottom: calc(16px + var(--dock-h) + 8px + env(safe-area-inset-bottom, 0px)); }
+
 /* ---------- Mood card (bottom left) ---------- */
 .mood-card {
   position: absolute;
@@ -597,6 +632,23 @@ kbd {
 .tracks.ranked .t small { display: flex; align-items: center; gap: 6px; min-width: 0; }
 .tracks.ranked .t small .dot { width: 6px; height: 6px; flex: none; }
 .tracks a.on, .tracks .row.on { background: var(--lift); }
+/* Rows that play in the Now playing dock, with a small "open in Spotify" link beside them */
+.tracks li.listen { display: flex; align-items: center; gap: 2px; }
+.tracks li.listen .row { flex: 1; min-width: 0; }
+.tracks .open {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--faint);
+}
+.tracks .open:hover, .tracks .open:focus-visible { color: var(--ink); background: var(--lift); }
+.tracks .row[aria-pressed="true"] { background: var(--lift); }
+.tracks .row[aria-pressed="true"] .t b { color: var(--champagne); }
+.tracks .row[aria-pressed="true"] .t b::before { content: "▶ "; font-size: 0.8em; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .chips li { padding: 4px 9px; border: 1px solid var(--hair); border-radius: 999px; font-size: 12px; color: var(--muted); }
 .chips b { margin-left: 5px; font-family: var(--mono); font-size: 10px; font-weight: 400; color: var(--faint); }
@@ -634,6 +686,10 @@ kbd {
   .ranges button { padding: 7px 10px; }
   .galaxy-list { top: calc(124px + env(safe-area-inset-top, 0px)); width: auto; right: 16px; }
   .galaxy-page.focused .galaxy-list { display: none; }
+  /* The dock spans the bottom; the bottom sheet sits on top of it, no taller than before, so the
+     planet you're visiting stays in view */
+  .now-playing { right: 16px; width: auto; }
+  .galaxy-page.playing .panel { bottom: calc(16px + var(--dock-h) + 8px + env(safe-area-inset-bottom, 0px)); max-height: calc(56% - var(--dock-h) - 8px); }
 }
 
 /* Small or short screens: the mood card keeps only the headline (the full mix and the mood
@@ -664,6 +720,11 @@ kbd {
   .headline h2 { font-size: 28px; }
   .galaxy-list { top: calc(64px + env(safe-area-inset-top, 0px)); right: auto; width: min(300px, 44vw); }
   .galaxy-page.focused .galaxy-list { display: grid; }
+  .now-playing { bottom: calc(12px + env(safe-area-inset-bottom, 0px)); right: auto; width: min(300px, 44vw); }
+  .galaxy-page.playing .panel { bottom: calc(12px + env(safe-area-inset-bottom, 0px)); max-height: none; }
+  /* Too short for both: the nebula is still a tap away from its caption */
+  .galaxy-page.playing .mood-card { display: none; }
+  .galaxy-page.playing .galaxy-list { top: calc(64px + env(safe-area-inset-top, 0px)); bottom: calc(16px + var(--dock-h) + 8px + env(safe-area-inset-bottom, 0px)); }
 }
 
 @media (prefers-reduced-motion: reduce) {

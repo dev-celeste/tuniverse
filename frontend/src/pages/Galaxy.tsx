@@ -7,12 +7,14 @@ import type { SpotifyUser, TimeRange } from '../api/types'
 import { startLogin } from '../auth'
 import Brand from '../components/Brand'
 import MoodCard from '../components/MoodCard'
+import NowPlaying from '../components/NowPlaying'
 import RangeSwitch from '../components/RangeSwitch'
 import GalaxyList from '../components/GalaxyList'
 import DetailPanel from '../galaxy/DetailPanel'
 import type { Focus } from '../galaxy/focus'
 import { useScene3D, useSceneConfig } from '../galaxy/sceneContext'
 import { toStars } from '../galaxy/stars'
+import type { Playing } from '../spotify'
 import { useLogout } from '../useLogout'
 
 function Status({ children }: { children: ReactNode }) {
@@ -42,6 +44,8 @@ export default function Galaxy({ source }: { source: Source }) {
   const [focus, setFocus] = useState<Focus>(null)
   const [highlightTrackId, setHighlightTrackId] = useState<string | null>(null)
   const [moodFilter, setMoodFilter] = useState<string | null>(null)
+  // The song in the Now playing dock: it keeps playing (and its star and moon stay lit) as you explore
+  const [playing, setPlaying] = useState<Playing | null>(null)
 
   const galaxy = useGalaxy(timeRange, source)
   const planets = useMemo(() => galaxy.data?.planets ?? [], [galaxy.data])
@@ -70,9 +74,18 @@ export default function Galaxy({ source }: { source: Source }) {
   const scene = useMemo(
     () =>
       galaxy.data
-        ? { mode: 'galaxy' as const, planets, stars, mood, focus: visibleFocus, onFocus: setFocus, highlightTrackId, moodFilter }
+        ? {
+            mode: 'galaxy' as const,
+            planets,
+            stars,
+            mood,
+            focus: visibleFocus,
+            onFocus: setFocus,
+            highlightTrackId: highlightTrackId ?? playing?.trackId ?? null,
+            moodFilter,
+          }
         : null,
-    [galaxy.data, planets, stars, mood, visibleFocus, highlightTrackId, moodFilter],
+    [galaxy.data, planets, stars, mood, visibleFocus, highlightTrackId, playing, moodFilter],
   )
   useSceneConfig(scene)
 
@@ -85,7 +98,7 @@ export default function Galaxy({ source }: { source: Source }) {
   }, [])
 
   return (
-    <div className={`galaxy-page${visibleFocus ? ' focused' : ''}`}>
+    <div className={`galaxy-page${visibleFocus ? ' focused' : ''}${playing ? ' playing' : ''}`}>
       <header className="top overlay-top">
         <Brand caption={demo ? 'Demo universe · sample data' : 'Your universe'} />
         <div className="actions">
@@ -131,8 +144,12 @@ export default function Galaxy({ source }: { source: Source }) {
           onClose={() => setFocus(null)}
           onHighlightTrack={setHighlightTrackId}
           onMoodFilter={setMoodFilter}
+          playingTrackId={playing?.trackId ?? null}
+          onListen={setPlaying}
         />
       )}
+
+      {playing && <NowPlaying playing={playing} onClose={() => setPlaying(null)} />}
 
       {/* The list view has its own nebula entry, and needs the space */}
       {scene3d && planets.length > 0 && mood && (

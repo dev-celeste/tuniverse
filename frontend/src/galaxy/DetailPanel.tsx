@@ -1,10 +1,11 @@
-import { type CSSProperties, useEffect, useRef } from 'react'
+import { type CSSProperties, type ReactNode, useEffect, useRef } from 'react'
 
 import type { MoodResponse, Planet, SpotifyUser, TimeRange, Track } from '../api/types'
 import { musicalEra } from '../era'
 import { formatCount, formatDuration, initials, pad2 } from '../format'
 import MoodRows from '../components/MoodRows'
 import { moodColor } from '../moods'
+import { type Playing, spotifyTrackId } from '../spotify'
 import { rangeLabel } from '../timeRanges'
 import type { Focus } from './focus'
 import type { Star } from './stars'
@@ -22,12 +23,15 @@ type Props = {
   /** Light up a track's star, moon and planet (null to clear). Moon ids are track ids. */
   onHighlightTrack: (trackId: string | null) => void
   onMoodFilter: (mood: string | null) => void
+  /** The song in the Now playing dock, if any. */
+  playingTrackId: string | null
+  onListen: (song: Playing) => void
 }
 
 const swatch = (color: string) => ({ '--c': color }) as CSSProperties
 
 /** The panel that slides in when you visit a planet, the core, the constellation or the nebula. */
-export default function DetailPanel({ focus, planets, stars, tracks, mood, user, timeRange, moodFilter, onClose, onHighlightTrack, onMoodFilter }: Props) {
+export default function DetailPanel({ focus, planets, stars, tracks, mood, user, timeRange, moodFilter, onClose, onHighlightTrack, onMoodFilter, playingTrackId, onListen }: Props) {
   const planet = focus?.kind === 'planet' ? planets.find((p) => p.id === focus.id) : undefined
   const open =
     planet !== undefined ||
@@ -66,10 +70,10 @@ export default function DetailPanel({ focus, planets, stars, tracks, mood, user,
           ← Galaxy <kbd>Esc</kbd>
         </button>
       )}
-      {planet && <PlanetDetails planet={planet} timeRange={timeRange} onHighlightMoon={onHighlightTrack} />}
+      {planet && <PlanetDetails planet={planet} timeRange={timeRange} onHighlightMoon={onHighlightTrack} listen={{ playingTrackId, onListen }} />}
       {focus?.kind === 'core' && <CoreDetails user={user} planets={planets} tracks={tracks} timeRange={timeRange} />}
       {focus?.kind === 'constellation' && stars.length > 0 && (
-        <TracksDetails stars={stars} timeRange={timeRange} selectedTrackId={focus.trackId} onHighlightTrack={onHighlightTrack} />
+        <TracksDetails stars={stars} timeRange={timeRange} selectedTrackId={focus.trackId} onHighlightTrack={onHighlightTrack} listen={{ playingTrackId, onListen }} />
       )}
       {focus?.kind === 'nebula' && mood && (
         <NebulaDetails mood={mood} timeRange={timeRange} moodFilter={moodFilter} onMoodFilter={onMoodFilter} />
@@ -88,7 +92,7 @@ function Portrait({ src, name, color, label }: { src: string | null | undefined;
   )
 }
 
-function PlanetDetails({ planet, timeRange, onHighlightMoon }: { planet: Planet; timeRange: TimeRange; onHighlightMoon: (id: string | null) => void }) {
+function PlanetDetails({ planet, timeRange, onHighlightMoon, listen }: { planet: Planet; timeRange: TimeRange; onHighlightMoon: (id: string | null) => void; listen: Listen }) {
   const moons = [...planet.moons].sort((a, b) => a.rank - b.rank)
 
   return (
@@ -152,24 +156,19 @@ function PlanetDetails({ planet, timeRange, onHighlightMoon }: { planet: Planet;
                 {moon.duration_ms != null && <span className="d">{formatDuration(moon.duration_ms)}</span>}
               </>
             )
-            const highlight = {
-              onPointerEnter: () => onHighlightMoon(moon.id),
-              onPointerLeave: () => onHighlightMoon(null),
-              onFocus: () => onHighlightMoon(moon.id),
-              onBlur: () => onHighlightMoon(null),
-            }
             return (
-              <li key={moon.id}>
-                {moon.spotify_url ? (
-                  <a href={moon.spotify_url} target="_blank" rel="noopener noreferrer" aria-label={`${moon.name}, open in Spotify`} {...highlight}>
-                    {content}
-                  </a>
-                ) : (
-                  <div className="row" tabIndex={0} {...highlight}>
-                    {content}
-                  </div>
-                )}
-              </li>
+              <TrackRow
+                key={moon.id}
+                id={moon.id}
+                title={moon.name}
+                artist={planet.name}
+                label={moon.name}
+                spotifyUrl={moon.spotify_url}
+                onHighlight={onHighlightMoon}
+                listen={listen}
+              >
+                {content}
+              </TrackRow>
             )
           })}
         </ol>
@@ -184,6 +183,73 @@ function PlanetDetails({ planet, timeRange, onHighlightMoon }: { planet: Planet;
       )}
       <p className="key">Color shows genre family · glow shows popularity · distance from the core shows rank</p>
     </>
+  )
+}
+
+type Listen = { playingTrackId: string | null; onListen: (song: Playing) => void }
+
+type TrackRowProps = {
+  id: string
+  title: string
+  artist: string
+  /** How the row is announced, e.g. "3. Song title" in the ranked list. */
+  label: string
+  spotifyUrl: string | null | undefined
+  selected?: boolean
+  onHighlight: (trackId: string | null) => void
+  listen: Listen
+  children: ReactNode
+}
+
+/**
+ * One song in a panel list. Hovering or focusing it lights up its star and moon. With a Spotify
+ * track link, the row plays the song in the Now playing dock and a small ↗ opens it in Spotify.
+ */
+function TrackRow({ id, title, artist, label, spotifyUrl, selected = false, onHighlight, listen, children }: TrackRowProps) {
+  const spotifyId = spotifyTrackId(spotifyUrl)
+  const playing = listen.playingTrackId === id
+  const props = {
+    'data-track': id,
+    onPointerEnter: () => onHighlight(id),
+    onPointerLeave: () => onHighlight(null),
+    onFocus: () => onHighlight(id),
+    onBlur: () => onHighlight(null),
+  }
+
+  if (spotifyId && spotifyUrl) {
+    return (
+      <li className="listen">
+        <button
+          type="button"
+          className={`row${selected ? ' on' : ''}`}
+          aria-pressed={playing}
+          aria-label={`Listen to ${label}`}
+          onClick={() => listen.onListen({ trackId: id, spotifyId, title, artist })}
+          {...props}
+        >
+          {children}
+        </button>
+        <a className="open" href={spotifyUrl} target="_blank" rel="noopener noreferrer" aria-label={`${label}, open in Spotify`} title="Open in Spotify">
+          ↗
+        </a>
+      </li>
+    )
+  }
+  if (spotifyUrl) {
+    return (
+      <li>
+        <a href={spotifyUrl} target="_blank" rel="noopener noreferrer" aria-label={`${label}, open in Spotify`} className={selected ? 'on' : undefined} {...props}>
+          {children}
+        </a>
+      </li>
+    )
+  }
+  return (
+    <li>
+      <div className={`row${selected ? ' on' : ''}`} tabIndex={0} {...props}>
+        {children}
+      </div>
+    </li>
   )
 }
 
@@ -272,7 +338,7 @@ function CoreDetails({ user, planets, tracks, timeRange }: { user: SpotifyUser; 
   )
 }
 
-function TracksDetails({ stars, timeRange, selectedTrackId, onHighlightTrack }: { stars: Star[]; timeRange: TimeRange; selectedTrackId?: string; onHighlightTrack: (id: string | null) => void }) {
+function TracksDetails({ stars, timeRange, selectedTrackId, onHighlightTrack, listen }: { stars: Star[]; timeRange: TimeRange; selectedTrackId?: string; onHighlightTrack: (id: string | null) => void; listen: Listen }) {
   const list = useRef<HTMLOListElement>(null)
 
   // Clicking a star opens the list at its song and lights it up for a moment
@@ -310,26 +376,20 @@ function TracksDetails({ stars, timeRange, selectedTrackId, onHighlightTrack }: 
               {track.duration_ms != null && <span className="d">{formatDuration(track.duration_ms)}</span>}
             </>
           )
-          const props = {
-            'data-track': track.id,
-            className: selectedTrackId === track.id ? 'on' : undefined,
-            onPointerEnter: () => onHighlightTrack(track.id),
-            onPointerLeave: () => onHighlightTrack(null),
-            onFocus: () => onHighlightTrack(track.id),
-            onBlur: () => onHighlightTrack(null),
-          }
           return (
-            <li key={track.id}>
-              {track.spotify_url ? (
-                <a href={track.spotify_url} target="_blank" rel="noopener noreferrer" aria-label={`${rank}. ${track.name}, open in Spotify`} {...props}>
-                  {content}
-                </a>
-              ) : (
-                <div tabIndex={0} {...props} className={`row${props.className ? ' on' : ''}`}>
-                  {content}
-                </div>
-              )}
-            </li>
+            <TrackRow
+              key={track.id}
+              id={track.id}
+              title={track.name}
+              artist={track.artists.join(', ')}
+              label={`${rank}. ${track.name}`}
+              spotifyUrl={track.spotify_url}
+              selected={selectedTrackId === track.id}
+              onHighlight={onHighlightTrack}
+              listen={listen}
+            >
+              {content}
+            </TrackRow>
           )
         })}
       </ol>

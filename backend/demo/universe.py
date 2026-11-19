@@ -11,7 +11,6 @@ tests/test_demo_universe.py fails if the committed JSON is out of date.
 import hashlib
 import json
 from pathlib import Path
-from urllib.parse import quote
 
 from services.spotify_service import (
     build_current_user_response,
@@ -47,6 +46,27 @@ ARTISTS = {
     "hozier": ("Hozier", [], 83, 9_800_000),
 }
 
+# Real Spotify ids, so links and the in-app player open the actual artists and songs
+SPOTIFY_ARTIST_IDS = {
+    "bad-bunny": "4q3ewBCX7sLwd24euuV69X",
+    "the-beatles": "3WrFJ7ztbogyGnTHbHJFl2",
+    "kiss": "07XSN3sPlIlB2L2XNcTwJw",
+    "britney-spears": "26dSoYclwsYLMAKD3tpOr4",
+    "arctic-monkeys": "7Ln80lUS6He07XvHI8qqHH",
+    "j-cole": "6l3HvQ5sa6mXTsMTB19rO5",
+    "john-summit": "7kNqXtgeIwFtelmRjWv205",
+    "my-chemical-romance": "7FBcuc1gsnv6Y1nwFtNRCb",
+    "tame-impala": "5INjqkS1o8h1imAzPqGZBb",
+    "linkin-park": "6XyY86QOPPrYVGvF9ch6wz",
+    "ariana-grande": "66CXWjxzNUsdJxJ2JdwvnR",
+    "led-zeppelin": "36QJpDe2go2KgaRleHCDTp",
+    "shakira": "0EmeFodog0BfCgMzAIvKQp",
+    "olivia-dean": "00x1fYSGhdqScXBRpSj3DW",
+    "taylor-swift": "06HL4z0CvFAxyc27GXpf02",
+    "phoebe-bridgers": "1r1uxoy19fzMxunt3ONAkG",
+    "hozier": "2FXC3k01G6Gw61bmprjgqS",
+}
+
 # Each period's top 10 artists, in rank order
 TOP_ARTISTS = {
     "short_term": ["john-summit", "bad-bunny", "olivia-dean", "ariana-grande", "linkin-park", "tame-impala", "j-cole", "shakira", "arctic-monkeys", "my-chemical-romance"],
@@ -56,23 +76,23 @@ TOP_ARTISTS = {
 
 # artist id: [(title, seconds, release date)], from Spotify's catalog
 TRACKS = {
-    "bad-bunny": [("DtMF", 237, "2025-01-05"), ("BAILE INoLVIDABLE", 368, "2025-01-05"), ("Tití Me Preguntó", 244, "2022-05-06")],
-    "the-beatles": [("Here Comes The Sun", 186, "1969-09-26"), ("Let It Be", 243, "1970-05-08")],
-    "kiss": [("I Was Made For Lovin' You", 271, "1979-05-23"), ("Rock And Roll All Nite", 168, "1975-03-19")],
-    "britney-spears": [("Toxic", 199, "2003-11-13"), ("...Baby One More Time", 211, "1999-01-12")],
-    "arctic-monkeys": [("Do I Wanna Know?", 273, "2013-09-09"), ("505", 254, "2007-04-24"), ("I Wanna Be Yours", 184, "2013-09-09")],
-    "j-cole": [("No Role Modelz", 293, "2014-12-09"), ("MIDDLE CHILD", 214, "2019-01-23")],
-    "john-summit": [("Where You Are", 236, "2023-03-03"), ("Shiver", 234, "2024-02-14")],
-    "my-chemical-romance": [("Welcome to the Black Parade", 311, "2006-10-20"), ("Helena", 205, "2004-06-08")],
-    "tame-impala": [("The Less I Know The Better", 216, "2015-07-17"), ("Let It Happen", 468, "2015-07-17")],
-    "linkin-park": [("In the End", 217, "2000-10-24"), ("Numb", 188, "2003-03-25"), ("The Emptiness Machine", 190, "2024-09-05")],
-    "ariana-grande": [("we can't be friends (wait for your love)", 229, "2024-03-08"), ("7 rings", 179, "2019-02-08")],
-    "led-zeppelin": [("Stairway to Heaven", 483, "1971-11-08"), ("Immigrant Song", 146, "1970-10-05")],
-    "shakira": [("Hips Don't Lie", 220, "2006-02-28"), ("Whenever, Wherever", 196, "2001-11-13")],
-    "olivia-dean": [("Man I Need", 184, "2025-08-15"), ("Dive", 201, "2023-03-28")],
-    "taylor-swift": [("Cruel Summer", 178, "2019-08-23")],
-    "phoebe-bridgers": [("Motion Sickness", 230, "2017-07-18")],
-    "hozier": [("Too Sweet", 251, "2024-03-22")],
+    "bad-bunny": [("DtMF", 237, "2025-01-05", "3sK8wGT43QFpWrvNQsrQya"), ("BAILE INoLVIDABLE", 368, "2025-01-05", "2lTm559tuIvatlT1u0JYG2"), ("Tití Me Preguntó", 244, "2022-05-06", "1IHWl5LamUGEuP4ozKQSXZ")],
+    "the-beatles": [("Here Comes The Sun", 186, "1969-09-26", "6dGnYIeXmHdcikdzNNDMm2"), ("Let It Be", 243, "1970-05-08", "7iN1s7xHE4ifF5povM6A48")],
+    "kiss": [("I Was Made For Lovin' You", 271, "1979-05-23", "07q0QVgO56EorrSGHC48y3"), ("Rock And Roll All Nite", 168, "1975-03-19", "1Buwv1iql0YsxftE5LHIgq")],
+    "britney-spears": [("Toxic", 199, "2003-11-13", "6I9VzXrHxO9rA9A5euc8Ak"), ("...Baby One More Time", 211, "1999-01-12", "3MjUtNVVq3C8Fn0MP3zhXa")],
+    "arctic-monkeys": [("Do I Wanna Know?", 273, "2013-09-09", "5FVd6KXrgO9B3JPmC8OPst"), ("505", 254, "2007-04-24", "58ge6dfP91o9oXMzq3XkIS"), ("I Wanna Be Yours", 184, "2013-09-09", "5XeFesFbtLpXzIVDNQP22n")],
+    "j-cole": [("No Role Modelz", 293, "2014-12-09", "68Dni7IE4VyPkTOH9mRWHr"), ("MIDDLE CHILD", 214, "2019-01-23", "2b5scDVCDxVsLalecDLAo2")],
+    "john-summit": [("Where You Are", 236, "2023-03-03", "3pUz2qJe5nqZemi3hhIxMk"), ("Shiver", 234, "2024-02-14", "32VIrOsJmwvqRm4rWFBCsi")],
+    "my-chemical-romance": [("Welcome to the Black Parade", 311, "2006-10-20", "5wQnmLuC1W7ATsArWACrgW"), ("Helena", 205, "2004-06-08", "5dTHtzHFPyi8TlTtzoz1J9")],
+    "tame-impala": [("The Less I Know The Better", 216, "2015-07-17", "6K4t31amVTZDgR3sKmwUJJ"), ("Let It Happen", 468, "2015-07-17", "2X485T9Z5Ly0xyaghN73ed")],
+    "linkin-park": [("In the End", 217, "2000-10-24", "60a0Rd6pjrkxjPbaKzXjfq"), ("Numb", 188, "2003-03-25", "2nLtzopw4rPReszdYBJU6h"), ("The Emptiness Machine", 190, "2024-09-05", "1EDPVGbyPKJPeGqATwXZvN")],
+    "ariana-grande": [("we can't be friends (wait for your love)", 229, "2024-03-08", "51ZQ1vr10ffzbwIjDCwqm4"), ("7 rings", 179, "2019-02-08", "6ocbgoVGwYJhOv1GgI9NsF")],
+    "led-zeppelin": [("Stairway to Heaven", 483, "1971-11-08", "5CQ30WqJwcep0pYcV4AMNc"), ("Immigrant Song", 146, "1970-10-05", "78lgmZwycJ3nzsdgmPPGNx")],
+    "shakira": [("Hips Don't Lie", 220, "2006-02-28", "3d0WouFnFmr0K3kjeza3fF"), ("Whenever, Wherever", 196, "2001-11-13", "2lnzGkdtDj5mtlcOW2yRtG")],
+    "olivia-dean": [("Man I Need", 184, "2025-08-15", "0mYXRQpTGjaLJt1l9MY4ps"), ("Dive", 201, "2023-03-28", "36vmaZyO0iAE6FZ7287fg2")],
+    "taylor-swift": [("Cruel Summer", 178, "2019-08-23", "1BxfuPKGuaTgP7aM0Bbdwr")],
+    "phoebe-bridgers": [("Motion Sickness", 230, "2017-07-18", "5xo8RrjJ9CVNrtRg2S3B1R")],
+    "hozier": [("Too Sweet", 251, "2024-03-22", "76JKIsdKrAfWUMjaA0u7v5")],
 }
 TRACKS_ONLY = ("taylor-swift", "phoebe-bridgers", "hozier")
 
@@ -84,34 +104,30 @@ def _stable(text: str) -> float:
     return int(hashlib.md5(text.encode()).hexdigest()[:8], 16) / 0xFFFFFFFF
 
 
-def _search_url(query: str) -> str:
-    return f"https://open.spotify.com/search/{quote(query)}"
-
-
 def _raw_artist(artist_id: str) -> dict:
     name, genres, popularity, followers = ARTISTS[artist_id]
+    spotify_id = SPOTIFY_ARTIST_IDS[artist_id]
     return {
-        "id": artist_id,
+        "id": spotify_id,
         "name": name,
         "genres": genres,
         "popularity": popularity,
         "followers": {"total": followers},
         "images": [],
-        "external_urls": {"spotify": _search_url(name)},
+        "external_urls": {"spotify": f"https://open.spotify.com/artist/{spotify_id}"},
     }
 
 
-def _raw_track(artist_id: str, title: str, seconds: int, release_date: str) -> dict:
-    artist_name = ARTISTS[artist_id][0]
+def _raw_track(artist_id: str, title: str, seconds: int, release_date: str, spotify_id: str) -> dict:
     return {
-        "id": f"{artist_id}--{title}".lower().replace(" ", "-"),
+        "id": spotify_id,
         "name": title,
-        "artists": [{"id": artist_id, "name": artist_name}],
+        "artists": [{"id": SPOTIFY_ARTIST_IDS[artist_id], "name": ARTISTS[artist_id][0]}],
         "album": {"name": title, "release_date": release_date, "images": []},
         "popularity": 70,
         "duration_ms": seconds * 1000,
         "explicit": False,
-        "external_urls": {"spotify": _search_url(f"{title} {artist_name}")},
+        "external_urls": {"spotify": f"https://open.spotify.com/track/{spotify_id}"},
     }
 
 
@@ -123,11 +139,11 @@ def _top_tracks(time_range: str) -> list[dict]:
     """
     ranked = []
     for rank, artist_id in enumerate(TOP_ARTISTS[time_range][:-1], start=1):
-        for title, seconds, date in TRACKS.get(artist_id, []):
-            ranked.append((rank + _stable(title + time_range) * 5, _raw_track(artist_id, title, seconds, date)))
+        for title, seconds, date, spotify_id in TRACKS.get(artist_id, []):
+            ranked.append((rank + _stable(title + time_range) * 5, _raw_track(artist_id, title, seconds, date, spotify_id)))
     for artist_id in TRACKS_ONLY:
-        for title, seconds, date in TRACKS[artist_id]:
-            ranked.append((3.5 + _stable(title + time_range) * 9, _raw_track(artist_id, title, seconds, date)))
+        for title, seconds, date, spotify_id in TRACKS[artist_id]:
+            ranked.append((3.5 + _stable(title + time_range) * 9, _raw_track(artist_id, title, seconds, date, spotify_id)))
     return [track for _, track in sorted(ranked, key=lambda pair: pair[0])]
 
 

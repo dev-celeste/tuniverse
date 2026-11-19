@@ -47,13 +47,13 @@ describe('visiting a planet', () => {
     expect(details.getByText('4.1M')).toBeInTheDocument()
     expect(details.getByText('metalcore · alt metal')).toBeInTheDocument()
 
-    // Tracks in top-tracks order, each linking to Spotify
-    const tracks = details.getAllByRole('link', { name: /open in Spotify$/ })
+    // Tracks in top-tracks order, each playable here and linking to Spotify
+    const tracks = details.getAllByRole('button', { name: /^Listen to/ })
     expect(tracks.map((t) => t.textContent)).toEqual([
       expect.stringContaining('The Summoning'),
       expect.stringContaining('Granite'),
     ])
-    expect(tracks[0]).toHaveAttribute('href', 'https://open.spotify.com/track/t1')
+    expect(details.getByRole('link', { name: 'The Summoning, open in Spotify' })).toHaveAttribute('href', 'https://open.spotify.com/track/t1')
     expect(details.getByRole('link', { name: 'Open Sleep Token in Spotify ↗' })).toBeInTheDocument()
   })
 
@@ -72,9 +72,9 @@ describe('visiting a planet', () => {
     const planets = await openGalaxy()
     await userEvent.click(planets.getByRole('button', { name: 'Sleep Token' }))
 
-    await userEvent.hover(within(panel()).getByRole('link', { name: 'Granite, open in Spotify' }))
+    await userEvent.hover(within(panel()).getByRole('button', { name: 'Listen to Granite' }))
     expect(screen.getByTestId('scene')).toHaveAttribute('data-highlight', 't2')
-    await userEvent.unhover(within(panel()).getByRole('link', { name: 'Granite, open in Spotify' }))
+    await userEvent.unhover(within(panel()).getByRole('button', { name: 'Listen to Granite' }))
     expect(screen.getByTestId('scene')).toHaveAttribute('data-highlight', '')
   })
 
@@ -138,12 +138,13 @@ describe('constellation', () => {
 
     const details = within(panel())
     expect(details.getByRole('heading', { name: 'Top tracks' })).toBeInTheDocument()
-    const rows = details.getAllByRole('link', { name: /open in Spotify$/ })
+    const rows = details.getAllByRole('button', { name: /^Listen to/ })
     expect(rows.map((r) => r.getAttribute('aria-label'))).toEqual([
-      '1. The Summoning, open in Spotify',
-      '2. Granite, open in Spotify',
-      '3. Dreams, open in Spotify',
+      'Listen to 1. The Summoning',
+      'Listen to 2. Granite',
+      'Listen to 3. Dreams',
     ])
+    expect(details.getAllByRole('link', { name: /open in Spotify$/ })).toHaveLength(3)
     // Only the track whose artist has no planet is marked
     expect(rows[0]).not.toHaveTextContent('not in your top artists')
     expect(rows[2]).toHaveTextContent('Fleetwood Mac · not in your top artists')
@@ -154,14 +155,14 @@ describe('constellation', () => {
     await openGalaxy()
     await userEvent.click(await screen.findByRole('button', { name: 'Top tracks' }))
 
-    await userEvent.hover(within(panel()).getByRole('link', { name: '2. Granite, open in Spotify' }))
+    await userEvent.hover(within(panel()).getByRole('button', { name: 'Listen to 2. Granite' }))
     expect(screen.getByTestId('scene')).toHaveAttribute('data-highlight', 't2')
   })
 
   it('clears the highlight when the panel closes under the pointer', async () => {
     await openGalaxy()
     await userEvent.click(await screen.findByRole('button', { name: 'Top tracks' }))
-    await userEvent.hover(within(panel()).getByRole('link', { name: '2. Granite, open in Spotify' }))
+    await userEvent.hover(within(panel()).getByRole('button', { name: 'Listen to 2. Granite' }))
 
     await userEvent.keyboard('{Escape}')
     expect(screen.getByTestId('scene')).toHaveAttribute('data-highlight', '')
@@ -171,7 +172,7 @@ describe('constellation', () => {
     await openGalaxy()
     await userEvent.click(await screen.findByRole('button', { name: 'Star 3: Dreams' }))
 
-    expect(within(panel()).getByRole('link', { name: '3. Dreams, open in Spotify' })).toHaveClass('on')
+    expect(within(panel()).getByRole('button', { name: 'Listen to 3. Dreams' })).toHaveClass('on')
     expect(screen.getByTestId('scene')).toHaveAttribute('data-highlight', 't9')
   })
 
