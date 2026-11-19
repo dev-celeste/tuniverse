@@ -577,6 +577,7 @@ kbd {
 }
 .np-close:hover, .np-close:focus-visible { color: var(--ink); background: var(--lift); }
 .now-playing iframe { display: block; width: 100%; height: 80px; border: 0; border-radius: 12px; color-scheme: normal; }
+.np-embed { height: 80px; border-radius: 12px; overflow: hidden; }
 .galaxy-page.playing .mood-card { bottom: calc(16px + var(--dock-h) + 8px + env(safe-area-inset-bottom, 0px)); }
 .galaxy-page.playing .galaxy-list { bottom: calc(16px + var(--dock-h) + 8px + env(safe-area-inset-bottom, 0px)); }
 
