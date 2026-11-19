@@ -55,14 +55,25 @@ export const NEBULA_CENTER = new Vector3(-120, -22, -250)
 export const NEBULA_HALF_SIZE = { w: 72, h: 52 }
 
 /**
- * Camera distance at which something of the given half-size fills the space beside the panel
- * (desktop) or above it (phones, where the panel is a bottom sheet).
+ * Screen width the detail panel covers on the right, or 0 where it's a bottom sheet instead
+ * (phones held upright). Phones held sideways are too short for a sheet, so they get a narrower
+ * side panel. Keep in step with the panel's media queries in global.css.
+ */
+export function sidePanelWidth(width: number, height: number) {
+  if (width > 720) return Math.min(380, width * 0.3)
+  if (height <= 520 && width > height) return Math.min(340, width * 0.46)
+  return 0
+}
+
+/**
+ * Camera distance at which something of the given half-size fills the space beside the panel,
+ * or above it where the panel is a bottom sheet.
  */
 export function fitDistance(halfW: number, halfH: number, camera: PerspectiveCamera, width: number) {
   const tanV = Math.tan((camera.fov * Math.PI) / 360)
   const tanH = tanV * camera.aspect
-  const wide = width > 720
-  const usableW = wide ? 1 - Math.min(380, width * 0.3) / width : 1
-  const usableH = wide ? 1 : 0.36
+  const side = sidePanelWidth(width, width / camera.aspect)
+  const usableW = side ? 1 - side / width : 1
+  const usableH = side ? 1 : 0.36
   return Math.max(halfH / (tanV * 0.66 * usableH), halfW / (tanH * 0.7 * usableW))
 }

@@ -73,14 +73,16 @@ export default function GalaxyScene({ mode, planets, stars, mood, focus, onFocus
     own ? ' hidden' : focus ? ' dimmed' : hovered ? ' hovered' : ''
 
   return (
-    <div className="scene" style={{ cursor: pointer ? 'pointer' : 'grab' }}>
+    // On the start screen the scene is only a backdrop: inert keeps its labels out of the tab order
+    <div className="scene" style={{ cursor: pointer ? 'pointer' : 'grab' }} inert={mode === 'landing'}>
       <Canvas
         // 1.5x is plenty for soft, glowing visuals and saves ~44% of the pixels a 2x screen would draw
         dpr={[1, 1.5]}
         flat
         camera={{ fov: 50, near: 0.1, far: 2000 }}
         gl={{ antialias: true, powerPreference: 'high-performance' }}
-        aria-label="Your music galaxy"
+        // Assistive tech gets the labels below instead, which are buttons for the same things
+        aria-hidden="true"
       >
         <color attach="background" args={['#05050a']} />
         <fogExp2 attach="fog" args={['#05050a', 0.0042]} />
@@ -151,12 +153,18 @@ export default function GalaxyScene({ mode, planets, stars, mood, focus, onFocus
         </EffectComposer>
       </Canvas>
 
-      {/* Labels, positioned every frame by LabelProjector. Planet names and the captions are
-          buttons, so the galaxy can also be explored by keyboard. */}
-      <div className="scene-labels">
-        <span className={`planet-label core-label${coreHovered ? ' show' : ''}`} ref={(el) => anchors.setElement('core', el)} aria-hidden="true">
+      {/* Labels, positioned every frame by LabelProjector. The core, planet names and captions are
+          buttons, so the galaxy can also be explored by keyboard and screen reader. */}
+      <nav className="scene-labels" aria-label="Galaxy">
+        <button
+          type="button"
+          className={`planet-label core-label${coreHovered ? ' show' : ''}`}
+          ref={(el) => anchors.setElement('core', el)}
+          aria-label="You: your listening profile"
+          onClick={() => onFocus({ kind: 'core' })}
+        >
           You
-        </span>
+        </button>
 
         {displayed.map((planet) => {
           const state =
@@ -238,7 +246,7 @@ export default function GalaxyScene({ mode, planets, stars, mood, focus, onFocus
             Mood nebula
           </button>
         )}
-      </div>
+      </nav>
     </div>
   )
 }

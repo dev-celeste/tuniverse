@@ -13,3 +13,7 @@ dist/
 
 # IDE
 .vscode/
+
+# Local only: machine-specific preview config, LinkedIn post images
+.claude/
+linkedin-assets/

@@ -30,3 +30,11 @@ export function useSceneConfig(config: SceneConfig | null) {
     if (config) setConfig(config)
   }, [config, setConfig])
 }
+
+/**
+ * Whether the 3D scene is running. False when WebGL is missing or the scene failed to start:
+ * pages then offer the list view, which reaches every panel without the canvas.
+ */
+export const Scene3DContext = createContext(true)
+
+export const useScene3D = () => useContext(Scene3DContext)

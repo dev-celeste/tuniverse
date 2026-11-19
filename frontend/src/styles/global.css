@@ -214,7 +214,7 @@ a { color: inherit; }
 
 /* ---------- Universe: one 3D scene under the start screen, demo and galaxy ---------- */
 .universe { position: fixed; inset: 0; overflow: hidden; }
-.universe .scene { position: absolute; inset: 0; transition: opacity 1.2s ease; }
+.universe .scene { position: absolute; inset: 0; z-index: 0; transition: opacity 1.2s ease; }
 /* Start screen: the scene is backdrop only */
 .universe.landing .scene { pointer-events: none; }
 .universe .scene-labels { transition: opacity 0.9s ease; }
@@ -234,7 +234,7 @@ a { color: inherit; }
 /* ---------- Galaxy pages (your galaxy, the demo) ---------- */
 /* Overlay over the scene: lets clicks through to the canvas except on its own controls */
 .galaxy-page { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 2; }
-.galaxy-page > .panel, .galaxy-page > .mood-card { pointer-events: auto; }
+.galaxy-page > .panel, .galaxy-page > .mood-card, .galaxy-page > .galaxy-list { pointer-events: auto; }
 /* A live backdrop blur over the animating canvas has to be recomputed every frame and halved the
    frame rate; over this dark scene a near-opaque fill looks almost the same and costs nothing */
 .galaxy-page .glass {
@@ -292,8 +292,10 @@ a { color: inherit; }
   font-weight: 400;
   color: var(--muted);
 }
+/* "You" under the core: shown on hover, or when reached by keyboard (the core itself is the click target) */
 .core-label { pointer-events: none; opacity: 0; }
 .core-label.show { opacity: 0.9; }
+.core-label:focus-visible { opacity: 1; }
 
 /* Constellation star labels: hidden until shown; "compact" keeps only the rank */
 .star-label {
@@ -359,6 +361,7 @@ a { color: inherit; }
 
 /* ---------- Header controls ---------- */
 .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: flex-end; }
+.view-controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: flex-end; }
 .tracks-btn {
   padding: 11px 14px;
   font-size: 12px;
@@ -500,6 +503,48 @@ kbd {
   color: var(--faint);
 }
 
+/* Opening a view focuses its heading for screen readers; it isn't a control, so no ring */
+.panel h2:focus { outline: none; }
+
+/* ---------- List view (no WebGL): the galaxy as a list, left side ---------- */
+.galaxy-list {
+  position: absolute;
+  z-index: 2;
+  top: calc(96px + env(safe-area-inset-top, 0px));
+  left: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  width: min(300px, calc(100vw - 32px));
+  padding: 18px 16px;
+  overflow-y: auto;
+  display: grid;
+  align-content: start;
+  gap: 14px;
+}
+.galaxy-list h1 { margin: 6px 0 0; font-family: var(--display); font-weight: 400; font-size: 30px; line-height: 1; }
+.galaxy-list .note { margin: 8px 0 0; font-size: 12px; line-height: 1.5; color: var(--muted); }
+.galaxy-list .section-title { margin: 0; }
+.galaxy-list .entries { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.galaxy-list .entries button {
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.galaxy-list .entries button:hover, .galaxy-list .entries button:focus-visible, .galaxy-list .entries button[aria-pressed="true"] { background: var(--lift); }
+.galaxy-list .entries b { font-weight: 500; }
+.galaxy-list .entries small { margin-left: auto; font-size: 11px; color: var(--muted); }
+.galaxy-list .rk { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+.galaxy-list .dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--c); box-shadow: 0 0 8px var(--c); align-self: center; }
+
 /* ---------- Mood card (bottom left) ---------- */
 .mood-card {
   position: absolute;
@@ -580,6 +625,45 @@ kbd {
   .dominant { font-size: 24px; }
   /* The bottom sheet needs the space */
   .galaxy-page.focused .mood-card { opacity: 0; pointer-events: none; }
+  /* Header in two rows: brand and account on top, the view controls below */
+  .galaxy-page .top { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 10px 12px; }
+  .galaxy-page .actions { display: contents; }
+  .galaxy-page .account { grid-row: 1; grid-column: 2; }
+  .galaxy-page .view-controls { grid-row: 2; grid-column: 1 / -1; justify-content: flex-start; flex-wrap: nowrap; }
+  .tracks-btn { padding: 10px 12px; }
+  .ranges button { padding: 7px 10px; }
+  .galaxy-list { top: calc(124px + env(safe-area-inset-top, 0px)); width: auto; right: 16px; }
+  .galaxy-page.focused .galaxy-list { display: none; }
+}
+
+/* Small or short screens: the mood card keeps only the headline (the full mix and the mood
+   filter are a tap away in the nebula panel), so it doesn't cover the galaxy */
+@media (max-width: 720px), (max-height: 560px) {
+  .mood-card .moods, .mood-card .basis { display: none; }
+  .mood-card { width: auto; gap: 6px; padding: 12px 14px; }
+}
+
+/* Phones held sideways: too short for a bottom sheet, so the panel goes back to the side, and
+   the header fits on one row. Keep in step with sidePanelWidth() in galaxy/places.ts. */
+@media (max-width: 720px) and (max-height: 520px) and (orientation: landscape) {
+  .galaxy-page .top { display: flex; align-items: center; flex-wrap: nowrap; }
+  .galaxy-page .actions { display: flex; flex-wrap: nowrap; }
+  .galaxy-page .view-controls { flex-wrap: nowrap; }
+  .galaxy-page .brand .eyebrow { display: none; }
+  .wordmark { font-size: 22px; }
+  .panel {
+    top: calc(64px + env(safe-area-inset-top, 0px));
+    left: auto;
+    right: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    width: min(320px, 44vw);
+    max-height: none;
+    padding: 16px 18px;
+  }
+  .panel.closed { transform: translateX(28px); }
+  .headline h2 { font-size: 28px; }
+  .galaxy-list { top: calc(64px + env(safe-area-inset-top, 0px)); right: auto; width: min(300px, 44vw); }
+  .galaxy-page.focused .galaxy-list { display: grid; }
 }
 
 @media (prefers-reduced-motion: reduce) {

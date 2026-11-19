@@ -8,9 +8,10 @@ import { startLogin } from '../auth'
 import Brand from '../components/Brand'
 import MoodCard from '../components/MoodCard'
 import RangeSwitch from '../components/RangeSwitch'
+import GalaxyList from '../components/GalaxyList'
 import DetailPanel from '../galaxy/DetailPanel'
 import type { Focus } from '../galaxy/focus'
-import { useSceneConfig } from '../galaxy/sceneContext'
+import { useScene3D, useSceneConfig } from '../galaxy/sceneContext'
 import { toStars } from '../galaxy/stars'
 import { useLogout } from '../useLogout'
 
@@ -35,6 +36,8 @@ export default function Galaxy({ source }: { source: Source }) {
   const demoUser = useDemoUser().data
   const user = demo ? demoUser : sessionUser
   const logout = useLogout()
+  // Without WebGL there's no scene to click: the list view stands in for it
+  const scene3d = useScene3D()
   const [timeRange, setTimeRange] = useState<TimeRange>('medium_term')
   const [focus, setFocus] = useState<Focus>(null)
   const [highlightTrackId, setHighlightTrackId] = useState<string | null>(null)
@@ -86,28 +89,34 @@ export default function Galaxy({ source }: { source: Source }) {
       <header className="top overlay-top">
         <Brand caption={demo ? 'Demo universe · sample data' : 'Your universe'} />
         <div className="actions">
-          {stars.length > 0 && (
-            <button
-              type="button"
-              className="tracks-btn glass"
-              aria-pressed={visibleFocus?.kind === 'constellation'}
-              onClick={() => setFocus(visibleFocus?.kind === 'constellation' ? null : { kind: 'constellation' })}
-            >
-              Top tracks
-            </button>
-          )}
-          <RangeSwitch value={timeRange} onChange={setTimeRange} busy={switchingRange} />
+          <div className="view-controls">
+            {stars.length > 0 && (
+              <button
+                type="button"
+                className="tracks-btn glass"
+                aria-pressed={visibleFocus?.kind === 'constellation'}
+                onClick={() => setFocus(visibleFocus?.kind === 'constellation' ? null : { kind: 'constellation' })}
+              >
+                Top tracks
+              </button>
+            )}
+            <RangeSwitch value={timeRange} onChange={setTimeRange} busy={switchingRange} />
+          </div>
           {demo ? (
-            <button type="button" className="btn btn-primary btn-small" onClick={startLogin}>
+            <button type="button" className="btn btn-primary btn-small account" onClick={startLogin}>
               Connect Spotify
             </button>
           ) : (
-            <button type="button" className="btn btn-ghost btn-small" onClick={logout}>
+            <button type="button" className="btn btn-ghost btn-small account" onClick={logout}>
               Log out
             </button>
           )}
         </div>
       </header>
+
+      {!scene3d && planets.length > 0 && (
+        <GalaxyList planets={planets} stars={stars} mood={mood} focus={visibleFocus} onFocus={setFocus} />
+      )}
 
       {planets.length > 0 && user && (
         <DetailPanel
@@ -125,7 +134,8 @@ export default function Galaxy({ source }: { source: Source }) {
         />
       )}
 
-      {planets.length > 0 && mood && (
+      {/* The list view has its own nebula entry, and needs the space */}
+      {scene3d && planets.length > 0 && mood && (
         <MoodCard
           mood={mood}
           timeRange={timeRange}

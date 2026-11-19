@@ -34,10 +34,33 @@ export default function DetailPanel({ focus, planets, stars, tracks, mood, user,
     focus?.kind === 'core' ||
     (focus?.kind === 'constellation' && stars.length > 0) ||
     (focus?.kind === 'nebula' && mood !== null)
+  const view = !open || !focus ? null : focus.kind === 'planet' ? `planet:${focus.id}` : focus.kind
+
+  // Opening a view moves focus to its heading, so screen readers announce it and Tab continues
+  // inside the panel; closing hands focus back to whatever opened it (a label, a list entry)
+  const panelRef = useRef<HTMLElement>(null)
+  const opener = useRef<HTMLElement | null>(null)
+  useEffect(() => {
+    const panel = panelRef.current
+    if (!panel) return
+    if (view) {
+      const active = document.activeElement
+      // The latest control outside the panel that changed the view (switching views from inside
+      // the panel, e.g. a mood link, keeps the one before)
+      if (active instanceof HTMLElement && active !== document.body && !panel.contains(active)) {
+        opener.current = active
+      }
+      panel.querySelector<HTMLElement>('h2')?.focus({ preventScroll: true })
+    } else if (opener.current) {
+      const back = opener.current
+      opener.current = null
+      if (back.isConnected && !back.closest('[inert]')) back.focus({ preventScroll: true })
+    }
+  }, [view])
 
   return (
     // inert while closed: hidden from assistive tech and unreachable by keyboard
-    <aside className={`panel glass${open ? '' : ' closed'}`} aria-label="Details" inert={!open}>
+    <aside ref={panelRef} className={`panel glass${open ? '' : ' closed'}`} aria-label="Details" inert={!open}>
       {open && (
         <button type="button" className="back" onClick={onClose}>
           ← Galaxy <kbd>Esc</kbd>
@@ -75,7 +98,7 @@ function PlanetDetails({ planet, timeRange, onHighlightMoon }: { planet: Planet;
         <p className="eyebrow">
           Rank {pad2(planet.rank)} · Top artist · {rangeLabel(timeRange)}
         </p>
-        <h2>{planet.name}</h2>
+        <h2 tabIndex={-1}>{planet.name}</h2>
         <p className="chip">
           <span className="dot" style={swatch(planet.color)} />
           {planet.mood}
@@ -178,7 +201,7 @@ function CoreDetails({ user, planets, tracks, timeRange }: { user: SpotifyUser; 
       <div className="headline">
         <Portrait src={user.image_url} name={name} color="#d8c49c" label="Your Spotify profile photo" />
         <p className="eyebrow">Your universe · {rangeLabel(timeRange)}</p>
-        <h2>{name}</h2>
+        <h2 tabIndex={-1}>{name}</h2>
       </div>
 
       <dl className="stats">
@@ -265,7 +288,7 @@ function TracksDetails({ stars, timeRange, selectedTrackId, onHighlightTrack }: 
     <>
       <div className="headline">
         <p className="eyebrow">Constellation · {rangeLabel(timeRange)}</p>
-        <h2>Top tracks</h2>
+        <h2 tabIndex={-1}>Top tracks</h2>
         <p className="chip">Your {stars.length} most-played songs, brightest first</p>
       </div>
 
@@ -324,7 +347,7 @@ function NebulaDetails({ mood, timeRange, moodFilter, onMoodFilter }: { mood: Mo
     <>
       <div className="headline">
         <p className="eyebrow">Mood nebula · {rangeLabel(timeRange)}</p>
-        <h2 style={{ color: moodColor(mood.dominant_mood) }}>{mood.dominant_mood}</h2>
+        <h2 tabIndex={-1} style={{ color: moodColor(mood.dominant_mood) }}>{mood.dominant_mood}</h2>
         <p className="chip">{share ? `Your dominant mood, ${share}% of your genre mix` : 'Not enough genre data to read a mood yet'}</p>
       </div>
 

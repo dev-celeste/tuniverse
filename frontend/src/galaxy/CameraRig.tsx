@@ -16,6 +16,7 @@ import {
   homeDistance,
   landingDistance,
   landingTarget,
+  sidePanelWidth,
 } from './places'
 
 const INTRO_DISTANCE = 320
@@ -149,11 +150,11 @@ export default function CameraRig({ mode, reducedMotion, focus, anchors, planetD
       }
     }
 
-    // Slide the focus into the open space beside the panel (above it on phones, where it's a bottom sheet)
-    const wide = size.width > 720
+    // Slide the focus into the open space beside the panel (above it where it's a bottom sheet)
+    const side = sidePanelWidth(size.width, size.height)
     const panelOpen = !landing && focus !== null
-    const wantX = panelOpen && wide ? Math.min(380, size.width * 0.3) / 2 : 0
-    const wantY = panelOpen && !wide ? size.height * 0.26 : 0
+    const wantX = panelOpen && side ? side / 2 : 0
+    const wantY = panelOpen && !side ? size.height * 0.26 : 0
     shift.current.x += (wantX - shift.current.x) * ease(0.02, dt)
     shift.current.y += (wantY - shift.current.y) * ease(0.02, dt)
     if (Math.abs(shift.current.x) > 0.5 || Math.abs(shift.current.y) > 0.5) {
