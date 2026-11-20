@@ -73,8 +73,9 @@ Both hosts redeploy on every push to `main`: Vercel for any change, Render only 
 
 **Free-plan behavior:** Render's free web service sleeps after 15 minutes without traffic and takes
 about a minute to wake. The demo doesn't need the API, so it's unaffected; the first login after a
-quiet spell is slow. Upgrading the service to a paid plan, or pinging `/api/v1/health` every ~10
-minutes, keeps it awake. The free Key Value store isn't persisted to disk, so a restart of it logs
+quiet spell would be slow, so `.github/workflows/keep-warm.yml` pings `/api/v1/health` every 10
+minutes (GitHub can run it a few minutes late, and pauses scheduled jobs after 60 days without
+commits; re-enable it under Actions). One always-on free service fits Render's 750 free hours a month. The free Key Value store isn't persisted to disk, so a restart of it logs
 everyone out (they just log in again).
 
 ### Checklist when it breaks
