@@ -34,36 +34,48 @@ This is the same shape as local dev, where the Vite dev server proxies `/api` to
 The frontend starts login with a full-page navigation (`window.location.href = "/api/v1/auth/login"`),
 not `fetch`, because it's a redirect chain through Spotify.
 
-### Production (Ticket 23)
+### Production
 
-1. **Backend** (Render / Railway / Fly.io): run
-   `uvicorn main:app --host 0.0.0.0 --port $PORT` from `backend/`, with a managed Redis.
-2. **Frontend** (Vercel): add a rewrite in `frontend/vercel.json`. Vercel doesn't
-   substitute env vars here, so put the real backend URL in:
+| Piece | Where | Config in the repo |
+|---|---|---|
+| Frontend (static React app) | Vercel, free | `frontend/vercel.json`: the `/api` proxy, routes, security headers |
+| API | Render web service, free | `render.yaml` (Blueprint) |
+| Sessions | Render Key Value (Redis), free | `render.yaml`: wired to the API as `REDIS_URL`, private to the account |
 
-   ```json
-   {
-     "rewrites": [
-       { "source": "/api/:path*", "destination": "https://<backend-host>/api/:path*" },
-       { "source": "/(.*)", "destination": "/index.html" }
-     ]
-   }
-   ```
+Order matters a little, because the API needs the frontend's address and vice versa.
 
-   The second rule sends client-side routes like `/galaxy` to the React app.
-   (Netlify equivalent: `/api/*  https://<backend-host>/api/:splat  200` in `_redirects`.)
-3. **Backend env vars:**
+1. **Vercel:** Add New → Project → import the GitHub repo. Set **Root Directory** to `frontend`
+   (Vercel reads the rest from `vercel.json`) and deploy. Note the address, e.g.
+   `https://tuniverse.vercel.app`; renaming the project in Settings → Domains gets a nicer one.
+   The demo already works at this point; Spotify login doesn't yet.
+2. **Render:** New → Blueprint → pick the repo. It creates `tuniverse-api` and
+   `tuniverse-sessions` and asks for:
 
    | Var | Value |
    |---|---|
-   | `SPOTIFY_REDIRECT_URI` | `https://tuniverse.app/api/v1/auth/callback` (the **frontend** domain) |
-   | `FRONTEND_URL` | `https://tuniverse.app` |
-   | `COOKIE_SECURE` | `true` |
-   | `REDIS_URL` | from the Redis provider |
-   | `CORS_ORIGINS` | `https://tuniverse.app` (unused behind the proxy, but harmless) |
-4. **Spotify dashboard:** add the production redirect URI, and add the Spotify accounts of anyone
-   who should be able to log in to the app's user allowlist (development-mode apps only allow
-   allowlisted users). Everyone else uses demo mode.
+   | `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET` | from the Spotify dashboard (same as `backend/.env`) |
+   | `SPOTIFY_REDIRECT_URI` | `https://<vercel-domain>/api/v1/auth/callback` (the **frontend** domain) |
+   | `FRONTEND_URL` | `https://<vercel-domain>` |
+
+   `COOKIE_SECURE=true`, `REDIS_URL` and the Python version are set by the Blueprint.
+   When it's live, `https://tuniverse-api.onrender.com/api/v1/health` returns `{"status":"ok"}`.
+3. **If Render gave the API a different address** than `tuniverse-api.onrender.com` (the name was
+   taken), put the real one in the `/api` rewrite in `frontend/vercel.json` and push. Vercel
+   doesn't substitute env vars in rewrites.
+4. **Spotify dashboard** → your app → Settings → Redirect URIs: add
+   `https://<vercel-domain>/api/v1/auth/callback` (keep the local one). Under User Management,
+   add the Spotify accounts that may log in (development mode allows 5). Everyone else uses the demo.
+5. **Check:** open the Vercel address → Connect Spotify → you land back on the start screen and
+   dive into your galaxy. `https://<vercel-domain>/api/v1/health` should answer through the proxy.
+
+Both hosts redeploy on every push to `main`: Vercel for any change, Render only when `backend/`,
+`requirements.txt` or `render.yaml` change.
+
+**Free-plan behavior:** Render's free web service sleeps after 15 minutes without traffic and takes
+about a minute to wake. The demo doesn't need the API, so it's unaffected; the first login after a
+quiet spell is slow. Upgrading the service to a paid plan, or pinging `/api/v1/health` every ~10
+minutes, keeps it awake. The free Key Value store isn't persisted to disk, so a restart of it logs
+everyone out (they just log in again).
 
 ### Checklist when it breaks
 
@@ -71,5 +83,7 @@ not `fetch`, because it's a redirect chain through Spotify.
   browser is on the same host as the API (`127.0.0.1` vs `localhost`, or a missing proxy rewrite).
 - `login_error=invalid_state` → the state cookie was lost between `/login` and `/callback`;
   usually the same host mismatch, or `COOKIE_SECURE=true` on plain http.
+- The first request after a while takes ~1 minute → Render's free service was asleep (see above).
+- `/api/v1/health` returns 503 → the API is up but can't reach Redis; check `tuniverse-sessions` in Render.
 - Spotify shows "INVALID_CLIENT: Invalid redirect URI" → `SPOTIFY_REDIRECT_URI` doesn't exactly
   match the dashboard.

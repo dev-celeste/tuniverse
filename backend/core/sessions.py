@@ -46,6 +46,8 @@ class SessionStore(Protocol):
 
     def delete(self, session_id: str) -> None: ...
 
+    def ping(self) -> bool: ...
+
 
 class InMemorySessionStore:
     """
@@ -64,6 +66,9 @@ class InMemorySessionStore:
 
     def delete(self, session_id: str) -> None:
         self._sessions.pop(session_id, None)
+
+    def ping(self) -> bool:
+        return True
 
 
 class RedisSessionStore:
@@ -84,6 +89,13 @@ class RedisSessionStore:
 
     def delete(self, session_id: str) -> None:
         self.redis.delete(self._key(session_id))
+
+    def ping(self) -> bool:
+        """False when Redis can't be reached (logins would fail), for the health check."""
+        try:
+            return bool(self.redis.ping())
+        except Exception:
+            return False
 
 
 @lru_cache

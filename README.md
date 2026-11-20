@@ -89,7 +89,7 @@ cd backend
 ```
 
 ### Deployment
-See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) — the frontend proxies `/api` to the backend so the session cookie stays first-party.
+Frontend on Vercel (`frontend/vercel.json`), API and Redis sessions on Render (`render.yaml` Blueprint), all on free plans. Step-by-step setup in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md); the frontend proxies `/api` to the backend so the session cookie stays first-party.
 
 ## Roadmap
 Phase 1 – Core Experience

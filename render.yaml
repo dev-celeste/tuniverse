@@ -1,0 +1,50 @@
+# Render Blueprint: the Tuniverse API and its session store, both on Render's free plans.
+# Render → New → Blueprint → pick this repo. It asks for the values marked sync: false.
+# See docs/DEPLOYMENT.md for the whole setup (the frontend is on Vercel).
+services:
+  - type: web
+    name: tuniverse-api
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    # --proxy-headers: Render terminates HTTPS in front of the app
+    startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips='*'
+    healthCheckPath: /api/v1/health
+    # Frontend-only commits don't redeploy the API
+    buildFilter:
+      paths:
+        - backend/**
+        - requirements.txt
+        - render.yaml
+      ignoredPaths:
+        - backend/tests/**
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.16
+      - key: SPOTIFY_CLIENT_ID
+        sync: false
+      - key: SPOTIFY_CLIENT_SECRET
+        sync: false
+      # https://<your-vercel-domain>/api/v1/auth/callback, also added in the Spotify dashboard
+      - key: SPOTIFY_REDIRECT_URI
+        sync: false
+      # https://<your-vercel-domain>
+      - key: FRONTEND_URL
+        sync: false
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: tuniverse-sessions
+          property: connectionString
+
+  # Sessions (opaque id → Spotify tokens), so logins survive restarts and redeploys
+  - type: keyvalue
+    name: tuniverse-sessions
+    plan: free
+    region: oregon
+    maxmemoryPolicy: allkeys-lru
+    # Reachable only from Render services in this account, never from the internet
+    ipAllowList: []
