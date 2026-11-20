@@ -231,6 +231,8 @@ export default function GalaxyScene({ mode, planets, stars, mood, focus, onFocus
             ref={(el) => anchors.setElement('caption:constellation', el)}
             tabIndex={skyFocus ? -1 : 0}
             onClick={() => onFocus({ kind: 'constellation' })}
+            onPointerEnter={() => setSkyHovered(true)}
+            onPointerLeave={() => setSkyHovered(false)}
           >
             <span className="rk">{stars.length}</span>Top tracks
           </button>
@@ -242,6 +244,8 @@ export default function GalaxyScene({ mode, planets, stars, mood, focus, onFocus
             ref={(el) => anchors.setElement('caption:nebula', el)}
             tabIndex={nebulaFocus ? -1 : 0}
             onClick={() => onFocus({ kind: 'nebula' })}
+            onPointerEnter={() => setNebulaHovered(true)}
+            onPointerLeave={() => setNebulaHovered(false)}
           >
             Mood nebula
           </button>

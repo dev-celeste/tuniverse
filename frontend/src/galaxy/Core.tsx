@@ -4,6 +4,7 @@ import { AdditiveBlending, Color, type Sprite, type SpriteMaterial } from 'three
 
 import type { AnchorStore } from './anchorStore'
 import { glowTexture } from './textures'
+import { isTap } from './tap'
 
 // Warm white until the mood loads, then the dominant mood's color
 const NEUTRAL = new Color('#f3d9c9')
@@ -47,7 +48,7 @@ export default function Core({ motion, tint, anchors, onHover, onSelect }: Props
         }}
         onPointerOut={() => onHover(false)}
         onClick={(e: ThreeEvent<MouseEvent>) => {
-          if (e.delta > 6) return
+          if (!isTap(e)) return
           e.stopPropagation()
           onSelect()
         }}

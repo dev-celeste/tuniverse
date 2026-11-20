@@ -18,6 +18,7 @@ import type { AnchorStore } from './anchorStore'
 import { hash, moonDistance, orbitFor, orbitSpeed, orbitTilt, sizeFor } from './layout'
 import { bandTexture, glowTexture } from './textures'
 import type { DisplayedPlanet } from './useDisplayedPlanets'
+import { isTap } from './tap'
 
 // Unit circle shared by every orbit line; each orbit scales it to its radius
 const CIRCLE = new BufferGeometry().setFromPoints(
@@ -124,7 +125,7 @@ export default function PlanetBody({ planet, motion, anchors, hovered, focused, 
         onPointerOut: () => onHover(null),
         onClick: (e: ThreeEvent<MouseEvent>) => {
           // Ignore the click at the end of a drag
-          if (e.delta > 6) return
+          if (!isTap(e)) return
           e.stopPropagation()
           onSelect(planet.id)
         },

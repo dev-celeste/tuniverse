@@ -7,6 +7,7 @@ import type { AnchorStore } from './anchorStore'
 import { rng } from './layout'
 import { NEBULA_CENTER } from './places'
 import { cloudTexture } from './textures'
+import { isTap } from './tap'
 
 const ease = (rate: number, dt: number) => 1 - Math.pow(rate, dt)
 const PUFF_COUNT = 32
@@ -113,7 +114,7 @@ export default function Nebula({ distribution, motion, anchors, focused, receded
           onHover(false)
         }}
         onClick={(e: ThreeEvent<MouseEvent>) => {
-          if (e.delta > 6) return
+          if (!isTap(e)) return
           e.stopPropagation()
           onSelect()
         }}

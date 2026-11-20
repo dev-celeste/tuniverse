@@ -7,6 +7,7 @@ import { hash } from './layout'
 import { CONSTELLATION_HALF_SIZE, CONSTELLATION_PATH, constellationFrame } from './places'
 import type { Star } from './stars'
 import { glowTexture } from './textures'
+import { isTap } from './tap'
 
 const ease = (rate: number, dt: number) => 1 - Math.pow(rate, dt)
 const WHITE = new Color('#ffffff')
@@ -107,7 +108,7 @@ export default function Constellation({ stars, motion, anchors, focused, shown, 
             }}
             onPointerOut={() => onHoverStar(null)}
             onClick={(e: ThreeEvent<MouseEvent>) => {
-              if (e.delta > 6) return
+              if (!isTap(e)) return
               e.stopPropagation()
               onSelect(star.track.id)
             }}
@@ -140,7 +141,7 @@ export default function Constellation({ stars, motion, anchors, focused, shown, 
           onHoverWhole(false)
         }}
         onClick={(e: ThreeEvent<MouseEvent>) => {
-          if (!pickWhole || e.delta > 6) return
+          if (!pickWhole || !isTap(e)) return
           e.stopPropagation()
           onSelect()
         }}

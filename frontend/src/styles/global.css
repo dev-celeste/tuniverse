@@ -352,12 +352,18 @@ a { color: inherit; }
   color: var(--champagne);
   opacity: 0.6;
   cursor: pointer;
+  /* The labels layer lets clicks through to the galaxy; the caption itself takes them */
+  pointer-events: auto;
   transition: opacity 0.4s;
 }
 .caption-label .rk { margin-right: 6px; opacity: 0.6; }
 .caption-label.hovered { opacity: 1; }
 .caption-label.dimmed { opacity: 0.25; }
 .caption-label.hidden { opacity: 0; pointer-events: none; }
+/* Fingers need a bigger target than the small caption text */
+@media (pointer: coarse) {
+  .caption-label { padding: 12px 14px; margin: -9px -8px; }
+}
 
 /* ---------- Header controls ---------- */
 .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: flex-end; }
