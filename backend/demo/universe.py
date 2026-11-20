@@ -67,6 +67,27 @@ SPOTIFY_ARTIST_IDS = {
     "hozier": "2FXC3k01G6Gw61bmprjgqS",
 }
 
+# Artist photo ids on Spotify's image CDN (320px), from the same public oEmbed endpoint as the covers
+ARTIST_PHOTOS = {
+    "bad-bunny": "ab6761610000517481f47f44084e0a09b5f0fa13",
+    "the-beatles": "ab67616100005174357fdaf56c64a36a36741538",
+    "kiss": "ab67616100005174d8205a492a79bfe4b34c567a",
+    "britney-spears": "ab67616100005174a82576e3d9f02b310e15a262",
+    "arctic-monkeys": "ab676161000051747da39dea0a72f581535fb11f",
+    "j-cole": "ab67616100005174c401ea77e86ee984b1ba9fc2",
+    "john-summit": "ab6761610000517420662b32f3dbabad755dfb53",
+    "my-chemical-romance": "ab676161000051740c55e74e435910793888f7cf",
+    "tame-impala": "ab67616100005174e412a782245eb20d9626c601",
+    "linkin-park": "ab67616100005174527d95dabbe8b8b527e8136f",
+    "ariana-grande": "ab6761610000517468412f2d0177a9ebc265ff58",
+    "led-zeppelin": "16eb3cdae0d824b520ac17710e943a99d3ef6602",
+    "shakira": "ab6761610000517417f15f351cba70561ad8bcac",
+    "olivia-dean": "ab676161000051745c7577ad44daeb7ce4b941a1",
+    "taylor-swift": "ab6761610000517412184bdd29403de54cb9d9c7",
+    "phoebe-bridgers": "ab676161000051746e2d4ab2b84463aa4c349311",
+    "hozier": "ab67616100005174ad85a585103dfc2f3439119a",
+}
+
 # Each period's top 10 artists, in rank order
 TOP_ARTISTS = {
     "short_term": ["john-summit", "bad-bunny", "olivia-dean", "ariana-grande", "linkin-park", "tame-impala", "j-cole", "shakira", "arctic-monkeys", "my-chemical-romance"],
@@ -96,6 +117,45 @@ TRACKS = {
 }
 TRACKS_ONLY = ("taylor-swift", "phoebe-bridgers", "hozier")
 
+# Album cover image ids on Spotify's image CDN (300px), keyed by track id. From Spotify's
+# public oEmbed endpoint, so the demo shows the same covers as a real account.
+ALBUM_COVERS = {
+    "3sK8wGT43QFpWrvNQsrQya": "ab67616d00001e02bbd45c8d36e0e045ef640411",
+    "2lTm559tuIvatlT1u0JYG2": "ab67616d00001e02bbd45c8d36e0e045ef640411",
+    "1IHWl5LamUGEuP4ozKQSXZ": "ab67616d00001e0249d694203245f241a1bcaa72",
+    "6dGnYIeXmHdcikdzNNDMm2": "ab67616d00001e02dc30583ba717007b00cceb25",
+    "7iN1s7xHE4ifF5povM6A48": "ab67616d00001e0284243a01af3c77b56fe01ab1",
+    "07q0QVgO56EorrSGHC48y3": "ab67616d00001e024384b6976cadaec272114022",
+    "1Buwv1iql0YsxftE5LHIgq": "ab67616d00001e0283c7a3d87674e9b7ecaaa1f5",
+    "6I9VzXrHxO9rA9A5euc8Ak": "ab67616d00001e02efc6988972cb04105f002cd4",
+    "3MjUtNVVq3C8Fn0MP3zhXa": "ab67616d00001e0236cf58e3e7cf36a145b1da18",
+    "5FVd6KXrgO9B3JPmC8OPst": "ab67616d00001e024ae1c4c5c45aabe565499163",
+    "58ge6dfP91o9oXMzq3XkIS": "ab67616d00001e020c8ac83035e9588e8ad34b90",
+    "5XeFesFbtLpXzIVDNQP22n": "ab67616d00001e024ae1c4c5c45aabe565499163",
+    "68Dni7IE4VyPkTOH9mRWHr": "ab67616d00001e02c6e0948bbb0681ff29cdbae8",
+    "2b5scDVCDxVsLalecDLAo2": "ab67616d00001e02c0ae820e3b64854de4642101",
+    "3pUz2qJe5nqZemi3hhIxMk": "ab67616d00001e02ac2be70b09319ac92b074fde",
+    "32VIrOsJmwvqRm4rWFBCsi": "ab67616d00001e02ac2be70b09319ac92b074fde",
+    "5wQnmLuC1W7ATsArWACrgW": "ab67616d00001e02663b6ce496144fa5c3670ac0",
+    "5dTHtzHFPyi8TlTtzoz1J9": "ab67616d00001e02cab7ae4868e9f9ce6bdfdf43",
+    "6K4t31amVTZDgR3sKmwUJJ": "ab67616d00001e029e1cfc756886ac782e363d79",
+    "2X485T9Z5Ly0xyaghN73ed": "ab67616d00001e029e1cfc756886ac782e363d79",
+    "60a0Rd6pjrkxjPbaKzXjfq": "ab67616d00001e02e2f039481babe23658fc719a",
+    "2nLtzopw4rPReszdYBJU6h": "ab67616d00001e025f1f51d14e8bea89484ecd1b",
+    "1EDPVGbyPKJPeGqATwXZvN": "ab67616d00001e028be9eeb8f19696ef2fd3b6b4",
+    "51ZQ1vr10ffzbwIjDCwqm4": "ab67616d00001e028b58d20f1b77295730db15b4",
+    "6ocbgoVGwYJhOv1GgI9NsF": "ab67616d00001e0256ac7b86e090f307e218e9c8",
+    "5CQ30WqJwcep0pYcV4AMNc": "ab67616d00001e02c8a11e48c91a982d086afc69",
+    "78lgmZwycJ3nzsdgmPPGNx": "ab67616d00001e0290a50cfe99a4c19ff3cbfbdb",
+    "3d0WouFnFmr0K3kjeza3fF": "ab67616d00001e0285432abc16fd92be0d435cb9",
+    "2lnzGkdtDj5mtlcOW2yRtG": "ab67616d00001e021f400a1f4d821b00824cf58f",
+    "0mYXRQpTGjaLJt1l9MY4ps": "ab67616d00001e029a336bfb6d40bbd90a507417",
+    "36vmaZyO0iAE6FZ7287fg2": "ab67616d00001e02cac9b52107643faf13a7587b",
+    "1BxfuPKGuaTgP7aM0Bbdwr": "ab67616d00001e02e787cffec20aa2a396a61647",
+    "5xo8RrjJ9CVNrtRg2S3B1R": "ab67616d00001e026c26e4a2e4df94a55591c48f",
+    "76JKIsdKrAfWUMjaA0u7v5": "ab67616d00001e028217a2c528bf9ad2ccbc82dc",
+}
+
 USER = {"id": "demo", "display_name": "Demo Listener", "images": [], "external_urls": {}, "followers": {"total": 48}}
 
 
@@ -113,7 +173,7 @@ def _raw_artist(artist_id: str) -> dict:
         "genres": genres,
         "popularity": popularity,
         "followers": {"total": followers},
-        "images": [],
+        "images": [{"url": f"https://i.scdn.co/image/{ARTIST_PHOTOS[artist_id]}", "height": 320, "width": 320}],
         "external_urls": {"spotify": f"https://open.spotify.com/artist/{spotify_id}"},
     }
 
@@ -123,7 +183,11 @@ def _raw_track(artist_id: str, title: str, seconds: int, release_date: str, spot
         "id": spotify_id,
         "name": title,
         "artists": [{"id": SPOTIFY_ARTIST_IDS[artist_id], "name": ARTISTS[artist_id][0]}],
-        "album": {"name": title, "release_date": release_date, "images": []},
+        "album": {
+            "name": title,
+            "release_date": release_date,
+            "images": [{"url": f"https://i.scdn.co/image/{ALBUM_COVERS[spotify_id]}", "height": 300, "width": 300}],
+        },
         "popularity": 70,
         "duration_ms": seconds * 1000,
         "explicit": False,
