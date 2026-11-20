@@ -6,6 +6,8 @@ Your top artists become planets, your top tracks become their moons, and the gen
 
 **Live:** https://tuniverse-blush.vercel.app (try the demo, no Spotify account needed)
 
+![The Tuniverse galaxy: planets for top artists, a constellation of top tracks and the mood nebula](docs/screenshots/galaxy.jpg)
+
 ## Current Status
 Live. Spotify login is limited to allowlisted accounts while the app is in Spotify's development mode; everyone else can explore the demo galaxy.
 
@@ -28,6 +30,29 @@ Live. Spotify login is limited to allowlisted accounts while the app is in Spoti
 - Genre-based mood analysis with a visual identity (palette + background style) per mood
 - Typed, slimmed responses for every endpoint, with `short_term` / `medium_term` / `long_term` time ranges
 - Test suites for both halves: auth, sessions, token refresh and every endpoint on the backend; the galaxy, player, accessibility and fallbacks on the frontend
+
+## Screenshots
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/planet.jpg" alt="Visiting the Arctic Monkeys planet, with its orbiting tracks and the Now playing dock"></td>
+    <td width="50%"><img src="docs/screenshots/nebula.jpg" alt="The mood nebula with the mood mix, top genres and visual identity"></td>
+  </tr>
+  <tr>
+    <td>Visit a planet to see the artist and their tracks, and play a song without leaving the galaxy</td>
+    <td>The mood nebula: each mood colors its share of the cloud</td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/constellation.jpg" alt="The top 20 tracks drawn as a single constellation path"></td>
+    <td width="50%" align="center">
+      <img src="docs/screenshots/phone.jpg" alt="The galaxy on a phone" width="45%">
+      <img src="docs/screenshots/phone-planet.jpg" alt="A planet's details on a phone" width="45%">
+    </td>
+  </tr>
+  <tr>
+    <td>Your top 20 tracks as one constellation, from #1 to #20</td>
+    <td>Phone layout</td>
+  </tr>
+</table>
 
 ## Tech Stack
 **Frontend:** React 19, TypeScript, Vite, React Three Fiber (three.js, drei, postprocessing bloom), TanStack Query, React Router, plain CSS, Vitest + Testing Library, oxlint
